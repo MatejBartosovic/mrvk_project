@@ -1,0 +1,10 @@
+bool MCBsSB_5V
+bool MCBs_12V
+bool videotransmitter
+bool wifi
+bool laser
+bool gps
+bool arm_5V
+bool arm_12V
+bool pc2
+bool camera

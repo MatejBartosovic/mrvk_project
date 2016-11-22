@@ -1,0 +1,7 @@
+bool central_stop
+bool hardware_central_stop
+float32 temperature
+bool power_off_sequence
+bool full_battery
+mrvk_driver/Battery battery
+mrvk_driver/Power_managment power_managment

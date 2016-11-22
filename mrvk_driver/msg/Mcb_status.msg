@@ -1,0 +1,11 @@
+string motor_name
+bool i2c_communication_error
+bool i2c_error_status
+bool rs422_communication_error
+bool shifting
+bool shifting_error
+uint8 gear_position
+float32 gear_current
+float32 board_voltage
+float32 motor_voltage
+float32 motor_current

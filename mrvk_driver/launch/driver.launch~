@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+	<param name="robot_description" command="$(find xacro)/xacro.py '$(find mrvk_description)/urdf/robot.urdf.xacro'" />
+	<!--robot specific parameters -->
+	<rosparam file="$(find mrvk_driver)/config/mrvk_driver.yaml" command="load" ns="mrvk"/>
+	<!-- start robot driver-->
+	<node  name="mrvk_driver" pkg="mrvk_driver" type="mrvk_driver" ns="mrvk"/>
+	<!-- load all available controllers-->
+	<include file="$(find mrvk_driver)/launch/spawn_diff_controllers.launch" ns='mrvk'/>
+</launch>

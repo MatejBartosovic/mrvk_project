@@ -1,0 +1,11 @@
+oznamovanie servisom  -- riesim ja 
+zdielana struktura naco dve? a ak dve tak ku nej ma pristup viac vlakien -- riesi miso 
+poziadavky na central stop a resetovanie flagov atd a ich atomaticke vracanie -- 
+
+generovanie commandu z vlastnej struktury
+
+flagu na posielanie commandov zamutexovat
+
+mb v callbacks a comunication interface je uplne nieco ine premenovat normalne
+
+asi bude treba napisat controller spawner ako ma lwa lebo sa nedaju vsetky naloadovat aj nastartovat

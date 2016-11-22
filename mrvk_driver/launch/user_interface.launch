@@ -1,0 +1,11 @@
+<launch>
+	<!-- zapina gmapping a vytvori model v rvize s kompletnou konfiguraciou -->
+	
+	<node name="robot_control" pkg="mrvk_driver" type="robot_control" output="screen" ns="mrvk" launch-prefix="xterm -e"/>
+	
+	<node name="joy_node" pkg="joy" type="joy_node">
+		<param name="dev" type="string" value="/dev/input/js1"/>
+	</node>
+
+	
+</launch>

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+	<node  name="controller_manager" pkg="controller_manager" type="controller_manager" args="start mrvk_group_velocity_controller" ns="mrvk"/>
+</launch>

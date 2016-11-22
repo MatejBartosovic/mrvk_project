@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+	<param name="robot_description" command="$(find xacro)/xacro.py '$(find mrvk_description)/urdf/robot.urdf.xacro'" />
+	<rosparam file="$(find mrvk_driver)/config/mrvk_driver.yaml" command="load" ns="mrvk/skuska"/>
+	<node  name="mrvk_driver" pkg="mrvk_driver" type="mrvk_driver" ns="mrvk"/>
+</launch>

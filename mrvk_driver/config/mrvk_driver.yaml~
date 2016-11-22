@@ -1,0 +1,44 @@
+joint_limits:
+  wheel_joint_left:
+    has_acceleration_limits: true
+    max_acceleration: 45 #rad*s^(-2)
+  wheel_joint_right:
+    has_acceleration_limits: true
+    max_acceleration: 45 #rad*s^(-2)
+
+transmissions: [mrvk_left_transmission, mrvk_right_transmission]
+#[main_board motor_control_board_left motor_control_bord_right]
+port_names: [/dev/ttyUSB0, /dev/ttyUSB1, /dev/ttyUSB2]
+
+baudrate: 230400
+stop_bits: 1    #1 - stopBits 1  #2 - stopBits 2 #3 - stopBits 1.5 
+parity: 1       #0 - none #1 - odd parity #2 - even parity
+byte_size: 8    #5 - fivebits #6 - sixbits #7 - sevenbits #8 eightbits
+ 
+main_board_timer_period: 0.5
+motor_control_board_timer_period: 0.1
+ 
+MCBsSB_5V: True
+MCBs_12V: True
+wifi: True
+video_transmitter: False
+laser_scanner: True
+gps: False
+pc2: False
+camera: True
+arm5V: False
+arm12V: False
+video: True      #true obraz z kamery na grabbery a z ramena na transmitter #false opacne
+ 
+motor_PID_ph: 0
+motor_PID_pl: 10
+motor_PID_ih: 0
+motor_PID_il: 15
+typ_regulacie_motora: False   #false - otackova regulacia #true - PWM
+ 
+kamera_PID_pko: 10
+kamera_PID_pkk: 10
+kamera_PID_iko: 40
+kamera_PID_ikk: 80
+
+publish_rate: 100

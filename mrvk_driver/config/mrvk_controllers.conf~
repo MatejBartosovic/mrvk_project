@@ -1,0 +1,58 @@
+mrvk_group_velocity_controller:
+  type: velocity_controllers/JointGroupVelocityController
+  joints:
+     - wheel_joint_left
+     - wheel_joint_right
+
+mrvk_left_motor_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  joint: wheel_joint_left
+
+mrvk_right_motor_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  joint: wheel_joint_right
+
+mrvk_joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+mrvk_diff_drive_controller:
+  type        : "diff_drive_controller/DiffDriveController"
+  left_wheel  : 'wheel_joint_left'
+  right_wheel : 'wheel_joint_right'
+  publish_rate: 50.0               # default: 50
+  pose_covariance_diagonal : [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
+  twist_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
+
+  # Wheel separation and diameter. These are both optional.
+  # diff_drive_controller will attempt to read either one or both from the
+  # URDF if not specified as a parameter
+  wheel_separation : 1.0
+  wheel_radius : 0.115
+
+  # Wheel separation and radius multipliers
+  wheel_separation_multiplier: 1.0 # default: 1.0
+  wheel_radius_multiplier    : 1.0 # default: 1.0
+
+  # Velocity commands timeout [s], default 0.5
+  cmd_vel_timeout: 0.25
+
+  # Base frame_id
+  base_frame_id: base_link #default: base_link
+
+  # Velocity and acceleration limits
+  # Whenever a min_* is unspecified, default to -max_*
+  linear:
+    x:
+      has_velocity_limits    : true
+      max_velocity           : 0.7  # m/s
+      min_velocity           : -0.7 # m/s
+      has_acceleration_limits: true
+      max_acceleration       : 5  # m/s^2
+      min_acceleration       : -5 # m/s^2
+  angular:
+    z:
+      has_velocity_limits    : true
+      max_velocity           : 2  # rad/s
+      has_acceleration_limits: true
+      max_acceleration       : 2  # rad/s^2

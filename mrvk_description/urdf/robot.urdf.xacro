@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz"
+       xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+       xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom"
+       xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
+       xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
+       name="mrvk" >
+
+  <!-- common stuff -->
+  
+  <xacro:include filename="$(find mrvk_description)/urdf/materials.urdf.xacro" />
+  <xacro:include filename="$(find mrvk_description)/urdf/common.urdf.xacro" />
+  
+  <xacro:include filename="$(find mrvk_description)/urdf/mrvk.urdf.xacro" />
+  <xacro:include filename="$(find mrvk_description)/urdf/kv01.urdf.xacro" />
+  
+  <!-- Used for fixing robot to Gazebo -->
+  <link name="world"/>
+  <!-- arm -->
+  <xacro:mrvk_base parent="world" end_point = "base_end_point">
+     <origin xyz="0 0 0.13" rpy="0 0 0" /> 
+  </xacro:mrvk_base>
+  <xacro:kv01_arm parent="base_end_point" end_point = "tool_point">
+  </xacro:kv01_arm>
+
+</robot>
