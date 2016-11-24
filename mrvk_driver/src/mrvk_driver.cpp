@@ -111,18 +111,11 @@ public:
 		last_time = current_time;
 		joint_to_act->propagate();
 		//ROS_ERROR("pravy vel =%lf cmd = %lf",velocity->at(1),velocity_command->at(1));
-		writeMB();
-		writeMotors();
+		comunication_interface->setMotorsVel(velocity_command->at(0),velocity_command->at(1));
+		/*comunication_interface->writeMB();
+		comunication_interface->writeMotors();*/
+		comunication_interface->write();
 		comunication_interface->waitToRead();
-	}
-
-	//TODO takto stop nebude fungovat kontroller tam natlaci svoje veci - PREROBIT
-	void stop(){
-
-		ROS_ERROR("stop");
-		comunication_interface->setSpeedLeftMotor(0);
-		comunication_interface->setSpeedRightMotor(0);
-		comunication_interface->setCameraPosition(0, 0);
 	}
 
 	int getFrequence(){
@@ -163,82 +156,6 @@ private:
 	joint_limits_interface::VelocityJointSaturationInterface jnt_limit_interface;
 	std::vector<mrvk::Limits> limits;
 
-	void writeMB(){
-
-		/*bool success = false;
-
-		if (comunication_interface->getMainBoard()->getCommandID()==REQUEST_COMMAND_FLAG){
-			comunication_interface->MBStatusUpdate();
-
-		}else {
-			success = comunication_interface->sendMainBoardStruct();
-		}*/
-		switch(__builtin_ffs(comunication_interface->getMainBoard()->getCommandID())){
-			case REQUEST_COMMAND_FLAG:
-				comunication_interface->MBStatusUpdate();
-				break;
-			case PARTIAL_COMMAND_FLAG-1:
-				comunication_interface->MBSendPartialCommd();
-				ROS_ERROR("MB partial");
-				break;
-			case CONTROL_COMMAND_FLAG:
-				comunication_interface->MBSendControlCommd();
-				ROS_ERROR("MB control");
-				break;
-			case UNITED_COMMAND_FLAG:
-				comunication_interface->MBSendUnitedCommd();
-				ROS_ERROR("MB united");
-				break;
-		}
-
-	}
-
-	void writeMotors(){
-		/*bool success = false;
-		static double speedL = 0;
-		static double speedR = 0;
-
-		if (speedL != velocity_command->at(0) || speedR != velocity_command->at(1)){
-			comunication_interface->setSpeedLeftMotor(velocity_command->at(0));
-			comunication_interface->setSpeedRightMotor(velocity_command->at(1));
-		}
-		else{
-			comunication_interface->LeftMCBStatusUpdate();
-			comunication_interface->RightMCBStatusUpdate();
-		}*/
-		//TODO prerob si to miso
-		comunication_interface->setMotorsVel(velocity_command->at(0),velocity_command->at(1));
-		switch(__builtin_ffs(comunication_interface->getMotorControlBoardLeft()->getCommandID())){
-			case REQUEST_COMMAND_FLAG:
-				comunication_interface->leftMCBStatusUpdate();
-				break;
-			case PARTIAL_COMMAND_FLAG-1:
-				comunication_interface->leftSendPartialCommand();
-				//ROS_ERROR("partial");
-				break;
-			case CONTROL_COMMAND_FLAG:
-				comunication_interface->leftSendControlCommand();
-				//ROS_ERROR("controll");
-				break;
-			default:
-				ROS_ERROR("V Command ID laveho motora bola zla hodnota (toto by nikdy nemalo nastat)");
-		}
-		switch(__builtin_ffs(comunication_interface->getMotorControlBoardRight()->getCommandID())){
-			case REQUEST_COMMAND_FLAG:
-				comunication_interface->rightMCBStatusUpdate();
-				break;
-			case PARTIAL_COMMAND_FLAG-1:
-				comunication_interface->rightSendPartialCommand();
-				//ROS_ERROR("partial");
-				break;
-			case CONTROL_COMMAND_FLAG:
-				comunication_interface->rightSendControlCommand();
-				//ROS_ERROR("controll");
-				break;
-			default:
-				ROS_ERROR("V Command ID praveho motora bola zla hodnota (toto by nikdy nemalo nastat)");
-				}
-	}
 };
 
 
@@ -252,7 +169,7 @@ int main (int argc, char **argv){
 
 	controller_manager::ControllerManager cm(driver.getHw());
 
-	ros::AsyncSpinner spinner(1);
+	ros::AsyncSpinner spinner(4);
 	spinner.start();
 	ros::Rate rate(driver.getFrequence());
 	ROS_ERROR("PERIOD = %lf",driver.getPeriod());

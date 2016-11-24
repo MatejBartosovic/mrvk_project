@@ -6,6 +6,7 @@
  */
 
 #include <mrvk_driver/callbacks.h>
+#include <errno.h>
 
 MrvkCallbacks::MrvkCallbacks(CommunicationInterface *interface) {
 
@@ -45,63 +46,38 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
 	//todo overit funkcnost
 	bool MrvkCallbacks::resetBatteryCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
 
-		pthread_mutex_t notify_mutex;
-		pthread_mutex_init(&notify_mutex,NULL);
-		pthread_mutex_lock(&notify_mutex);
-		interface->registerMutex(&notify_mutex,CommunicationInterface::MAIN_BOARD);
+		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
 		interface->getMainBoard()->resetBatery();
-		pthread_mutex_lock(&notify_mutex);
-		pthread_mutex_destroy(&notify_mutex);
-		res.success = interface->getCallbackResult(CommunicationInterface::MAIN_BOARD);
+		interface->callback_condition.wait(lock);
+		res.success = interface->succes;
+		interface->callback_mutex.unlock();
+
 		if (res.success)
 			res.message = "battery is reset";
 		else res.message = "battery is not reset";
+		res.success = true;
 		return true;
 	}
 
-	//TODO uplne prerobit reset central stop Miso - neviem ako si predstavujes prerobit reset central stop
 	bool MrvkCallbacks::resetCentralStopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
-/*
-		res.success = interface->resetCentralStop();
-		if (res.success)
-			res.message = "central stop is successful reset";
-		else res.message = "Central stop was not reset";
 
-		ROS_ERROR("central stop callback");
-		return true;*/
-		pthread_mutex_t notify_mutex;
-		pthread_mutex_init(&notify_mutex,NULL);
-		pthread_mutex_lock(&notify_mutex);
 		uint8_t MCB_command[21];
 		uint8_t MB_command[21];
 		uint8_t request[5];
 
-		interface->registerMutex(&notify_mutex,CommunicationInterface::LEFT_MOTOR);
+		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
 		interface->getMotorControlBoardLeft()->setErrFlags(true,true);
-		pthread_mutex_lock(&notify_mutex);
-		if(!interface->getCallbackResult(CommunicationInterface::LEFT_MOTOR)){
-			ROS_ERROR("FAILED to reset left motor flags");
-			return false;
-		}
-
-		interface->registerMutex(&notify_mutex,CommunicationInterface::RIGHT_MOTOR);
 		interface->getMotorControlBoardRight()->setErrFlags(true,true);
-		pthread_mutex_lock(&notify_mutex);
-		if(!interface->getCallbackResult(CommunicationInterface::RIGHT_MOTOR)){
-			ROS_ERROR("FAILED to reset right motor flags");
-			return false;
-		}
+		interface->callback_condition.wait(lock);
+		res.success = interface->succes;
+		interface->callback_mutex.unlock();
 
-		interface->registerMutex(&notify_mutex,CommunicationInterface::MAIN_BOARD);
+		interface->callback_mutex.lock();
 		interface->getMainBoard()->setCentralStop(false);
-		pthread_mutex_lock(&notify_mutex);
-		if(!interface->getCallbackResult(CommunicationInterface::MAIN_BOARD)){
-			ROS_ERROR("FAILED to reset central stop");
-			return false;
-		}
+		interface->callback_condition.wait(lock);
+		res.success &= interface->succes;
+		interface->callback_mutex.unlock();
 
-		usleep(500000);
-		//if(interface->get)
 		return true;
 	}
 
@@ -121,19 +97,14 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
 		bool success = false;
 		static bool state = false;
 		ros::NodeHandle n;
-		pthread_mutex_t notify_mutex;
-		if(pthread_mutex_init(&notify_mutex,NULL)){
-			ROS_ERROR("nezbehol init mutexu");
-			return false;
-		}
-		pthread_mutex_lock(&notify_mutex);
-		interface->registerMutex(&notify_mutex,CommunicationInterface::MAIN_BOARD);
+
+		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
 		if (state){
 			interface->getMainBoard()->setArmPower(false);
-			pthread_mutex_lock(&notify_mutex);
-			pthread_mutex_destroy(&notify_mutex);
+			interface->callback_condition.wait(lock);
+			res.success = interface->succes;
+			interface->callback_mutex.unlock();
 
-			res.success = interface->getCallbackResult(CommunicationInterface::MAIN_BOARD);
 			if (res.success){
 				res.message = "Napajanie ramena vypnute";
 				state = false;
@@ -144,12 +115,10 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
 		}
 		else{
 			interface->getMainBoard()->setArmPower(true);
-			ROS_ERROR("cakam na mutexe");
-			pthread_mutex_lock(&notify_mutex);
-			ROS_ERROR("po mutexe");
-			pthread_mutex_destroy(&notify_mutex);
+			interface->callback_condition.wait(lock);
+			res.success = interface->succes;
+			interface->callback_mutex.unlock();
 
-			res.success = interface->getCallbackResult(CommunicationInterface::MAIN_BOARD);
 			if (res.success){
 				res.message = "Napajanie ramena zapnute";
 				state = true;
@@ -163,37 +132,16 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
 	//todo overit funkcnost
 	bool MrvkCallbacks::setCameraSourceCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res) {
 
-		/*mb->commandID = CommunicationInterface::PARTIAL_COMMAND;
-		bool success = false;
+		timespec timeout;
+		timeout.tv_sec +=1;
 
-		if (mb->videoGrabber){
-			mb->videoGrabber = false;
-
-			receiveAnswer(&success);
-			res.success = success;
-			if (res.success)
-				res.message =  "Kamera na video transmitter";
-			else res.message = "error";
-
-
-		} else{
-			mb->videoGrabber = true;
-			receiveAnswer(&success);
-			res.success = success;
-			if (res.success)
-				res.message =  "Kamera na grabbery";
-			else res.message = "error";
-		}*/
-
-		pthread_mutex_t notify_mutex;
-		pthread_mutex_init(&notify_mutex,NULL);
-		pthread_mutex_lock(&notify_mutex);
-		interface->registerMutex(&notify_mutex,CommunicationInterface::MAIN_BOARD);
+		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
 		bool ret = interface->getMainBoard()->switchVideo();
-		pthread_mutex_lock(&notify_mutex);
-		pthread_mutex_destroy(&notify_mutex);
-		if(!interface->getCallbackResult(CommunicationInterface::MAIN_BOARD)){
-			res.success = false;
+		interface->callback_condition.wait(lock);
+		res.success = interface->succes;
+		interface->callback_mutex.unlock();
+
+		if(!res.success){
 			interface->getMainBoard()->switchVideo(); // zmena spet
 			res.message = "Video switch FAILED!!!!!";
 		}
@@ -208,20 +156,14 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
 	//100% funkcny servis
 	bool MrvkCallbacks::setPowerManagmentCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
 
-		pthread_mutex_t notify_mutex;
-		pthread_mutex_init(&notify_mutex,NULL);
-		pthread_mutex_lock(&notify_mutex);
-
-		bool success = false;
 		SET_MAIN_BOARD config;
 		getMbFromParam(&config);
 
-		interface->registerMutex(&notify_mutex,CommunicationInterface::MAIN_BOARD);
+		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
 		interface->getMainBoard()->setParamatersMB(&config);
-
-		pthread_mutex_lock(&notify_mutex);
-		pthread_mutex_destroy(&notify_mutex);
-		res.success = interface->getCallbackResult(CommunicationInterface::MAIN_BOARD);
+		interface->callback_condition.wait(lock);
+		res.success = interface->succes;
+		interface->callback_mutex.unlock();
 		return true;
 	}
 

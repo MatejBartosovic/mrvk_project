@@ -1,10 +1,10 @@
 joint_limits:
   wheel_joint_left:
     has_acceleration_limits: true
-    max_acceleration: 45 #rad*s^(-2)
+    max_acceleration: 20 #rad*s^(-2)
   wheel_joint_right:
     has_acceleration_limits: true
-    max_acceleration: 45 #rad*s^(-2)
+    max_acceleration: 20 #rad*s^(-2)
 
 transmissions: [mrvk_left_transmission, mrvk_right_transmission]
 #[main_board motor_control_board_left motor_control_bord_right]
@@ -41,4 +41,4 @@ kamera_PID_pkk: 10
 kamera_PID_iko: 40
 kamera_PID_ikk: 80
 
-publish_rate: 100
+publish_rate: 1
