@@ -16,13 +16,18 @@ public:
 	const static int LEFT_MOTOR = 1;
 	const static int RIGHT_MOTOR = 2;
 
+    const static int MAIN_BOARD_BROADCAST_FLAG = 1;
+    const static int LEFT_MOTOR_BROADCAST_FLAG = 2;
+    const static int RIGHT_MOTOR_BROADCAST_FLAG= 4;
+    const static int MOTORS_BROADCAST_FLAG= 6;
+    const static int ALL_BROADCAST_FLAG= 7;
+
 
 	CommunicationInterface(std::vector<std::string> ports, int baudrate, int stopBits, int parity, int byteSize);
 	~CommunicationInterface();
 	bool init();
 	bool isActive();
-	//void registerMutex(pthread_mutex_t* mutex,int id);
-	//bool getCallbackResult(int id);
+
 	int waitToRead();
 
 	bool setCameraVelocity(double linearX, double angularZ);
@@ -44,41 +49,37 @@ public:
 	//bool resetCentralStop();
 
 	void close();
-	boost::mutex callback_mutex;
-	boost::condition_variable callback_condition;
-	bool succes;
-
+	boost::mutex broadcast_mutex;
+    boost::condition_variable broadcast;
+    int succes;
 private:
 	void setupPort(int sb,int p,int bs);
 
 	bool isAnswerOk();
 
-	//void notifyAllCallbacks(bool response,int id);
-	//void processCallbacks(int id);
-
-	bool write(int id,uint8_t *dataWrite, int lengthWrite);
+	int write(int id,uint8_t *dataWrite, int lengthWrite);
 	bool read(int lengthRead);
 	void setFds(fd_set *set,int* flag);
 	int getReadableFd(fd_set *set,int* flag);
 
 	//MOTOR BOARD
-	bool leftMCBStatusUpdate();
-	bool rightMCBStatusUpdate();
-	bool leftSendPartialCommand();
-	bool rightSendPartialCommand();
-	bool leftSendControlCommand();
-	bool rightSendControlCommand();
+    int leftMCBStatusUpdate();
+    int rightMCBStatusUpdate();
+    int leftSendPartialCommand();
+    int rightSendPartialCommand();
+    int leftSendControlCommand();
+    int rightSendControlCommand();
 
 	//MAIN BOARD
 	//jednorazove prikazy
-	bool MBStatusUpdate();
-	bool MBSendPartialCommd();
-	bool MBSendControlCommd();
-	bool MBSendUnitedCommd();
+    int MBStatusUpdate();
+    int MBSendPartialCommd();
+    int MBSendControlCommd();
+    int MBSendUnitedCommd();
 
 
-	bool writeMB();
-	bool writeMotors();
+	int writeMB();
+	int writeMotors();
 
 	bool active;
 	std::vector<serial::Serial*> my_serials;
@@ -95,11 +96,8 @@ private:
 	int byteSize;
 	int stopBits;
 	int parity;
-
-	//std::vector<pthread_mutex_t*> waitings_callbacks[3];
-	//std::vector<pthread_mutex_t*> processed_callbacks[3];
-	//bool callback_res[3];
 };
+
 
 #endif /* COMMUNICATION_INTERFACE_H_ */
 

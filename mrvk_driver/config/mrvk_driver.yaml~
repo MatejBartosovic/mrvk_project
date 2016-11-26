@@ -41,4 +41,4 @@ kamera_PID_pkk: 10
 kamera_PID_iko: 40
 kamera_PID_ikk: 80
 
-publish_rate: 1
+publish_rate: 50

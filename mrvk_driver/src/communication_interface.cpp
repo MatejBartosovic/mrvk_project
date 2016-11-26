@@ -175,7 +175,7 @@ bool CommunicationInterface::setMotorParameters(REGULATOR_MOTOR regulator, bool 
 
 }
 
-bool CommunicationInterface::MBStatusUpdate(){
+int CommunicationInterface::MBStatusUpdate(){
 
 	uint8_t command[MBCommand::requestCommandLength];
 	read_lengths[MAIN_BOARD] =  mb.getRequestCommand(command);
@@ -183,21 +183,21 @@ bool CommunicationInterface::MBStatusUpdate(){
 
 }
 
-bool CommunicationInterface::MBSendPartialCommd(){
+int CommunicationInterface::MBSendPartialCommd(){
 
 	uint8_t command[MBCommand::partialCommandLength];
 	read_lengths[MAIN_BOARD] =  mb.getPartialCommand(command);
 	return write(MAIN_BOARD, command, MBCommand::partialCommandLength);
 }
 
-bool CommunicationInterface::MBSendControlCommd(){
+int CommunicationInterface::MBSendControlCommd(){
 
 	uint8_t command[MBCommand::controlCommandLength];
 	read_lengths[MAIN_BOARD] =  mb.getControlCommand(command);
 	return write(MAIN_BOARD, command, MBCommand::controlCommandLength);
 }
 
-bool CommunicationInterface::MBSendUnitedCommd(){
+int CommunicationInterface::MBSendUnitedCommd(){
 
 	uint8_t command[MBCommand::unitedCommandLength];
 	read_lengths[MAIN_BOARD] =  mb.getUnitedCommand(command);
@@ -205,7 +205,7 @@ bool CommunicationInterface::MBSendUnitedCommd(){
 }
 
 
-bool CommunicationInterface::leftMCBStatusUpdate(){
+int CommunicationInterface::leftMCBStatusUpdate(){
 
 	uint8_t command[MCBCommand::requestCommandLength];
 	read_lengths[LEFT_MOTOR] = lavy.getRequestCommand(command);
@@ -213,7 +213,7 @@ bool CommunicationInterface::leftMCBStatusUpdate(){
 
 }
 
-bool CommunicationInterface::rightMCBStatusUpdate(){
+int CommunicationInterface::rightMCBStatusUpdate(){
 
 	uint8_t command[MCBCommand::requestCommandLength];
 	read_lengths[RIGHT_MOTOR] = pravy.getRequestCommand(command);
@@ -221,7 +221,7 @@ bool CommunicationInterface::rightMCBStatusUpdate(){
 
 }
 
-bool CommunicationInterface::leftSendPartialCommand(){
+int CommunicationInterface::leftSendPartialCommand(){
 
 	uint8_t command[MCBCommand::partialCommandLength];
 	read_lengths[LEFT_MOTOR] = lavy.getPartialCommand(command);
@@ -229,7 +229,7 @@ bool CommunicationInterface::leftSendPartialCommand(){
 
 }
 
-bool CommunicationInterface::rightSendPartialCommand(){
+int CommunicationInterface::rightSendPartialCommand(){
 
 	uint8_t command[MCBCommand::partialCommandLength];
 	read_lengths[RIGHT_MOTOR] = pravy.getPartialCommand(command);
@@ -237,14 +237,14 @@ bool CommunicationInterface::rightSendPartialCommand(){
 
 }
 
-bool CommunicationInterface::leftSendControlCommand(){
+int CommunicationInterface::leftSendControlCommand(){
 
 	uint8_t command[MCBCommand::controlCommandLength];
 	read_lengths[LEFT_MOTOR] = lavy.getControlCommand(command);
 	return write(LEFT_MOTOR,command,MCBCommand::controlCommandLength);
 
 }
-bool CommunicationInterface::rightSendControlCommand(){
+int CommunicationInterface::rightSendControlCommand(){
 
 	uint8_t command[MCBCommand::controlCommandLength];
 	read_lengths[RIGHT_MOTOR] = pravy.getControlCommand(command);
@@ -252,7 +252,7 @@ bool CommunicationInterface::rightSendControlCommand(){
 
 }
 
-bool CommunicationInterface::writeMB(){
+int CommunicationInterface::writeMB(){
 
 	/*bool success = false;
 	if (comunication_interface->getMainBoard()->getCommandID()==REQUEST_COMMAND_FLAG){
@@ -261,74 +261,73 @@ bool CommunicationInterface::writeMB(){
 	}else {
 		success = comunication_interface->sendMainBoardStruct();
 	}*/
-	int ret;
+	int succes = 0;
 	switch(__builtin_ffs(getMainBoard()->getCommandID())){
 		case REQUEST_COMMAND_FLAG:
-			ret = MBStatusUpdate();
+            succes |= MBStatusUpdate();
 			break;
 		case PARTIAL_COMMAND_FLAG-1:
-			ret = MBSendPartialCommd();
+            succes |= MBSendPartialCommd();
 			ROS_ERROR("MB partial");
 			break;
 		case CONTROL_COMMAND_FLAG:
-			ret = MBSendControlCommd();
+            succes |= MBSendControlCommd();
 			ROS_ERROR("MB control");
 			break;
 		case UNITED_COMMAND_FLAG:
-			ret = MBSendUnitedCommd();
+            succes |= MBSendUnitedCommd();
 			ROS_ERROR("MB united");
 			break;
 		default:
 			ROS_ERROR("V Command ID Main boardy bola zla hodnota (toto by nikdy nemalo nastat)");
-			ret = false;
+            succes = false;
 	}
-	return ret;
+	return succes;
 }
 
-bool CommunicationInterface::writeMotors(){
-	int ret;
+int CommunicationInterface::writeMotors(){
+    int succes = 0;
 	switch(__builtin_ffs(getMotorControlBoardLeft()->getCommandID())){
 		case REQUEST_COMMAND_FLAG:
-			ret = leftMCBStatusUpdate();
+            succes |= leftMCBStatusUpdate();
 			break;
 		case PARTIAL_COMMAND_FLAG-1:
-			ret =leftSendPartialCommand();
+            succes |= leftSendPartialCommand();
 			//ROS_ERROR("partial");
 			break;
 		case CONTROL_COMMAND_FLAG:
-			ret = leftSendControlCommand();
+            succes |= leftSendControlCommand();
 			//ROS_ERROR("controll");
 			break;
 		default:
 			ROS_ERROR("V Command ID laveho motora bola zla hodnota (toto by nikdy nemalo nastat)");
-			ret = false;
+            succes = false;
 	}
 	switch(__builtin_ffs(getMotorControlBoardRight()->getCommandID())){
 		case REQUEST_COMMAND_FLAG:
-			ret &= rightMCBStatusUpdate();
+            succes |= rightMCBStatusUpdate();
 			break;
 		case PARTIAL_COMMAND_FLAG-1:
-			ret &= rightSendPartialCommand();
+            succes |= rightSendPartialCommand();
 			//ROS_ERROR("partial");
 			break;
 		case CONTROL_COMMAND_FLAG:
-			ret &= rightSendControlCommand();
+            succes |= rightSendControlCommand();
 			//ROS_ERROR("controll");
 			break;
 		default:
 			ROS_ERROR("V Command ID praveho motora bola zla hodnota (toto by nikdy nemalo nastat)");
-			ret = false;
+            succes = false;
 			}
-	return ret;
+	return succes;
 }
 
 bool CommunicationInterface::write(){
 
-	boost::mutex::scoped_lock lock(callback_mutex);
+	boost::mutex::scoped_lock locfk(broadcast_mutex);
 	succes =  writeMB();
-	succes &= writeMotors();
-	//todo ret reslt
-	callback_condition.notify_all();
+	succes |= writeMotors();
+    broadcast.notify_all();
 }
 
 //TODO pojde prec
@@ -377,7 +376,7 @@ void CommunicationInterface::close(){
 }
 
 
-bool CommunicationInterface::write(int id,uint8_t *dataWrite, int lengthWrite){
+int CommunicationInterface::write(int id,uint8_t *dataWrite, int lengthWrite){
 	if(active){
 		int count = -1;
 		try{
@@ -387,15 +386,15 @@ bool CommunicationInterface::write(int id,uint8_t *dataWrite, int lengthWrite){
 				ROS_ERROR("chyba pri zapise na port");
 				active = false;
 				close();
-				return false;
+				return 0;
 			}
 		if (count != lengthWrite){
 			ROS_ERROR("count!= lengthWrite. count = %d", count);
-			return false;
+			return 0;
 		}
-		return true;
+		return 1 << id;
 	}
-	return false;
+	return 0;
 }
 
 bool CommunicationInterface::read(int id){
@@ -456,8 +455,9 @@ int CommunicationInterface::waitToRead(){
 	int sucesfull_readings = 0;
 	int index;
 	int setFlags = 0;
-	while(1){
+	while(sucesfull_readings != my_serials.size()){
 		setFds(&read_set,&setFlags);
+		ROS_ERROR("select");
 		//select aktualizuje timeout a aktualizuje set
 		//ROS_ERROR("mb %d mcbl %d mcbr %d",(int)FD_ISSET(my_serials[0]->getFd(),&read_set),(int)FD_ISSET(my_serials[1]->getFd(),&read_set),(int)FD_ISSET(my_serials[2]->getFd(),&read_set));
 		readable_fds = select(fd_max+1,&read_set,NULL,NULL,&timeout);
@@ -476,8 +476,10 @@ int CommunicationInterface::waitToRead(){
 				read(index);
 			}
 		}
-		if(timeout.tv_usec == 0 || sucesfull_readings ==my_serials.size())
+		if(timeout.tv_usec == 0){
+            ROS_ERROR("Receive TIMEOUT flags = '%d'",setFlags);
 			break;
+        }
 	}
 	return sucesfull_readings;
 }
@@ -572,3 +574,4 @@ void CommunicationInterface::setupPort(int sb,int p,int bs){
 		serial->setBytesize(byteSize);
 	}
 }
+

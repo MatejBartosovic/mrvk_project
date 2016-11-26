@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <ros/ros.h>
 #include <std_srvs/Trigger.h>
+#include <std_srvs/SetBool.h>
 
 #include <mrvk_driver/communication_interface.h>
 
@@ -36,7 +37,8 @@ class MrvkCallbacks{
 		ros::ServiceServer resetCentralStopSS;
 		//ros::ServiceServer stopSS;
 		ros::ServiceServer setArmVoltageSS;
-		ros::ServiceServer setCameraSourceSS;
+		ros::ServiceServer toggleArmVoltageSS;
+		ros::ServiceServer toggleCameraSourceSS;
 		ros::ServiceServer setPowerManagmentSS;
 		ros::ServiceServer setMotorParametersSS;
 
@@ -46,8 +48,9 @@ class MrvkCallbacks{
 		bool resetBatteryCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool resetCentralStopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		//bool stopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
-		bool setArmVoltageCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
-		bool setCameraSourceCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
+		bool setArmVoltageCallback(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res);
+		bool toggleArmVoltageCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
+		bool toggleCameraSourceCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool setPowerManagmentCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		//bool setMotorParametersCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 

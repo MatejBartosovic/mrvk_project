@@ -1,5 +1,6 @@
 #include <mrvk_driver/Mb_status.h>
 #include <mrvk_driver/Mcb_status.h>
+#include <boost/thread.hpp>
 
 
 
@@ -31,6 +32,30 @@ public:
 	double getCameraPositionZ();
 	double getCameraPositionX();
 
+	//power management
+	bool getPowerMCBsSB_5V();
+	bool getPowerMCBs_12V();
+	bool getPowerVideoTransmitter();
+	bool getPowerWifi();
+	bool getPowerLaser();
+	bool getPowerGps();
+	bool getPowerArm();
+	bool getPowerPc2();
+	bool getPowerCamera();
+
+	//MB status
+	bool getStatusCentralStop();
+	bool getStatusHardwareCentralStop();
+	float getStatusMbTemperature();
+	bool getStatusPowerOffSequence();
+	bool getStatusFullBattery();
+
+	//mcb status
+
+	bool getStatusMotorErrors();
+
+
+
 	//const static int HEADER_LENGTH = 4;
 
 	const static uint8_t HEADER = 0xFF; //byte 0,1
@@ -56,7 +81,8 @@ public:
 	static int16_t char2BToInt16(unsigned char H, unsigned char L);
 	static uint32_t char4BToUint32(uint8_t HH, uint8_t H, uint8_t L, uint8_t LL);
 
-
+	boost::mutex data_mutex;
+	boost::condition_variable data;
 
 protected:
 	void convertMsg(uint8_t *data, uint8_t device);

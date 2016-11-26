@@ -364,10 +364,10 @@
   </transmission>
 <!--${1/ODOMETRY_CONSTANT/WHEEL_RADIUS}-->
   
-  <!--transmission name="camera_horizontal_transmission">
+  <transmission name="camera_horizontal_transmission">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="scan_to_veza">
-      <hardwareInterface>PositionJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="camera_horizontal_motor">
       <hardwareInterface>PositionJointInterface</hardwareInterface>
@@ -377,13 +377,13 @@
   <transmission name="camera_vertical_transmission">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="camera_r_to_camera">
-      <hardwareInterface>PositionJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="camera_vertical_motor">
       <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
-  </transmission-->
+  </transmission>
 
 
     

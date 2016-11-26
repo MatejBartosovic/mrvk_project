@@ -4,10 +4,11 @@ Conversions::Conversions(){
 
 	cameraPositionX = 0;
 	cameraPositionZ = 0;
+
 }
 
 void Conversions::convertMsg(uint8_t *data, uint8_t device){
-
+    boost::unique_lock<boost::mutex> lock(data_mutex);
 	switch(device){
 	case MAIN_BOARD_ADRESS:
 		if (data[0] == 0x40 || data[0] == 0x02)
@@ -21,6 +22,58 @@ void Conversions::convertMsg(uint8_t *data, uint8_t device){
 		answerMCB(data, device);
 		break;
 	}
+    this->data.notify_all();
+}
+
+
+//power management
+bool Conversions::getPowerMCBsSB_5V(){
+    return statusMB.power_managment.MCBsSB_5V;
+}
+bool Conversions::getPowerMCBs_12V(){
+    return statusMB.power_managment.MCBs_12V;
+}
+bool Conversions::getPowerVideoTransmitter(){
+    return statusMB.power_managment.videotransmitter;
+}
+bool Conversions::getPowerWifi(){
+    return statusMB.power_managment.wifi;
+}
+bool Conversions::getPowerLaser(){
+    return statusMB.power_managment.laser;
+}
+bool Conversions::getPowerGps(){
+    return statusMB.power_managment.gps;
+}
+bool Conversions::getPowerArm(){
+    return statusMB.power_managment.arm_5V && statusMB.power_managment.arm_12V;
+}
+bool Conversions::getPowerPc2(){
+    return statusMB.power_managment.pc2;
+}
+bool Conversions::getPowerCamera(){
+    return statusMB.power_managment.camera;
+}
+
+//MB status
+bool Conversions::getStatusCentralStop(){
+    return statusMB.central_stop;
+}
+bool Conversions::getStatusHardwareCentralStop(){
+    return statusMB.hardware_central_stop;
+}
+float Conversions::getStatusMbTemperature(){
+    return statusMB.temperature;
+}
+bool Conversions::getStatusPowerOffSequence(){
+    return statusMB.power_off_sequence;
+}
+bool Conversions::getStatusFullBattery(){
+    return statusMB.full_battery;
+}
+
+bool Conversions::getStatusMotorErrors(){
+    return statusMCB[0].i2c_communication_error && statusMCB[0].i2c_error_status && statusMCB[0].rs422_communication_error &&statusMCB[1].i2c_communication_error && statusMCB[1].i2c_error_status && statusMCB[1].rs422_communication_error;
 }
 
 void Conversions::answerMB_40_02(uint8_t *data){
@@ -150,7 +203,6 @@ mrvk_driver::Mcb_status Conversions::getStatusMCB(uint8_t device){
 }
 
 double Conversions::getSpeedLeftWheel(){
-
 	return speedWheels[0];
 }
 
@@ -159,11 +211,11 @@ double Conversions::getSpeedRightWheel(){
 }
 
 double Conversions::getCameraPositionZ() {
-		return cameraPositionZ;
+    return cameraPositionZ;
 	}
 
-	double Conversions::getCameraPositionX(){
-		return cameraPositionX;
+double Conversions::getCameraPositionX(){
+    return cameraPositionX;
 	}
 
 int16_t Conversions::char2BToInt16(unsigned char H, unsigned char L)

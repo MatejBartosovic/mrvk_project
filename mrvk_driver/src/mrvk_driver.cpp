@@ -19,7 +19,7 @@ class MrvkDriver{
 public:
 	MrvkDriver() : mrvkHW(){
 
-		if(mrvkHW.init(&hw, &robot_transmissions) != 2){
+		if(mrvkHW.init(&hw, &robot_transmissions) != 4){
 			ROS_ERROR("init nezbehol");
 			ros::shutdown();
 		}
@@ -28,12 +28,17 @@ public:
 		act_to_joint = robot_transmissions.get<transmission_interface::ActuatorToJointStateInterface>();
 		this->velocity = mrvkHW.getVelVector();
 		this->velocity_command = mrvkHW.getVelCmdVector();
+        this->position = mrvkHW.getPosVector();
+        this->position_command = mrvkHW.getPosCmdVector();
 
 		limits = mrvkHW.getLimits();
-		for(int i=0; i< limits.size(); i++){
-			ROS_ERROR("%s",limits[i].joint.c_str());
+		for(int i=0; i< 2; i++){
+			//ROS_ERROR("%s",limits[i].joint.c_str());
 			jnt_limit_interface.registerHandle(joint_limits_interface::VelocityJointSaturationHandle(hw.get<hardware_interface::VelocityJointInterface>()->getHandle(limits[i].joint),limits[i].joint_info));
 		}
+        for(int i= 2; i<4;i++){
+            camera_limit_interface.registerHandle(joint_limits_interface::PositionJointSaturationHandle(hw.get<hardware_interface::PositionJointInterface>()->getHandle(limits[i].joint),limits[i].joint_info));
+        }
 		BOOST_FOREACH(std::string name,jnt_limit_interface.getNames()){
 			ROS_ERROR("mam %s",name.c_str());		
 		}
@@ -107,13 +112,12 @@ public:
 
 	void write(){
 		current_time = ros::Time::now();
-		jnt_limit_interface.enforceLimits(current_time - last_time); //TODO ros::duration prerobit
+		jnt_limit_interface.enforceLimits(current_time - last_time);
+        camera_limit_interface.enforceLimits(current_time - last_time);
 		last_time = current_time;
 		joint_to_act->propagate();
 		//ROS_ERROR("pravy vel =%lf cmd = %lf",velocity->at(1),velocity_command->at(1));
 		comunication_interface->setMotorsVel(velocity_command->at(0),velocity_command->at(1));
-		/*comunication_interface->writeMB();
-		comunication_interface->writeMotors();*/
 		comunication_interface->write();
 		comunication_interface->waitToRead();
 	}
@@ -136,6 +140,8 @@ private:
 	int publish_rate;
 	std::vector<double>* velocity;
 	std::vector<double>* velocity_command;
+    std::vector<double>* position;
+    std::vector<double>* position_command;
 	MrvkCallbacks *callbacks;
 
 	ros::Time last_time;
@@ -154,6 +160,7 @@ private:
 	transmission_interface::JointToActuatorVelocityInterface* joint_to_act;
 	transmission_interface::ActuatorToJointStateInterface* act_to_joint;
 	joint_limits_interface::VelocityJointSaturationInterface jnt_limit_interface;
+    joint_limits_interface::PositionJointSaturationInterface camera_limit_interface;
 	std::vector<mrvk::Limits> limits;
 
 };

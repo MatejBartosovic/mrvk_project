@@ -21,7 +21,8 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface *interface) {
 	resetBatterySS = n.advertiseService("reset_Q_batery", &MrvkCallbacks::resetBatteryCallback, this);
 	//stopSS = n.advertiseService("set_global_stop", &MrvkCallbacks::stopCallback, this);
 	setArmVoltageSS = n.advertiseService("set_arm_voltage", &MrvkCallbacks::setArmVoltageCallback, this);
-	setCameraSourceSS = n.advertiseService("camera_source", &MrvkCallbacks::setCameraSourceCallback, this);
+    toggleArmVoltageSS = n.advertiseService("toggle_arm_voltage", &MrvkCallbacks::toggleArmVoltageCallback, this);
+    toggleCameraSourceSS = n.advertiseService("toggle_camera_source", &MrvkCallbacks::toggleCameraSourceCallback, this);
 	setPowerManagmentSS = n.advertiseService("write_main_board_settings", &MrvkCallbacks::setPowerManagmentCallback, this);
 	///setMotorParametersSS = n.advertiseService("write_motor_settings", &MrvkCallbacks::setMotorParametersCallback, this);
 
@@ -43,42 +44,62 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
 		return true;
 	}*/
 
-	//todo overit funkcnost
+	//todo overit funkcnost + ked bude na baterkach tak overit premennu full_battery
 	bool MrvkCallbacks::resetBatteryCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
 
-		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
-		interface->getMainBoard()->resetBatery();
-		interface->callback_condition.wait(lock);
-		res.success = interface->succes;
-		interface->callback_mutex.unlock();
-
-		if (res.success)
-			res.message = "battery is reset";
-		else res.message = "battery is not reset";
-		res.success = true;
-		return true;
+        boost::unique_lock<boost::mutex> lock(interface->broadcast_mutex);
+        interface->getMainBoard()->resetBatery();
+        interface->broadcast.wait(lock);
+        if (interface->succes & CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) { res.success = true;
+            res.message = "Battery reseted";
+            return true;
+        } else {
+            res.success = true;
+            res.message = "Write Failed";
+            return true;
+        }
+        return true;
 	}
 
 	bool MrvkCallbacks::resetCentralStopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
 
-		uint8_t MCB_command[21];
-		uint8_t MB_command[21];
-		uint8_t request[5];
+        uint8_t MCB_command[21];
+        uint8_t MB_command[21];
+        uint8_t request[5];
+        int response;
 
-		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
-		interface->getMotorControlBoardLeft()->setErrFlags(true,true);
-		interface->getMotorControlBoardRight()->setErrFlags(true,true);
-		interface->callback_condition.wait(lock);
-		res.success = interface->succes;
-		interface->callback_mutex.unlock();
+        //send motors request
+        boost::unique_lock<boost::mutex> broadcast_lock(interface->broadcast_mutex);
+        interface->getMotorControlBoardLeft()->setErrFlags(true,true);
+        interface->getMotorControlBoardRight()->setErrFlags(true,true);
+        interface->broadcast.wait(broadcast_lock);
+        if((interface->succes & CommunicationInterface::MOTORS_BROADCAST_FLAG) != CommunicationInterface::MOTORS_BROADCAST_FLAG){
+            res.message += "Motor boards write failed ";
+            res.success = false;
+            return true;
+        }
 
-		interface->callback_mutex.lock();
-		interface->getMainBoard()->setCentralStop(false);
-		interface->callback_condition.wait(lock);
-		res.success &= interface->succes;
-		interface->callback_mutex.unlock();
+        //send main board request
+        interface->getMainBoard()->setCentralStop(false);
+        interface->broadcast.wait(broadcast_lock);
+        if((interface->succes & CommunicationInterface::ALL_BROADCAST_FLAG) != CommunicationInterface::ALL_BROADCAST_FLAG){
+            res.message += "Main board write failed. ";
+            res.success = false;
+        }
+        interface->broadcast_mutex.unlock();
 
-		return true;
+        //wait to unblock
+        boost::unique_lock<boost::mutex> lock(interface->data_mutex);
+        for(int i =0;i<300;i++){
+            interface->data.wait(lock);
+            if(!interface->getStatusCentralStop()) {
+                res.success = true;
+                res.message = "Ok";
+                return true;
+            }
+        }
+        res.message = "TIMEDOUT";
+        res.success = false;
 	}
 
 
@@ -92,79 +113,97 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
 	}*/
 
 	//100% funkcny servis
-	bool MrvkCallbacks::setArmVoltageCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
+	bool MrvkCallbacks::setArmVoltageCallback(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res){
 
-		bool success = false;
-		static bool state = false;
-		ros::NodeHandle n;
-
-		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
-		if (state){
-			interface->getMainBoard()->setArmPower(false);
-			interface->callback_condition.wait(lock);
-			res.success = interface->succes;
-			interface->callback_mutex.unlock();
-
-			if (res.success){
-				res.message = "Napajanie ramena vypnute";
-				state = false;
-				n.setParam("arm5V", false);
-				n.setParam("arm12V", false);
-			}
-			else res.message = "error";
-		}
-		else{
-			interface->getMainBoard()->setArmPower(true);
-			interface->callback_condition.wait(lock);
-			res.success = interface->succes;
-			interface->callback_mutex.unlock();
-
-			if (res.success){
-				res.message = "Napajanie ramena zapnute";
-				state = true;
-				n.setParam("arm5V", true);
-				n.setParam("arm12V", true);
-			}
-			else res.message = "error";
-		}
-		return true;
+        //send request
+        boost::unique_lock<boost::mutex> lock(interface->broadcast_mutex);
+        interface->getMainBoard()->setArmPower(req.data);
+        interface->broadcast.wait(lock);
+        if((interface->succes & CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) != CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG){
+            interface->getMainBoard()->setArmPower(!req.data); //zmena spet
+            res.message += "Main bosrd write failed. ";
+            res.success = false;
+            return true;
+        }
+        interface->broadcast_mutex.unlock();
+        //check
+        boost::unique_lock<boost::mutex> data_lock(interface->broadcast_mutex);
+        for(int i = 0;i<12;i++){
+            interface->data.wait(data_lock);
+            if(interface->getPowerArm()==req.data){
+                res.message = "Ok";
+                res.success = true;
+                return true;
+            }
+        }
+        res.message = "TIMEDOUT";
+        res.success = true;
 	}
-	//todo overit funkcnost
-	bool MrvkCallbacks::setCameraSourceCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res) {
 
-		timespec timeout;
-		timeout.tv_sec +=1;
+    bool MrvkCallbacks::toggleArmVoltageCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
 
-		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
-		bool ret = interface->getMainBoard()->switchVideo();
-		interface->callback_condition.wait(lock);
-		res.success = interface->succes;
-		interface->callback_mutex.unlock();
+        //send request
+        boost::unique_lock<boost::mutex> lock(interface->broadcast_mutex);
+        bool new_state = !interface->getPowerArm();
+        interface->getMainBoard()->setArmPower(new_state);
+        interface->broadcast.wait(lock);
+        if((interface->succes & CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) != CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG){
+            interface->getMainBoard()->setArmPower(!new_state); //zmena spet
+            res.message += "Main bosrd write failed. ";
+            res.success = false;
+            return true;
+        }
+        interface->broadcast_mutex.unlock();
 
-		if(!res.success){
-			interface->getMainBoard()->switchVideo(); // zmena spet
-			res.message = "Video switch FAILED!!!!!";
-		}
-		//TODO dorobit vypis
-		if(ret)
-			res.message = "neviem kedy je zapnuta a kedy vypnuta";
-		else
-			res.message = "neviem kedy je zapnuta a kedy vypnuta";
-		return true;
+        //check
+        boost::unique_lock<boost::mutex> data_lock(interface->broadcast_mutex);
+        for(int i = 0;i<12;i++){
+            interface->data.wait(data_lock);
+            if(interface->getPowerArm() == new_state){
+                res.message = "Ok";
+                res.success = true;
+                return true;
+            }
+        }
+            res.message = "TIMEDOUT";
+            res.success = false;
+    }
+
+	//TODO overit funkcnost prerobit na toggle + set a kontroly
+	bool MrvkCallbacks::toggleCameraSourceCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res) {
+
+        //send request
+        boost::unique_lock<boost::mutex> lock(interface->broadcast_mutex);
+        bool ret = interface->getMainBoard()->switchVideo();
+        interface->broadcast.wait(lock);
+        if ((interface->succes & CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) !=
+            CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) {
+            interface->getMainBoard()->switchVideo(); //zmena spet
+            res.message = "Main boadr write failed. ";
+            res.success = false;
+            return true;
+        }
 	}
 
 	//100% funkcny servis
 	bool MrvkCallbacks::setPowerManagmentCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
+        if(interface->isActive()){
+	    	SET_MAIN_BOARD config;
+    		getMbFromParam(&config);
 
-		SET_MAIN_BOARD config;
-		getMbFromParam(&config);
-
-		boost::unique_lock<boost::mutex> lock(interface->callback_mutex);
-		interface->getMainBoard()->setParamatersMB(&config);
-		interface->callback_condition.wait(lock);
-		res.success = interface->succes;
-		interface->callback_mutex.unlock();
-		return true;
+	    	boost::unique_lock<boost::mutex> lock(interface->broadcast_mutex);
+    		interface->getMainBoard()->setParamatersMB(&config);
+		    interface->broadcast.wait(lock);
+            if((interface->succes & CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) != CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG){
+                res.message = "Maind board write failed. If comunication is running correctly the settings will be written next cycle";
+                res.success = false;
+                return true;
+            }
+            res.success = true;
+		    return true;
+        }
+        res.message = "Comunication is not active";
+        res.success = false;
 	}
 
 	/*bool MrvkCallbacks::setMotorParametersCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
