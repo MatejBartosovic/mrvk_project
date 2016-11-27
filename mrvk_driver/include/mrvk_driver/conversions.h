@@ -32,29 +32,20 @@ public:
 	double getCameraPositionZ();
 	double getCameraPositionX();
 
-	//power management
-	bool getPowerMCBsSB_5V();
-	bool getPowerMCBs_12V();
-	bool getPowerVideoTransmitter();
-	bool getPowerWifi();
-	bool getPowerLaser();
-	bool getPowerGps();
-	bool getPowerArm();
-	bool getPowerPc2();
-	bool getPowerCamera();
+    template <typename TMember>
+    bool getStatus(TMember member){
+        return statusMB.*member;
+	}
+    //example getStatus(&mrvk_driver::Mb_status::central_stop);
 
-	//MB status
-	bool getStatusCentralStop();
-	bool getStatusHardwareCentralStop();
-	float getStatusMbTemperature();
-	bool getStatusPowerOffSequence();
-	bool getStatusFullBattery();
-
+    template <typename TMember>
+    bool getPowerStatus(TMember member){
+        return statusMB.power_managment.*member;
+    }
+    //interface->getPowerStatus(&mrvk_driver::Power_managment_::arm_5V);
+    bool getPowerArm();
 	//mcb status
-
 	bool getStatusMotorErrors();
-
-
 
 	//const static int HEADER_LENGTH = 4;
 
