@@ -3,7 +3,7 @@
 /***Trieda MBCommand (pre Main board)  dedi metody z  triedy Command***/
 //public
 //constructor
-MBCommand::MBCommand(uint8_t adresa) : Command(adresa)
+MBCommand::MBCommand(uint8_t adresa) : Command(adresa),last_X_camera(0),last_Z_camera(0)
 {
     rob_set_MB.MCBsSB_5V = true; //true
     rob_set_MB.MCBs_12V = true; //true
@@ -280,13 +280,18 @@ bool MBCommand::getCentralStop(){
 	pthread_mutex_unlock(&MB_mutex);	
   } 
   
-  void MBCommand::setKameraVelocity(int Z, int X)
+  void MBCommand::setKameraCommand(int Z, int X)
 {
-	 pthread_mutex_lock(&MB_mutex);	
-   rob_set_MB.camAngleX = X;
-   rob_set_MB.camAngleZ = Z;
-   rob_set_MB.commandID |= PARTIAL_COMMAND_FLAG;
-	 pthread_mutex_unlock(&MB_mutex);	
+	pthread_mutex_lock(&MB_mutex);
+	if((Z != last_Z_camera)||(X !=last_X_camera)){
+		ROS_ERROR("hovno %d %d",X,Z);
+		last_Z_camera = Z;
+		last_X_camera = X;
+		rob_set_MB.camAngleX = X;
+		rob_set_MB.camAngleZ = Z;
+		rob_set_MB.commandID |= PARTIAL_COMMAND_FLAG;
+	}
+	pthread_mutex_unlock(&MB_mutex);
   } 
 
    void MBCommand::setMCBsSB_5V(bool parameter)
@@ -378,9 +383,11 @@ void MBCommand::setPowerOff(bool parameter)
 }
 void MBCommand::setPosRotCam(bool parameter) //ak je true tak je polohova regulacia inak otackova
    {
-	pthread_mutex_lock(&MB_mutex);	
- 	rob_set_MB.posRotCam = parameter;
- 	rob_set_MB.commandID |= UNITED_COMMAND_FLAG;
+	pthread_mutex_lock(&MB_mutex);
+	if(parameter!=rob_set_MB.posRotCam ){
+		rob_set_MB.posRotCam = parameter;
+		rob_set_MB.commandID |= UNITED_COMMAND_FLAG;
+	}
 	pthread_mutex_unlock(&MB_mutex);	
 }
 
@@ -646,12 +653,13 @@ short MCBCommand::getMotorSpeed()
 	return ret;
   }
   //settery
+// TODO
 void MCBCommand::setMotorSpeed(double speed)
 {
 	if(current_vel_set!=speed){
 		current_vel_set = speed;
 		pthread_mutex_lock(&MCB_mutex);
-		Motor_set.Speed = -speed;
+		Motor_set.Speed = speed;
 		Motor_set.commandID |= PARTIAL_COMMAND_FLAG;
 		pthread_mutex_unlock(&MCB_mutex);
 	}

@@ -197,15 +197,17 @@ class MBCommand: public Command
 	void setVideoGrabberSwitch(bool parameter);
 	void setVideoTransmitterSwitch(bool parameter);
   	void setKameraRegulator(uint8_t pko,uint8_t pkk,uint8_t iko, uint8_t ikk);
-  	void setKameraVelocity(int Z, int X);
+  	void setKameraCommand(int Z, int X);
 	const static int controlCommandLength = 21;  //zapisuje vsetko aj parametre PI regulatora kamery
 	const static int partialCommandLength = 13;   //nezapisuje paramtre PI regulatora a dostava odpoved okrem  info napajani zariadeni
 	const static int unitedCommandLength = 21;    //zapisuje vsetko + dostava odpoved na vsetko
 	private: 
-	 SET_MAIN_BOARD rob_set_MB;
-		pthread_mutex_t MB_mutex;
-	  void kameraVelocity(uint8_t* command,double x, double z);
-	   void kameraPosition(uint8_t* command,double z, double x);
+	SET_MAIN_BOARD rob_set_MB;
+	pthread_mutex_t MB_mutex;
+	void kameraVelocity(uint8_t* command,double x, double z);
+	void kameraPosition(uint8_t* command,double z, double x);
+	int last_X_camera;
+	int last_Z_camera;
 };
 
 class MCBCommand: public Command
@@ -232,7 +234,7 @@ class MCBCommand: public Command
   	private:
   	 ROBLL_SET_MOTOR Motor_set;
 		 pthread_mutex_t MCB_mutex;
-	int current_vel_set;
+	double current_vel_set;
 };
 
 class SBCommand: public Command

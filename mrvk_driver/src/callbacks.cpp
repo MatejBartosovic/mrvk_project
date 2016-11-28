@@ -92,7 +92,7 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
         boost::unique_lock<boost::mutex> lock(interface->data_mutex);
         for(int i =0;i<300;i++){
             interface->data.wait(lock);
-            if(!interface->getStatus(&mrvk_driver::Mb_status::central_stop)) {
+            if(!interface->getStatus(&mrvk_driver::Mb_status::central_stop,true)) {
                 res.success = true;
                 res.message = "Ok";
                 return true;

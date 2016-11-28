@@ -24,7 +24,8 @@ public:
 			ros::shutdown();
 		}
 
-		joint_to_act = robot_transmissions.get<transmission_interface::JointToActuatorVelocityInterface>();
+		joint_to_vel_act = robot_transmissions.get<transmission_interface::JointToActuatorVelocityInterface>();
+		joint_to_pos_act = robot_transmissions.get<transmission_interface::JointToActuatorPositionInterface>();
 		act_to_joint = robot_transmissions.get<transmission_interface::ActuatorToJointStateInterface>();
 		this->velocity = mrvkHW.getVelVector();
 		this->velocity_command = mrvkHW.getVelCmdVector();
@@ -41,6 +42,9 @@ public:
         }
 		BOOST_FOREACH(std::string name,jnt_limit_interface.getNames()){
 			ROS_ERROR("mam %s",name.c_str());		
+		}
+		BOOST_FOREACH(std::string name,camera_limit_interface.getNames()){
+			ROS_ERROR("mam %s",name.c_str());
 		}
 		std::vector<std::string> ports;
 		int baud;
@@ -113,11 +117,13 @@ public:
 	void write(){
 		current_time = ros::Time::now();
 		jnt_limit_interface.enforceLimits(current_time - last_time);
-        camera_limit_interface.enforceLimits(current_time - last_time);
+        //camera_limit_interface.enforceLimits(current_time - last_time);
 		last_time = current_time;
-		joint_to_act->propagate();
-		//ROS_ERROR("pravy vel =%lf cmd = %lf",velocity->at(1),velocity_command->at(1));
+		joint_to_vel_act->propagate();
+		joint_to_pos_act->propagate();
+		ROS_ERROR("kamera vel =%lf cmd = %lf",position_command->at(2),position_command->at(3));
 		comunication_interface->setMotorsVel(velocity_command->at(0),velocity_command->at(1));
+		comunication_interface->setCameraPosition(position_command->at(2),position_command->at(3));
 		comunication_interface->write();
 		comunication_interface->waitToRead();
 	}
@@ -157,7 +163,8 @@ private:
 	mrvk::HwInterface mrvkHW;
 	transmission_interface::RobotTransmissions robot_transmissions;
 
-	transmission_interface::JointToActuatorVelocityInterface* joint_to_act;
+	transmission_interface::JointToActuatorVelocityInterface* joint_to_vel_act;
+	transmission_interface::JointToActuatorPositionInterface* joint_to_pos_act;
 	transmission_interface::ActuatorToJointStateInterface* act_to_joint;
 	joint_limits_interface::VelocityJointSaturationInterface jnt_limit_interface;
     joint_limits_interface::PositionJointSaturationInterface camera_limit_interface;

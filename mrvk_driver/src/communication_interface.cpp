@@ -75,8 +75,8 @@ bool CommunicationInterface::isActive(){
 
 void CommunicationInterface::setMotorsVel(double left_vel,double right_vel){
 
-	lavy.setMotorSpeed(left_vel);
-	pravy.setMotorSpeed(-right_vel);
+	lavy.setMotorSpeed(-left_vel);
+	pravy.setMotorSpeed(right_vel);
 
 }
 
@@ -88,23 +88,21 @@ bool CommunicationInterface::setCameraVelocity(double linearX, double angularZ){
 	static double oldLinearX = 0;
 	static double oldAngularZ = 0;
 
-	if ((oldLinearX == linearX) && (oldAngularZ == angularZ)) //ak pride rovnaka sprava ako pred tym, callback sa moze ukoncit
 		return true;
 
 	oldLinearX = linearX;
 	oldAngularZ = angularZ;
 
 	mb.setPosRotCam(false);
- 	mb.setKameraVelocity(angularZ,linearX);
+ 	mb.setKameraCommand(angularZ,linearX);
  	int read_length = mb.getControlCommand(command);
 
 	 //return writeAndRead(command, MBCommand::controlCommandLength, read_length, 1);
-
 }
 //todo dorobit kameru - poloha
 bool CommunicationInterface::setCameraPosition(double linearX, double angularZ){
 
-	uint8_t command[MBCommand::controlCommandLength];
+	/*uint8_t command[MBCommand::controlCommandLength];
 
 		static double oldLinearX = 0;
 		static double oldAngularZ = 0;
@@ -119,7 +117,10 @@ bool CommunicationInterface::setCameraPosition(double linearX, double angularZ){
 	 	mb.setKameraVelocity(angularZ,linearX);
 	 	int read_length = mb.getControlCommand(command);
 
-	// return writeAndRead(command, MBCommand::controlCommandLength, read_length, 1);
+	// return writeAndRead(command, MBCommand::controlCommandLength, read_length, 1);*/
+	mb.setPosRotCam(true);
+	mb.setKameraCommand(linearX,angularZ);
+	//mb.setKameraCommand(10,10);
 
 }
 
@@ -254,13 +255,6 @@ int CommunicationInterface::rightSendControlCommand(){
 
 int CommunicationInterface::writeMB(){
 
-	/*bool success = false;
-	if (comunication_interface->getMainBoard()->getCommandID()==REQUEST_COMMAND_FLAG){
-		comunication_interface->MBStatusUpdate();
-
-	}else {
-		success = comunication_interface->sendMainBoardStruct();
-	}*/
 	int succes = 0;
 	switch(__builtin_ffs(getMainBoard()->getCommandID())){
 		case REQUEST_COMMAND_FLAG:
@@ -286,6 +280,7 @@ int CommunicationInterface::writeMB(){
 }
 
 int CommunicationInterface::writeMotors(){
+
     int succes = 0;
 	switch(__builtin_ffs(getMotorControlBoardLeft()->getCommandID())){
 		case REQUEST_COMMAND_FLAG:
@@ -293,11 +288,11 @@ int CommunicationInterface::writeMotors(){
 			break;
 		case PARTIAL_COMMAND_FLAG-1:
             succes |= leftSendPartialCommand();
-			//ROS_ERROR("partial");
+			ROS_ERROR("partial");
 			break;
 		case CONTROL_COMMAND_FLAG:
             succes |= leftSendControlCommand();
-			//ROS_ERROR("controll");
+			ROS_ERROR("controll");
 			break;
 		default:
 			ROS_ERROR("V Command ID laveho motora bola zla hodnota (toto by nikdy nemalo nastat)");
@@ -457,7 +452,7 @@ int CommunicationInterface::waitToRead(){
 	int setFlags = 0;
 	while(sucesfull_readings != my_serials.size()){
 		setFds(&read_set,&setFlags);
-		ROS_ERROR("select");
+		//ROS_ERROR("select");
 		//select aktualizuje timeout a aktualizuje set
 		//ROS_ERROR("mb %d mcbl %d mcbr %d",(int)FD_ISSET(my_serials[0]->getFd(),&read_set),(int)FD_ISSET(my_serials[1]->getFd(),&read_set),(int)FD_ISSET(my_serials[2]->getFd(),&read_set));
 		readable_fds = select(fd_max+1,&read_set,NULL,NULL,&timeout);

@@ -32,16 +32,16 @@ public:
 	double getCameraPositionZ();
 	double getCameraPositionX();
 
-    template <typename TMember>
-    bool getStatus(TMember member){
+    template <typename TMember,typename TValue>
+    TValue getStatus(TMember member,TValue nic){
         return statusMB.*member;
 	}
     //example getStatus(&mrvk_driver::Mb_status::central_stop);
 
-    template <typename TMember>
+    /*template <typename TMember>
     bool getPowerStatus(TMember member){
         return statusMB.power_managment.*member;
-    }
+    }*/
     //interface->getPowerStatus(&mrvk_driver::Power_managment_::arm_5V);
     bool getPowerArm();
 	//mcb status

@@ -37,14 +37,13 @@ public:
 	//TODO pojde prec
 	bool sendMainBoardStruct();
 
-	MBCommand* getMainBoard();
-
 	bool write();
 
 	void setMotorsVel(double left_vel,double right_vel);
 	bool setMotorParameters(REGULATOR_MOTOR regulator, bool regulation_type);
 	MCBCommand* getMotorControlBoardLeft();
 	MCBCommand* getMotorControlBoardRight();
+	MBCommand* getMainBoard();
 
 	//bool resetCentralStop();
 
