@@ -23,7 +23,7 @@ MBCommand::MBCommand(uint8_t adresa) : Command(adresa),last_X_camera(0),last_Z_c
    rob_set_MB.video1 = true;
    rob_set_MB.video2 = false;
    // defaultne nastavena otackova regulacia s rychlostami 0,0
-   rob_set_MB.posRotCam = false; //false
+   rob_set_MB.posRotCam = true; //false
    rob_set_MB.camAngleX = 0;
    rob_set_MB.camAngleZ = 0;
    
@@ -96,9 +96,9 @@ int MBCommand::getPartialCommand(uint8_t* command) // sluzi na skrateni prikaz v
 	if (rob_set_MB.resetQbat) rob_set_MB.resetQbat = false;
 	
 	if (!rob_set_MB.posRotCam) //otackova regulacia
-		kameraVelocity(&command[7],(double)rob_set_MB.camAngleZ,(double)rob_set_MB.camAngleX);
+		kameraVelocity(&command[5],(double)rob_set_MB.camAngleZ,(double)rob_set_MB.camAngleX);
 	else 
-	 	kameraPosition(&command[7],(double)rob_set_MB.camAngleZ,(double)rob_set_MB.camAngleX);
+	 	kameraPosition(&command[5],(double)rob_set_MB.camAngleZ,(double)rob_set_MB.camAngleX);
 		rob_set_MB.commandID = REQUEST_COMMAND_FLAG;
 		pthread_mutex_unlock(&MB_mutex);	
 		command[9] = 0;

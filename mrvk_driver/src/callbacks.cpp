@@ -176,13 +176,13 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
         boost::unique_lock<boost::mutex> lock(interface->broadcast_mutex);
         bool ret = interface->getMainBoard()->switchVideo();
         interface->broadcast.wait(lock);
-        if ((interface->succes & CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) !=
-            CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) {
+        if ((interface->succes & CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) != CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) {
             interface->getMainBoard()->switchVideo(); //zmena spet
             res.message = "Main boadr write failed. ";
             res.success = false;
             return true;
         }
+        return true;
 	}
 
 	//100% funkcny servis
@@ -202,8 +202,10 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
             res.success = true;
 		    return true;
         }
+
         res.message = "Comunication is not active";
         res.success = false;
+        return true;
 	}
 
 	/*bool MrvkCallbacks::setMotorParametersCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){

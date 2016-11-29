@@ -100,6 +100,7 @@ bool CommunicationInterface::setCameraVelocity(double linearX, double angularZ){
 	 //return writeAndRead(command, MBCommand::controlCommandLength, read_length, 1);
 }
 //todo dorobit kameru - poloha
+//TODO opravit navratovu hodnotu (void)
 bool CommunicationInterface::setCameraPosition(double linearX, double angularZ){
 
 	/*uint8_t command[MBCommand::controlCommandLength];
@@ -118,10 +119,10 @@ bool CommunicationInterface::setCameraPosition(double linearX, double angularZ){
 	 	int read_length = mb.getControlCommand(command);
 
 	// return writeAndRead(command, MBCommand::controlCommandLength, read_length, 1);*/
-	mb.setPosRotCam(true);
+	//mb.setPosRotCam(true);
 	mb.setKameraCommand(linearX,angularZ);
 	//mb.setKameraCommand(10,10);
-
+	return true;
 }
 
 
