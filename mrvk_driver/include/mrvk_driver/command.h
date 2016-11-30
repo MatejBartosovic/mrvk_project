@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <ros/ros.h>
-
+//TODO boost mutexi
 
 #define MBOFS1 50.0
 #define MBOFS2 50.0
@@ -13,8 +13,6 @@
 #define MBZISK2 11.584
 #define MBNULPOL2 3495
 
-//todo zmazat
-double read_kompas();
 
 //TODO skovat do classy command
 const static int PARTIAL_COMMAND_FLAG = 4;
@@ -150,6 +148,7 @@ class Command
 	protected:
 	  uint8_t adresa;
 	  uint8_t computeCRC(uint8_t *buffer, unsigned int num);
+	  int16_t char2BToInt16(unsigned char H, unsigned char L);
 	  int computeParity(uint8_t x);
 	  void processParity(uint8_t *byte);
 	 void uint16ToChar2B(uint16_t X, uint8_t &H, uint8_t &L);
@@ -174,7 +173,7 @@ class MBCommand: public Command
 	bool getCentralStop();
 	void setParamatersMB_PM(bool MCBsSB_5V,bool MCBs_12V, bool videoTransmitter, bool wifi, bool laser,
     				  bool GPS, bool ARM_5V, bool ARM_12V, bool PC2, bool kamera);
-	void setParamatersMB(SET_MAIN_BOARD* config);
+	void setParamaters(SET_MAIN_BOARD* config);
     void setParametersMB_CTRL(bool centralStop, bool powerOff, bool fullBatAck, bool resetQbat, bool camera_source);
     void setMCBsSB_5V(bool parameter);
     void setMCBs_12V(bool parameter);
@@ -201,6 +200,7 @@ class MBCommand: public Command
 	const static int controlCommandLength = 21;  //zapisuje vsetko aj parametre PI regulatora kamery
 	const static int partialCommandLength = 13;   //nezapisuje paramtre PI regulatora a dostava odpoved okrem  info napajani zariadeni
 	const static int unitedCommandLength = 21;    //zapisuje vsetko + dostava odpoved na vsetko
+
 	private: 
 	SET_MAIN_BOARD rob_set_MB;
 	pthread_mutex_t MB_mutex;
@@ -235,36 +235,6 @@ class MCBCommand: public Command
   	 ROBLL_SET_MOTOR Motor_set;
 		 pthread_mutex_t MCB_mutex;
 	double current_vel_set;
-};
-
-class SBCommand: public Command
-{
-	public:
-	SBCommand(uint8_t adresa);
-	int getRequestKompasCommand(uint8_t* command);
-	int getControlKompasCommand(uint8_t* command, bool calibrate, bool reset);
-	void addSample(uint8_t* data);
-	void resetSamples();
-	double getBearing();
-	/*int getControlCommand(uint8_t* commnand);
-    	int getPartialCommand(uint8_t* command);
-    	void getStructMotor(ROBLL_SET_MOTOR* Motor);
-    	bool getMotorControl();
-    	void setMotorSpeed(double speed);
-  	void setManualRad(bool parameter);
-  	void setGearPosition(uint8_t position);
-  	void setErrFlags(bool I2C, bool RS422);
-  	const static int controlCommandLength = 21;
-	const static int partialCommandLength = 13;
-	void setRegulatorPID(uint8_t PH,uint8_t PL,uint8_t IH,uint8_t IL);
-	void setMotorControl(bool parameter); //otackova regulacia 0 PWM 1*/
-  	private:
-  	int16_t char2BToInt16(unsigned char H, unsigned char L);
-  	  REQUEST_COMMAND sb_req;
-  	  COMPASS_CMPS03 kompas; 
-  	  double sum_samples;
-			pthread_mutex_t SB_mutex;
-  	  
 };
 
 #endif //COMMAND_H_

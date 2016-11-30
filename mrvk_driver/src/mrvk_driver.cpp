@@ -19,14 +19,17 @@ class MrvkDriver{
 public:
 	MrvkDriver() : mrvkHW(){
 
-		if(mrvkHW.init(&hw, &robot_transmissions) != 4){
+		if(mrvkHW.init(&hw, &robot_transmissions) !=4 ){
 			ROS_ERROR("init nezbehol");
 			ros::shutdown();
 		}
 
 		joint_to_vel_act = robot_transmissions.get<transmission_interface::JointToActuatorVelocityInterface>();
 		joint_to_pos_act = robot_transmissions.get<transmission_interface::JointToActuatorPositionInterface>();
-		act_to_joint = robot_transmissions.get<transmission_interface::ActuatorToJointStateInterface>();
+		act_to_joint_state = robot_transmissions.get<transmission_interface::ActuatorToJointStateInterface>();
+		act_to_pos_joint = robot_transmissions.get<transmission_interface::ActuatorToJointPositionInterface>();
+		act_to_vel_joint = robot_transmissions.get<transmission_interface::ActuatorToJointVelocityInterface>();
+
 		this->velocity = mrvkHW.getVelVector();
 		this->velocity_command = mrvkHW.getVelCmdVector();
         this->position = mrvkHW.getPosVector();
@@ -37,9 +40,9 @@ public:
 			//ROS_ERROR("%s",limits[i].joint.c_str());
 			jnt_limit_interface.registerHandle(joint_limits_interface::VelocityJointSaturationHandle(hw.get<hardware_interface::VelocityJointInterface>()->getHandle(limits[i].joint),limits[i].joint_info));
 		}
-        for(int i= 2; i<4;i++){
+        /*for(int i= 2; i<4;i++){
             camera_limit_interface.registerHandle(joint_limits_interface::PositionJointSaturationHandle(hw.get<hardware_interface::PositionJointInterface>()->getHandle(limits[i].joint),limits[i].joint_info));
-        }
+        }*/
 		BOOST_FOREACH(std::string name,jnt_limit_interface.getNames()){
 			ROS_ERROR("mam %s",name.c_str());		
 		}
@@ -73,7 +76,7 @@ public:
 
 	bool init(){
 
-		ROS_ERROR("robot init"); //TODO prerobit na info alebo prec
+		ROS_INFO("Robot init"); //TODO prerobit na info alebo prec
 
 		if (!comunication_interface->init())
 			return false;
@@ -82,7 +85,7 @@ public:
 
 		//TODO funkciu setMbFromParam presunut do comunication interface a prerobit set mainboart aby si to pitala sama
 		callbacks->getMbFromParam(&config);							//nastavi default parametre
-		comunication_interface->setMainBoard(&config);
+		comunication_interface->getMainBoard()->setParamaters(&config);
 
 		/*REGULATOR_MOTOR regulator;
 		bool regulation_type;
@@ -106,9 +109,9 @@ public:
 	void read(){
 		velocity->at(0) = comunication_interface->getSpeedLeftWheel();
 		velocity->at(1) = -comunication_interface->getSpeedRightWheel();
-		//velocity->at(0) = velocity_command->at(0);
-		//velocity->at(1) = velocity_command->at(1);
-		act_to_joint->propagate();	
+		act_to_joint_state->propagate();
+		//act_to_pos_joint->propagate();
+		//act_to_vel_joint->propagate();
 		pub_MCBlStatus.publish(comunication_interface->getStatusMCB(CommunicationInterface::LEFT_MOTOR_ADRESS));
 		pub_MCBrStatus.publish(comunication_interface->getStatusMCB(CommunicationInterface::RIGHT_MOTOR_ADRESS));
 		pub_MBStatus.publish(comunication_interface->getStatusMB());
@@ -117,11 +120,11 @@ public:
 	void write(){
 		current_time = ros::Time::now();
 		jnt_limit_interface.enforceLimits(current_time - last_time);
-        //camera_limit_interface.enforceLimits(current_time - last_time);
+        camera_limit_interface.enforceLimits(current_time - last_time);
 		last_time = current_time;
 		joint_to_vel_act->propagate();
 		joint_to_pos_act->propagate();
-		ROS_ERROR("kamera vel =%lf cmd = %lf",position_command->at(2),position_command->at(3));
+		//ROS_ERROR("kamera vel =%lf cmd = %lf",position_command->at(2),position_command->at(3));
 		comunication_interface->setMotorsVel(velocity_command->at(0),velocity_command->at(1));
 		comunication_interface->setCameraPosition(position_command->at(2),position_command->at(3));
 		comunication_interface->write();
@@ -165,9 +168,15 @@ private:
 
 	transmission_interface::JointToActuatorVelocityInterface* joint_to_vel_act;
 	transmission_interface::JointToActuatorPositionInterface* joint_to_pos_act;
-	transmission_interface::ActuatorToJointStateInterface* act_to_joint;
+	transmission_interface::ActuatorToJointStateInterface* act_to_joint_state;
+	transmission_interface::ActuatorToJointPositionInterface* act_to_pos_joint;
+	transmission_interface::ActuatorToJointVelocityInterface* act_to_vel_joint;
+
+
+
 	joint_limits_interface::VelocityJointSaturationInterface jnt_limit_interface;
     joint_limits_interface::PositionJointSaturationInterface camera_limit_interface;
+
 	std::vector<mrvk::Limits> limits;
 
 };

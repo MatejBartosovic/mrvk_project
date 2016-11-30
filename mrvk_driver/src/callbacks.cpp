@@ -192,7 +192,7 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
     		getMbFromParam(&config);
 
 	    	boost::unique_lock<boost::mutex> lock(interface->broadcast_mutex);
-    		interface->getMainBoard()->setParamatersMB(&config);
+    		interface->getMainBoard()->setParamaters(&config);
 		    interface->broadcast.wait(lock);
             if((interface->succes & CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG) != CommunicationInterface::MAIN_BOARD_BROADCAST_FLAG){
                 res.message = "Maind board write failed. If comunication is running correctly the settings will be written next cycle";

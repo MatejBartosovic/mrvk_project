@@ -25,41 +25,38 @@ public:
 
 	CommunicationInterface(std::vector<std::string> ports, int baudrate, int stopBits, int parity, int byteSize);
 	~CommunicationInterface();
+
 	bool init();
 	bool isActive();
-
-	int waitToRead();
-
-	bool setCameraVelocity(double linearX, double angularZ);
-	bool setCameraPosition(double linearX, double angularZ);
-	bool setMainBoard(SET_MAIN_BOARD *param);
-	//prikazy, ktore  sa ulozia do struktury a na ich zapis je potrebne zavolat funkciu writeMB
-	//TODO pojde prec
-	bool sendMainBoardStruct();
+	void close();
 
 	bool write();
+	int waitToRead();
 
+	void setMotorParameters(REGULATOR_MOTOR regulator, bool regulation_type);
+
+	void setCameraPosition(double linearX, double angularZ);
 	void setMotorsVel(double left_vel,double right_vel);
-	bool setMotorParameters(REGULATOR_MOTOR regulator, bool regulation_type);
+
+
 	MCBCommand* getMotorControlBoardLeft();
 	MCBCommand* getMotorControlBoardRight();
 	MBCommand* getMainBoard();
 
-	//bool resetCentralStop();
-
-	void close();
+	//TODO daco s timto vymislet
 	boost::mutex broadcast_mutex;
     boost::condition_variable broadcast;
     int succes;
 private:
-	void setupPort(int sb,int p,int bs);
 
-	bool isAnswerOk();
+	void setupPort(int sb,int p,int bs);
 
 	int write(int id,uint8_t *dataWrite, int lengthWrite);
 	bool read(int lengthRead);
 	void setFds(fd_set *set,int* flag);
 	int getReadableFd(fd_set *set,int* flag);
+	int writeMB();
+	int writeMotors();
 
 	//MOTOR BOARD
     int leftMCBStatusUpdate();
@@ -70,15 +67,10 @@ private:
     int rightSendControlCommand();
 
 	//MAIN BOARD
-	//jednorazove prikazy
     int MBStatusUpdate();
     int MBSendPartialCommd();
     int MBSendControlCommd();
     int MBSendUnitedCommd();
-
-
-	int writeMB();
-	int writeMotors();
 
 	bool active;
 	std::vector<serial::Serial*> my_serials;
@@ -86,8 +78,6 @@ private:
 	MCBCommand pravy;
 	MBCommand mb;
 
-
-	//todo nestaci to ako lokalne premenne??
 	std::vector<std::string> ports;
 	int fd_max;
 	std::vector<int> read_lengths;

@@ -1,6 +1,16 @@
 #include <mrvk_driver/communication_interface.h>
 #include <boost/foreach.hpp>
 
+
+/*
+ *
+ *
+ * Public functions
+ *
+ *
+ * */
+
+
 CommunicationInterface::CommunicationInterface(std::vector<std::string> ports, int baudrate, int stopBits, int parity, int byteSize):
 mb(MAIN_BOARD_ADRESS), pravy(RIGHT_MOTOR_ADRESS), lavy(LEFT_MOTOR_ADRESS){
 
@@ -33,13 +43,11 @@ bool CommunicationInterface::init(){
 		return false;
 	}
 
-	ROS_ERROR("som tu1");
 	std::vector<int> fds;
 	BOOST_FOREACH(serial::Serial* serial,my_serials){
-		ROS_ERROR("som tu2");
 
 		if (serial->isOpen())
-			ROS_ERROR("port otvoreny"); //TODO prerobit na info
+			ROS_INFO("port otvoreny");
 		else{
 			ROS_ERROR("port sa neotvoril");
 			active = false;
@@ -63,14 +71,81 @@ bool CommunicationInterface::init(){
 			fd_max = fd;
 	}
 	active = true;
-	ROS_ERROR("0 = %d, 0 = %d, 0 = %d max = %d",fds[0],fds[1],fds[2],fd_max);
-	ROS_ERROR("init hotovy"); //TODO prerobit na info
+	ROS_INFO("init done");
 
 		return true;
 }
 
 bool CommunicationInterface::isActive(){
 	return active;
+}
+
+void CommunicationInterface::close(){
+	if (active){
+		BOOST_FOREACH(serial::Serial* serial,my_serials){
+			serial->close();
+		}
+		active = false;
+	}
+}
+
+bool CommunicationInterface::write(){
+
+	boost::mutex::scoped_lock locfk(broadcast_mutex);
+	succes =  writeMB();
+	succes |= writeMotors();
+    broadcast.notify_all();
+}
+
+int CommunicationInterface::waitToRead(){
+
+	fd_set read_set;
+	timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 50000; //500ms
+	int readable_fds;
+	int sucesfull_readings = 0;
+	int index;
+	int setFlags = 0;
+	while(sucesfull_readings != my_serials.size()){
+		setFds(&read_set,&setFlags);
+		readable_fds = select(fd_max+1,&read_set,NULL,NULL,&timeout);
+		if (readable_fds == -1){
+			ROS_ERROR("select failed");
+			if(timeout.tv_usec == 0)
+				return sucesfull_readings;
+			else
+				continue; //TODO nieco lebsie tu vymysliet
+		}
+		for(int i = 0;i<readable_fds;i++){
+			index = getReadableFd(&read_set,&setFlags); // vrati file descriptor, ktory je citatelny
+			if(index !=-1){
+				sucesfull_readings ++;
+				read(index);
+			}
+		}
+		if(timeout.tv_usec == 0){
+            ROS_ERROR("Receive TIMEOUT flags = '%d'",setFlags);
+			break;
+        }
+	}
+	return sucesfull_readings;
+}
+
+void CommunicationInterface::setMotorParameters(REGULATOR_MOTOR regulator, bool regulation_type){
+
+	lavy.setRegulatorPID(regulator);
+	lavy.setMotorControl(regulation_type);
+	pravy.setRegulatorPID(regulator);
+	pravy.setMotorControl(regulation_type);
+
+}
+
+void CommunicationInterface::setCameraPosition(double linearX, double angularZ){
+
+	//mb.setPosRotCam(true); // true poloha , false rychlost
+	mb.setKameraCommand(linearX,angularZ);
+	return;
 }
 
 void CommunicationInterface::setMotorsVel(double left_vel,double right_vel){
@@ -80,101 +155,51 @@ void CommunicationInterface::setMotorsVel(double left_vel,double right_vel){
 
 }
 
-//todo dorobit kameru rychlost otacania
-bool CommunicationInterface::setCameraVelocity(double linearX, double angularZ){
+//Getters
 
-	uint8_t command[MBCommand::controlCommandLength];
-
-	static double oldLinearX = 0;
-	static double oldAngularZ = 0;
-
-		return true;
-
-	oldLinearX = linearX;
-	oldAngularZ = angularZ;
-
-	mb.setPosRotCam(false);
- 	mb.setKameraCommand(angularZ,linearX);
- 	int read_length = mb.getControlCommand(command);
-
-	 //return writeAndRead(command, MBCommand::controlCommandLength, read_length, 1);
-}
-//todo dorobit kameru - poloha
-//TODO opravit navratovu hodnotu (void)
-bool CommunicationInterface::setCameraPosition(double linearX, double angularZ){
-
-	/*uint8_t command[MBCommand::controlCommandLength];
-
-		static double oldLinearX = 0;
-		static double oldAngularZ = 0;
-
-		if ((oldLinearX == linearX) && (oldAngularZ == angularZ)) //ak pride rovnaka sprava ako pred tym, callback sa moze ukoncit
-			return true;
-
-		oldLinearX = linearX;
-		oldAngularZ = angularZ;
-
-		mb.setPosRotCam(true);
-	 	mb.setKameraVelocity(angularZ,linearX);
-	 	int read_length = mb.getControlCommand(command);
-
-	// return writeAndRead(command, MBCommand::controlCommandLength, read_length, 1);*/
-	//mb.setPosRotCam(true);
-	mb.setKameraCommand(linearX,angularZ);
-	//mb.setKameraCommand(10,10);
-	return true;
+MBCommand* CommunicationInterface::getMainBoard(){
+	return &mb;
 }
 
-
-/*
- * TODO nieco s timto spravit
- * volat iba pred zacatkom komunikacneho cyklu!!!!!!
- * jednorazovy prikaz pre inicializacne nastavenia
-*/
-
-bool CommunicationInterface::setMainBoard(SET_MAIN_BOARD *param){
-	//TODO cekni toto miso prerobil somm to
-	/*uint8_t command[MBCommand::controlCommandLength];
-	mb.setParamatersMB(param);
-	int read_length = mb.getControlCommand(command);
-
-	if(! write(my_serials[MAIN_BOARD], command, MBCommand::controlCommandLength))
-		return false;
-	else return read(MAIN_BOARD);*/
-	mb.setParamatersMB(param);
-	
+MCBCommand* CommunicationInterface::getMotorControlBoardLeft(){
+	return &lavy;
+}
+MCBCommand* CommunicationInterface::getMotorControlBoardRight(){
+	return &pravy;
 }
 
 /*
- * volat iba pred zacatkom komunikacneho cyklu!!!!!!
- * jednorazovy prikaz pre inicializacne nastavenia
- */
-bool CommunicationInterface::setMotorParameters(REGULATOR_MOTOR regulator, bool regulation_type){
+ *
+ *
+ * Private functions
+ *
+ *
+ * */
 
-	/*uint8_t command[MCBCommand::controlCommandLength];
+int CommunicationInterface::writeMB(){
 
-	lavy.setRegulatorPID(regulator);
-	lavy.setMotorControl(regulation_type);
-	int read_length = lavy.getControlCommand(command);
-
-	if ( !write(LEFT_MOTOR, command, MCBCommand::controlCommandLength))
-		return false;
-
-	read(read_length);
-
-	pravy.setRegulatorPID(regulator);
-	pravy.setMotorControl(regulation_type);
-	pravy.getControlCommand(command);
-
-	if ( !write(RIGHT_MOTOR, command, MCBCommand::controlCommandLength))
-		return false;
-
-	return read(read_length);*/
-	lavy.setRegulatorPID(regulator);
-	lavy.setMotorControl(regulation_type);
-	pravy.setRegulatorPID(regulator);
-	pravy.setMotorControl(regulation_type);
-
+	int succes = 0;
+	switch(__builtin_ffs(getMainBoard()->getCommandID())){
+		case REQUEST_COMMAND_FLAG:
+            succes |= MBStatusUpdate();
+			break;
+		case PARTIAL_COMMAND_FLAG-1:
+            succes |= MBSendPartialCommd();
+			ROS_ERROR("MB partial");
+			break;
+		case CONTROL_COMMAND_FLAG:
+            succes |= MBSendControlCommd();
+			ROS_ERROR("MB control");
+			break;
+		case UNITED_COMMAND_FLAG:
+            succes |= MBSendUnitedCommd();
+			ROS_ERROR("MB united");
+			break;
+		default:
+			ROS_ERROR("V Command ID Main boardy bola zla hodnota (toto by nikdy nemalo nastat)");
+            succes = false;
+	}
+	return succes;
 }
 
 int CommunicationInterface::MBStatusUpdate(){
@@ -254,32 +279,6 @@ int CommunicationInterface::rightSendControlCommand(){
 
 }
 
-int CommunicationInterface::writeMB(){
-
-	int succes = 0;
-	switch(__builtin_ffs(getMainBoard()->getCommandID())){
-		case REQUEST_COMMAND_FLAG:
-            succes |= MBStatusUpdate();
-			break;
-		case PARTIAL_COMMAND_FLAG-1:
-            succes |= MBSendPartialCommd();
-			ROS_ERROR("MB partial");
-			break;
-		case CONTROL_COMMAND_FLAG:
-            succes |= MBSendControlCommd();
-			ROS_ERROR("MB control");
-			break;
-		case UNITED_COMMAND_FLAG:
-            succes |= MBSendUnitedCommd();
-			ROS_ERROR("MB united");
-			break;
-		default:
-			ROS_ERROR("V Command ID Main boardy bola zla hodnota (toto by nikdy nemalo nastat)");
-            succes = false;
-	}
-	return succes;
-}
-
 int CommunicationInterface::writeMotors(){
 
     int succes = 0;
@@ -318,59 +317,10 @@ int CommunicationInterface::writeMotors(){
 	return succes;
 }
 
-bool CommunicationInterface::write(){
-
-	boost::mutex::scoped_lock locfk(broadcast_mutex);
-	succes =  writeMB();
-	succes |= writeMotors();
-    broadcast.notify_all();
-}
-
-//TODO pojde prec
-/*bool CommunicationInterface::sendMainBoardStruct(){
-
-	 //TODO cez switch ten je asi rychlejsi ale neviem a malocc
-	 int commandID =mb.getCommandID();
-	 ROS_ERROR("mb command ID %d", commandID);
-	if (commandID & UNITED_COMMAND_FLAG){
-
-		uint8_t command[MBCommand::unitedCommandLength];
-		processCallbacks(MAIN_BOARD);
-		read_lengths[MAIN_BOARD] =  mb.getUnitedCommand(command); // dlzka, ktora je ocakavana na reade
-		write(MAIN_BOARD, command, MBCommand::unitedCommandLength);
-	}
-
-	else if (commandID & CONTROL_COMMAND_FLAG){
-			uint8_t command[MBCommand::controlCommandLength];
-			processCallbacks(MAIN_BOARD);
-			read_lengths[MAIN_BOARD] =  mb.getControlCommand(command); // dlzka, ktora je ocakavana na reade
-			write(MAIN_BOARD, command, MBCommand::controlCommandLength);
-		}
-
-	else if (commandID & PARTIAL_COMMAND_FLAG){
-		uint8_t command[MBCommand::partialCommandLength];
-		processCallbacks(MAIN_BOARD);
-		read_lengths[MAIN_BOARD] =  mb.getPartialCommand(command); // dlzka, ktora je ocakavana na reade
-		write(MAIN_BOARD, command, MBCommand::partialCommandLength);
-	}
-
-	return false;
-}*/
-
 CommunicationInterface::~CommunicationInterface(){
 
 	close();
 }
-
-void CommunicationInterface::close(){
-	if (active){
-		BOOST_FOREACH(serial::Serial* serial,my_serials){
-			serial->close();
-		}
-		active = false;
-	}
-}
-
 
 int CommunicationInterface::write(int id,uint8_t *dataWrite, int lengthWrite){
 	if(active){
@@ -439,46 +389,6 @@ bool CommunicationInterface::read(int id){
 
 }
 
-
-
-int CommunicationInterface::waitToRead(){
-		//my_serials[0]->flush();
-	fd_set read_set;
-	timeval timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 50000; //500ms
-	int readable_fds;
-	int sucesfull_readings = 0;
-	int index;
-	int setFlags = 0;
-	while(sucesfull_readings != my_serials.size()){
-		setFds(&read_set,&setFlags);
-		//ROS_ERROR("select");
-		//select aktualizuje timeout a aktualizuje set
-		//ROS_ERROR("mb %d mcbl %d mcbr %d",(int)FD_ISSET(my_serials[0]->getFd(),&read_set),(int)FD_ISSET(my_serials[1]->getFd(),&read_set),(int)FD_ISSET(my_serials[2]->getFd(),&read_set));
-		readable_fds = select(fd_max+1,&read_set,NULL,NULL,&timeout);
-		//ROS_ERROR("za selectom readable fds = %d timeout = %d available bytes = %d",readable_fds,(int)timeout.tv_usec,(int)my_serials[0]->available());
-		if (readable_fds == -1){
-			ROS_ERROR("select failed");
-			if(timeout.tv_usec == 0)
-				return sucesfull_readings;
-			else
-				continue; //TODO nieco lebsie tu vymisliet
-		}
-		for(int i = 0;i<readable_fds;i++){
-			index = getReadableFd(&read_set,&setFlags); // vrati file descriptor ktori je citatelny
-			if(index !=-1){
-				sucesfull_readings ++;
-				read(index);
-			}
-		}
-		if(timeout.tv_usec == 0){
-            ROS_ERROR("Receive TIMEOUT flags = '%d'",setFlags);
-			break;
-        }
-	}
-	return sucesfull_readings;
-}
 void CommunicationInterface::setFds(fd_set *set,int* flag){
 	FD_ZERO(set);
 	for(int i=0;i<my_serials.size();i++){
@@ -495,30 +405,6 @@ int CommunicationInterface::getReadableFd(fd_set *set,int* flag){
 		}
 	}
 	return -1;
-}
-
-MBCommand* CommunicationInterface::getMainBoard(){
-	return &mb;
-}
-
-MCBCommand* CommunicationInterface::getMotorControlBoardLeft(){
-	return &lavy;
-}
-MCBCommand* CommunicationInterface::getMotorControlBoardRight(){
-	return &pravy;
-}
-
-//todo nepojde prec?
-bool CommunicationInterface::isAnswerOk(){
-	//todo znovu prerobena funkcia iba na mb
-	//TODO preco je velkost 7 a citas 6? Miso - neviem mozno preklep. Tu ale treba domysliet problem, ze ked pride odpoved OK tak pride 6 bytov ale ked pride ERROR tak 7 bytov
-	uint8_t data[7];
-	int result_byte = my_serials[0]->read(data, 6);
-
-	if (data[4] == MSG_OK)
-		return true;
-	else return false;
-
 }
 
 void CommunicationInterface::setupPort(int sb,int p,int bs){

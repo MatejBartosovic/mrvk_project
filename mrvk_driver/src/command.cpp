@@ -234,7 +234,7 @@ bool MBCommand::getCentralStop(){
 		pthread_mutex_unlock(&MB_mutex);	
  }
 
- void MBCommand::setParamatersMB(SET_MAIN_BOARD* config)
+ void MBCommand::setParamaters(SET_MAIN_BOARD* config)
     {
 	pthread_mutex_lock(&MB_mutex);
     rob_set_MB.MCBsSB_5V = config->MCBsSB_5V;
@@ -723,133 +723,7 @@ int MCBCommand::getCommandID(bool nuluj){
 	return id;
 }
 
-/*** Trieda pre Sensor Board ***/
-SBCommand::SBCommand(uint8_t adresa) : Command(adresa)
-{
-		pthread_mutex_init(&SB_mutex, NULL);
-    sb_req.adresa = adresa;
-    sb_req.dlzka_spravy = 0x83;
-    sb_req.cislo_commandu = 0x45;
-   
-    uint8_t crc = computeCRC((uint8_t*)&sb_req,3);
-	sb_req.crcL=crc & 0x0f;
-	sb_req.crcH=(crc & 0xf0)>>4;
 
-	if(!computeParity((uint8_t)sb_req.crcL)) sb_req.crcL ^=0x80;
-	if(!computeParity((uint8_t)sb_req.crcH)) sb_req.crcH ^=0x80;
-	
-	sum_samples = 0;
-	
-	 kompas.SOFT_REV_NUM = 0;
-         kompas.COM_BEAR_BYTE = 0;
-        kompas.COM_BEAR_WORD = 0;
-        kompas.SEN1_DIFSIG = 0;
-        kompas.SEN2_DIFSIG = 0;
-        kompas.CALVALUE1 = 0;
-        kompas.CALVALUE2 = 0;
-	kompas.BEAR_AVG = 0;		///pocitana hodnota, klzavy priemer - len ked robot stoji, pre riadenie treba pouzivat COM_BEAR_WORD, ked vobec 
-	kompas.BEAR_AVG_COUNT = 0;
-}
-
- int SBCommand::getRequestKompasCommand(uint8_t* command)
- {
-			pthread_mutex_lock(&SB_mutex);
-		 	command[0] = sb_req.adresa;
-    	command[1] = sb_req.dlzka_spravy;
-    	command[2] = sb_req.cislo_commandu;
-    	command[3] = sb_req.crcH;
-    	command[4] = sb_req.crcL;
-			pthread_mutex_unlock(&SB_mutex);
-    	//printf("%d",requestCommandLength); //komentovane 29.1.2016 Matej Bartosovic (neodkomentovat??)
-    	return 14;
-}
-
-
- int SBCommand::getControlKompasCommand(uint8_t* command, bool calibrate, bool reset)
- {
- 	
-	command[0] = 0x09; 
-	command[1] = 0x85; 
-	command[2] = 0x04;
-	command[3] = 0x80;
-	pthread_mutex_lock(&SB_mutex);
-	command[4]=1*reset + 2*calibrate;
-	pthread_mutex_unlock(&SB_mutex);
-	if(!computeParity(command[4])){ 
-		command[4] ^=0x80; 
-		command[3]=0x01; 
-	}
-	computeCRCWithParity(command,7);
-	
-    	return 6;
-}
-
-//odpoved na request command 0x45 (kratsia)
-void SBCommand::addSample(uint8_t data[])
-{
-	 SENZOR_BOARD_ANSWER_STATUS *p;
-	  p=(SENZOR_BOARD_ANSWER_STATUS*)data;
-	// ROBLL_COMPASS_CMPS03 rob_compass_CMPS03;
-	// ROBLL_COMPASS_HM55B rob_compass_HM55B;
-	//SensorB_OUT_54 *p;
-
-	kompas.COM_BEAR_WORD = char2BToInt16(data[5], data[6]);
-	//rob_compass_CMPS03.COM_BEAR_WORD=((uint16) RobLLRS422ComputeSwb(p->HLRCA.CBW));
-	//(*rob_compass_CMPS03).new_data=true;
-//	(*rob_compass_CMPS03).time=*rob_time_counter;
-
-	//if(rob_odometry->movement_right || rob_odometry->movement_left){
-		///robot je v pohybe - do BEAR_AVG sa da aktualna hodnota komapsu
-	//	rob_compass_CMPS03->BEAR_AVG=rob_compass_CMPS03->COM_BEAR_WORD;
-	//	rob_compass_CMPS03->BEAR_AVG_COUNT=0;
-	//	rob_CMPS03_compute.sum_samples=((double) 0.0);
-	//}
-	
-	///robot stoji - teda aspon vzhladom na pohony - moze sa ratat priemer
-		pthread_mutex_lock(&SB_mutex);
-	kompas.BEAR_AVG_COUNT++;
-	if (kompas.BEAR_AVG_COUNT > 5) //vzorky sa zacnu pridavat az po 5 citaniach
-	{	
-		sum_samples+=kompas.COM_BEAR_WORD;
-		kompas.BEAR_AVG=sum_samples/(kompas.BEAR_AVG_COUNT - 5);
-	}
-	pthread_mutex_unlock(&SB_mutex);
-	
-	//rob_compass_HM55B.X_AXIS=((int) RobLLRS422ComputeSwb(p->HLRCA.XM));
-	//rob_compass_HM55B.Y_AXIS=((int) RobLLRS422ComputeSwb(p->HLRCA.YM));
-	//rob_compass_HM55B.ARM=((double) (((short)RobLLRS422ComputeSwb(p->HLRCA.AP)+ARMP2)*ARMP1));
-	//rob_compass_HM55B.new_data=true;
-	//rob_compass_HM55B.time=*rob_time_counter;
-	
-	
-	
-	//ROS_INFO("CMPS03 uhol svet ( bear word) %.4f po deleni %.4f po deleni  %.4f",rob_compass_CMPS03.COM_BEAR_WORD,rob_compass_CMPS03.COM_BEAR_WORD/180.04,rob_compass_CMPS03.COM_BEAR_WORD/360.08);
-	//ROS_INFO("HM55B X %d",rob_compass_HM55B.X_AXIS);
-	//ROS_INFO("HM55B Y %d",rob_compass_HM55B.Y_AXIS);
-	//ROS_INFO("HM55B ARM %.4f",rob_compass_HM55B.ARM);
-	
-}
-
-void SBCommand::resetSamples()
-{
-	pthread_mutex_lock(&SB_mutex);
-	sum_samples = 0;
-	kompas.BEAR_AVG_COUNT = 0;
-	kompas.BEAR_AVG = 0;
-	pthread_mutex_unlock(&SB_mutex);
-}
-
-double SBCommand::getBearing()
-{ 
-	pthread_mutex_lock(&SB_mutex);
-	double x=kompas.BEAR_AVG/10+90; //kompas je otoceny (rotuje opacne) a potoceny o 90 stupnov
-	pthread_mutex_unlock(&SB_mutex);
-	if(x>=360)
-		x-=360;
-	x=360-x;
-	
-	return x; //lebo datasheet compas cmps03
-}
 
 /*** Hlavna trieda Commnad ***/
 Command::Command(uint8_t adresa)
@@ -868,12 +742,7 @@ Command::Command(uint8_t adresa)
 	if(!computeParity((uint8_t)req.crcL)) req.crcL ^=0x80;
 	if(!computeParity((uint8_t)req.crcH)) req.crcH ^=0x80;
  }
- // private pre SB
- int16_t SBCommand::char2BToInt16(unsigned char H, unsigned char L)
-{
-	uint16_t result = (H << 8) | L;
-	return (int16_t) result;
-}
+
  //public gettery
  //request command je skoro zhodny pre oba moduly preto je implementovany v tejto triede
  int Command::getRequestCommand(uint8_t* command)
@@ -947,4 +816,9 @@ Command::Command(uint8_t adresa)
 void Command::uint16ToChar2B(uint16_t X, uint8_t &H, uint8_t &L){
 	H= (X>>8) & 0xff; 
 	L= X & 0xff;
+}
+ int16_t Command::char2BToInt16(unsigned char H, unsigned char L)
+{
+	uint16_t result = (H << 8) | L;
+	return (int16_t) result;
 }
