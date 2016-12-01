@@ -284,7 +284,6 @@ bool MBCommand::getCentralStop(){
 {
 	pthread_mutex_lock(&MB_mutex);
 	if((Z != last_Z_camera)||(X !=last_X_camera)){
-		ROS_ERROR("hovno %d %d",X,Z);
 		last_Z_camera = Z;
 		last_X_camera = X;
 		rob_set_MB.camAngleX = X;
@@ -509,7 +508,7 @@ void MBCommand::kameraPosition(uint8_t* command,double z, double x)
 MCBCommand::MCBCommand(uint8_t adresa) : Command(adresa)
 {
 //init pre motory
-	Motor_set.Speed=0;		///@todo treba preradit na radiany
+	Motor_set.Speed=0;
 	Motor_set.GearPosition=0;
 	pthread_mutex_init(&MCB_mutex, NULL);
 	Motor_set.MotorControl=false;
@@ -552,13 +551,8 @@ int MCBCommand::getControlCommand(uint8_t* command){
 	command[1] = 0x13;
 	command[2] = 0x80;
 	pthread_mutex_lock(&MCB_mutex);
-	//Motor_set.Speed=rychlost;		///!@todo tu treba urobit prepocet z radianov na prislusnu jednotku
-	if(adresa == 0x05){
-		uint16ToChar2B((-(short)(Motor_set.Speed)), command[4], command[5]);
-	}
-	else{
-		uint16ToChar2B(((short) Motor_set.Speed), command[4], command[5]);
-	}
+
+	uint16ToChar2B(((short) Motor_set.Speed), command[4], command[5]);
 	command[6]=Motor_set.GearPosition;
 	command[7]=Motor_set.MotorControl+2*Motor_set.Clr_I2C_CER+4*Motor_set.Clr_RS_CER+8*Motor_set.ManualShift;
 
@@ -620,7 +614,7 @@ int MCBCommand::getPartialCommand(uint8_t* command){ //ciastocny command v datas
   void MCBCommand::getStructMotor(ROBLL_SET_MOTOR* Motor)
   {
 	pthread_mutex_lock(&MCB_mutex);
-  Motor->Speed = Motor_set.Speed;			//!<posielana ziadana rychlost v imulzoch/10ms @todo preratat na ziadanu na rad/s
+  Motor->Speed = Motor_set.Speed;			//!<posielana ziadana rychlost v imulzoch/10ms
   Motor->GearPosition = Motor_set.GearPosition;
 
   Motor->MotorControl = Motor_set.MotorControl;		//!< otackova=0, PWM=true riadenie
@@ -652,8 +646,9 @@ short MCBCommand::getMotorSpeed()
 	pthread_mutex_unlock(&MCB_mutex);
 	return ret;
   }
+
   //settery
-// TODO
+
 void MCBCommand::setMotorSpeed(double speed)
 {
 	if(current_vel_set!=speed){

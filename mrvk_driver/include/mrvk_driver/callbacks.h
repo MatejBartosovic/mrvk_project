@@ -30,30 +30,24 @@ class MrvkCallbacks{
 
 	CommunicationInterface *interface;
 
-		//ros::ServiceServer initSS;
 		ros::ServiceServer shutdownSS;
-		//ros::ServiceServer resetFlagsSS;
 		ros::ServiceServer resetBatterySS;
 		ros::ServiceServer resetCentralStopSS;
-		//ros::ServiceServer stopSS;
+		ros::ServiceServer blockMovementSS;
 		ros::ServiceServer setArmVoltageSS;
 		ros::ServiceServer toggleArmVoltageSS;
 		ros::ServiceServer toggleCameraSourceSS;
 		ros::ServiceServer setPowerManagmentSS;
 		ros::ServiceServer setMotorParametersSS;
 
-		//	bool initCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool shutdownCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
-		//bool resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool resetBatteryCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool resetCentralStopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
-		//bool stopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
+		bool blockMovementCallback(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res);
 		bool setArmVoltageCallback(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res);
 		bool toggleArmVoltageCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool toggleCameraSourceCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool setPowerManagmentCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
-		//bool setMotorParametersCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
-
 
 };
 

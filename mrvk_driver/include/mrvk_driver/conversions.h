@@ -36,13 +36,8 @@ public:
     TValue getStatus(TMember member,TValue nic){
         return statusMB.*member;
 	}
-    //example getStatus(&mrvk_driver::Mb_status::central_stop);
+    //example getStatus(&mrvk_driver::Mb_status::central_stop,true);
 
-    /*template <typename TMember>
-    bool getPowerStatus(TMember member){
-        return statusMB.power_managment.*member;
-    }*/
-    //interface->getPowerStatus(&mrvk_driver::Power_managment_::arm_5V);
     bool getPowerArm();
 	//mcb status
 	bool getStatusMotorErrors();

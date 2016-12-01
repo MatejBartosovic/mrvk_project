@@ -12,7 +12,7 @@
 
 
 CommunicationInterface::CommunicationInterface(std::vector<std::string> ports, int baudrate, int stopBits, int parity, int byteSize):
-mb(MAIN_BOARD_ADRESS), pravy(RIGHT_MOTOR_ADRESS), lavy(LEFT_MOTOR_ADRESS){
+mb(MAIN_BOARD_ADRESS), pravy(RIGHT_MOTOR_ADRESS), lavy(LEFT_MOTOR_ADRESS),blocked(false){
 
 	if(ports.size()!=3)
 		throw std::invalid_argument("Invalid serial ports.");
@@ -150,9 +150,19 @@ void CommunicationInterface::setCameraPosition(double linearX, double angularZ){
 
 void CommunicationInterface::setMotorsVel(double left_vel,double right_vel){
 
+	if (blocked){
+		left_vel = 0;
+		right_vel = 0;
+	}
+
 	lavy.setMotorSpeed(-left_vel);
 	pravy.setMotorSpeed(right_vel);
 
+}
+
+void CommunicationInterface::blockMovement(bool param){
+
+	blocked = param;
 }
 
 //Getters

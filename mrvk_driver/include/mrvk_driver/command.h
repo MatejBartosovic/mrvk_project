@@ -73,7 +73,7 @@ typedef struct request_command
 
 	}REGULATOR_MOTOR;
 typedef struct robll_set_motor { // MCB odomna pre ronyho - pouzijem len v sstatusa SS
-		double Speed;			//!<posielana ziadana rychlost v imulzoch/10ms @todo preratat na ziadanu na rad/s
+		double Speed;			//!<posielana ziadana rychlost v imulzoch/10ms
 		unsigned char GearPosition;
 
 		bool MotorControl;		//!< otackova=0, PWM=true riadenie

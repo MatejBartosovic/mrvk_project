@@ -55,7 +55,6 @@ void Conversions::answerMB_40_02(uint8_t *data){
 
 		cameraPositionZ = (char2BToInt16(data[4], data[5]) - MBNULPOL1)/MBZISK1;
 		cameraPositionX = (char2BToInt16(data[6], data[7]) - MBNULPOL2)/MBZISK2;
-		//todo dorobit kameru otacanie a klopenie
 		//todo anal. hodnota 12V a 5V
 
 		if (energy_source) //napajane z baterie
@@ -91,7 +90,6 @@ void Conversions::answerMB_10(uint8_t *data){
 
 		bool energy_source=((data[1] & 64) ? true : false);
 
-		//todo dorobit kameru otacanie a klopenie
 		//todo anal. hodnota 12V a 5V
 
 		cameraPositionZ = (char2BToInt16(data[2], data[3]) - MBNULPOL1)/MBZISK1;
@@ -136,8 +134,7 @@ void Conversions::answerMCB(uint8_t *data, uint8_t device){
 		statusMCB[motorIndex].shifting = ((data[1] & 8) ? true : false);
 		statusMCB[motorIndex].shifting_error =  ((data[1] & 16) ? true : false);
 
-		speedWheels[motorIndex] = (float) char2BToInt16(data[4], data[5]); //* ODOMETRY_CONSTANT * WHEEL_RADIUS;
-		//todo speed, odometria
+		speedWheels[motorIndex] = (float) char2BToInt16(data[4], data[5]);
 
 		statusMCB[motorIndex].gear_position = data[10];
 

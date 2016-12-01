@@ -14,35 +14,15 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface *interface) {
 
 	ros::NodeHandle n;
 
-	//initSS = n.advertiseService("init", &MrvkCallbacks::initCallback, this);
-	//resetFlagsSS = n.advertiseService("reset_flags", &MrvkCallbacks::resetFlagsCallback, this);
 	shutdownSS = n.advertiseService("shutdown", &MrvkCallbacks::shutdownCallback, this);
 	resetCentralStopSS = n.advertiseService("reset_central_stop", &MrvkCallbacks::resetCentralStopCallback, this);
 	resetBatterySS = n.advertiseService("reset_Q_batery", &MrvkCallbacks::resetBatteryCallback, this);
-	//stopSS = n.advertiseService("set_global_stop", &MrvkCallbacks::stopCallback, this);
+	blockMovementSS = n.advertiseService("block_movement", &MrvkCallbacks::blockMovementCallback, this);
 	setArmVoltageSS = n.advertiseService("set_arm_voltage", &MrvkCallbacks::setArmVoltageCallback, this);
     toggleArmVoltageSS = n.advertiseService("toggle_arm_voltage", &MrvkCallbacks::toggleArmVoltageCallback, this);
     toggleCameraSourceSS = n.advertiseService("toggle_camera_source", &MrvkCallbacks::toggleCameraSourceCallback, this);
 	setPowerManagmentSS = n.advertiseService("write_main_board_settings", &MrvkCallbacks::setPowerManagmentCallback, this);
-	///setMotorParametersSS = n.advertiseService("write_motor_settings", &MrvkCallbacks::setMotorParametersCallback, this);
-
 }
-
-/*void MrvkCallbacks::resetCallbacksFlags() {
-
-	inter = 0;
-}*/
-
-/*
-bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res) {
-
-		//resetFlags = true;
-		//newCallback = true;
-
-		res.success = true;
-		res.message = "flags are reset";
-		return true;
-	}*/
 
 	//todo overit funkcnost + ked bude na baterkach tak overit premennu full_battery
 	bool MrvkCallbacks::resetBatteryCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
@@ -70,6 +50,7 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
 
         //send motors request
         boost::unique_lock<boost::mutex> broadcast_lock(interface->broadcast_mutex);
+        interface->blockMovement(true);
         interface->getMotorControlBoardLeft()->setErrFlags(true,true);
         interface->getMotorControlBoardRight()->setErrFlags(true,true);
         interface->broadcast.wait(broadcast_lock);
@@ -93,6 +74,7 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
         for(int i =0;i<300;i++){
             interface->data.wait(lock);
             if(!interface->getStatus(&mrvk_driver::Mb_status::central_stop,true)) {
+            	interface->blockMovement(false);
                 res.success = true;
                 res.message = "Ok";
                 return true;
@@ -103,14 +85,13 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
 	}
 
 
-	/*bool MrvkCallbacks::stopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res)
+	bool MrvkCallbacks::blockMovementCallback(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res)
 	{
-		//stop = true;
-		////newCallback = true;
-		 //stop();
-		 res.success = true;
-		 return true;
-	}*/
+		boost::unique_lock<boost::mutex> broadcast_lock(interface->broadcast_mutex);
+		interface->blockMovement(req.data);
+		return true;
+	}
+
 
 	//100% funkcny servis
 	bool MrvkCallbacks::setArmVoltageCallback(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res){
@@ -208,23 +189,6 @@ bool MrvkCallbacks::resetFlagsCallback(std_srvs::Trigger::Request  &req, std_srv
         return true;
 	}
 
-	/*bool MrvkCallbacks::setMotorParametersCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
-
-		//setMotorParameters = true;
-		//newCallback = true;
-
-		res.success = true;
-		return true;
-	}*/
-
-/*	bool MrvkCallbacks::initCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
-
-		if (init())
-			res.success = true;
-		else res.success = false;
-
-		return true;
-	}*/
 
 	bool MrvkCallbacks::shutdownCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
 

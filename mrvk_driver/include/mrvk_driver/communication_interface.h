@@ -37,7 +37,7 @@ public:
 
 	void setCameraPosition(double linearX, double angularZ);
 	void setMotorsVel(double left_vel,double right_vel);
-
+	void blockMovement(bool param);
 
 	MCBCommand* getMotorControlBoardLeft();
 	MCBCommand* getMotorControlBoardRight();
@@ -73,6 +73,8 @@ private:
     int MBSendUnitedCommd();
 
 	bool active;
+	bool blocked;
+
 	std::vector<serial::Serial*> my_serials;
 	MCBCommand lavy;
 	MCBCommand pravy;
