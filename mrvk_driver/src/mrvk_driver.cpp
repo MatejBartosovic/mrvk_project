@@ -9,15 +9,12 @@
 #include <controller_manager/controller_manager.h>
 #include <mrvk_driver/callbacks.h>
 
-
-//todo spravit nastavenie parametrov motora
-//polohovanie kamery
-//rozdelit komunikaciu na 3 porty
+#include <diagnostic_updater/diagnostic_updater.h>
 
 class MrvkDriver{
 
 public:
-	MrvkDriver() : mrvkHW(){
+	MrvkDriver() : mrvkHW(),diagnostic_( ){
 
 		if(mrvkHW.init(&hw, &robot_transmissions) !=4 ){
 			ROS_ERROR("init nezbehol");
@@ -60,16 +57,17 @@ public:
 		comunication_interface = new CommunicationInterface(ports, baud, stopBits, parity, byteSize);
 		callbacks = new MrvkCallbacks(comunication_interface);
 
-		//TODO toto prec Miso: zatial to tu chcem nechat potom by som spravil diagnostic updater
-		pub_MCBlStatus = n.advertise<mrvk_driver::Mcb_status>("motor_status_left", 10); //publishery s konkretnou statusovou spravou
-		pub_MCBrStatus = n.advertise<mrvk_driver::Mcb_status>("motor_status_right", 10); //publishery s konkretnou statusovou spravou
-		pub_MBStatus = n.advertise<mrvk_driver::Mb_status>("main_board_status", 10);
+		diagnostic_.add("mrvk_driver Status", this, &MrvkDriver::diagnostics);
+	    diagnostic_.setHardwareID("none");
 
+	    double statusPeriod;
+	    n.param<double>("status_period", statusPeriod, 5);
+		status_timer = n.createTimer(ros::Duration(statusPeriod), &MrvkDriver::statusTimerCallback, this);
 	}
 
 	bool init(){
 
-		ROS_INFO("Robot init"); //TODO prerobit na info alebo prec
+		ROS_INFO("Robot init");
 
 		if (!comunication_interface->init())
 			return false;
@@ -85,12 +83,10 @@ public:
 		comunication_interface->setMotorParameters(regulator, regulation_type);
 
 		//todo dorobit odblokovanie central stopu do initu
-
 		last_time = ros::Time::now();
 		current_time = ros::Time::now();
 
 		 return true;
-
 	}
 
 	void read(){
@@ -99,9 +95,11 @@ public:
 		act_to_joint_state->propagate();
 		//act_to_pos_joint->propagate();
 		//act_to_vel_joint->propagate();
-		pub_MCBlStatus.publish(comunication_interface->getStatusMCB(CommunicationInterface::LEFT_MOTOR_ADRESS));
-		pub_MCBrStatus.publish(comunication_interface->getStatusMCB(CommunicationInterface::RIGHT_MOTOR_ADRESS));
-		pub_MBStatus.publish(comunication_interface->getStatusMB());
+		statusMutex.lock();
+		mainBoardStatus = comunication_interface->getStatusMB();
+		leftMotorStatus = comunication_interface->getStatusMCB(CommunicationInterface::LEFT_MOTOR_ADRESS);
+		rightMotorStatus = comunication_interface->getStatusMCB(CommunicationInterface::RIGHT_MOTOR_ADRESS);
+		statusMutex.unlock();
 	}
 
 	void write(){
@@ -167,8 +165,38 @@ private:
 
 	std::vector<mrvk::Limits> limits;
 
-};
+	mrvk_driver::Mb_status mainBoardStatus;
+	mrvk_driver::Mcb_status leftMotorStatus;
+	mrvk_driver::Mcb_status rightMotorStatus;
 
+	boost::mutex statusMutex;
+	ros::Timer status_timer;
+	diagnostic_updater::Updater diagnostic_;
+
+	void diagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat){
+
+
+		if (comunication_interface->isActive()){
+
+			stat.summary(0, "Connected");
+
+			 statusMutex.lock();
+			 stat.add<mrvk_driver::Mb_status>("main board status",mainBoardStatus);
+			 stat.add<mrvk_driver::Mcb_status>("left motor board status",leftMotorStatus);
+			 stat.add<mrvk_driver::Mcb_status>("right board status",rightMotorStatus);
+			 ROS_ERROR("test koniec");
+			 statusMutex.unlock();
+
+		}else stat.summary(2, "Disconnected");
+
+	}
+
+	void statusTimerCallback(const ros::TimerEvent& timer_struct) {
+
+		diagnostic_.update();
+	}
+
+};
 
 int main (int argc, char **argv){
 

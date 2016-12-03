@@ -15,8 +15,7 @@ stop_bits: 1    #1 - stopBits 1  #2 - stopBits 2 #3 - stopBits 1.5
 parity: 1       #0 - none #1 - odd parity #2 - even parity
 byte_size: 8    #5 - fivebits #6 - sixbits #7 - sevenbits #8 eightbits
  
-main_board_timer_period: 0.5
-motor_control_board_timer_period: 0.1
+status_period: 5
  
 MCBsSB_5V: True
 MCBs_12V: True
