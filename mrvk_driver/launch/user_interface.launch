@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 	<!-- zapina gmapping a vytvori model v rvize s kompletnou konfiguraciou -->
 	
@@ -6,5 +7,6 @@
 	<node name="joy_node" pkg="joy" type="joy_node">
 		<param name="dev" type="string" value="/dev/input/js1"/>
 	</node>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_driver)/rviz/mappping.rviz" required="true"/>
 	
 </launch>

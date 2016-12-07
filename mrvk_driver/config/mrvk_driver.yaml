@@ -8,7 +8,7 @@ joint_limits:
 
 transmissions: [mrvk_left_transmission, mrvk_right_transmission,camera_horizontal_transmission, camera_vertical_transmission]
 #[main_board motor_control_board_left motor_control_bord_right]
-port_names: [/dev/ttyUSB0, /dev/ttyUSB1, /dev/ttyUSB2]
+port_names: [/dev/ttyUSB0, /dev/ttyUSB2, /dev/ttyUSB3]
 
 baudrate: 230400
 stop_bits: 1    #1 - stopBits 1  #2 - stopBits 2 #3 - stopBits 1.5 

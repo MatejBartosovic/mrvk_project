@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 	<!-- zapina gmapping a vytvori model v rvize s kompletnou konfiguraciou -->	
 	<include file="$(find mrvk_driver)/launch/driver.launch" />
@@ -31,9 +32,5 @@
   	</node>
 	
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
-	
-	
-	
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_driver)/rviz/mappping.rviz" required="true"/>
 	
 </launch>
