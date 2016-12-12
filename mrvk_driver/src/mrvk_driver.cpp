@@ -92,9 +92,9 @@ public:
 	void read(){
 		velocity->at(0) = comunication_interface->getSpeedLeftWheel();
 		velocity->at(1) = -comunication_interface->getSpeedRightWheel();
+		position->at(0) = position->at(0) + velocity->at(0) * getPeriod();
+		position->at(1) = position->at(1) + velocity->at(1) * getPeriod();
 		act_to_joint_state->propagate();
-		//act_to_pos_joint->propagate();
-		//act_to_vel_joint->propagate();
 		statusMutex.lock();
 		mainBoardStatus = comunication_interface->getStatusMB();
 		leftMotorStatus = comunication_interface->getStatusMCB(CommunicationInterface::LEFT_MOTOR_ADRESS);
@@ -104,7 +104,6 @@ public:
 
 	void write(){
 		propagataAndEnforceLimits();  // spocitaj rychlosti z motora cez prevodovku a dodrz limity
-		//ROS_ERROR("kamera vel =%lf cmd = %lf",position_command->at(2),position_command->at(3));
 		comunication_interface->setMotorsVel(velocity_command->at(0),velocity_command->at(1));
 		comunication_interface->setCameraPosition(position_command->at(2),position_command->at(3));
 		comunication_interface->write();
@@ -184,7 +183,6 @@ private:
 			 stat.add<mrvk_driver::Mb_status>("main board status",mainBoardStatus);
 			 stat.add<mrvk_driver::Mcb_status>("left motor board status",leftMotorStatus);
 			 stat.add<mrvk_driver::Mcb_status>("right board status",rightMotorStatus);
-			 ROS_ERROR("test koniec");
 			 statusMutex.unlock();
 
 		}else stat.summary(2, "Disconnected");
@@ -219,7 +217,6 @@ int main (int argc, char **argv){
 		driver.read();
 		cm.update(ros::Time::now(), ros::Duration(driver.getPeriod()));
 		driver.write();
-		rate.sleep();
 	}
 	
 return 0;
