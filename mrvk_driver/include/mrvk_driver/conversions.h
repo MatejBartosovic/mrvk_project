@@ -19,6 +19,8 @@
 #define MBZISK2 11.584
 #define MBNULPOL2 3495
 
+#define ODOMETRY_CONSTANT 0.006546076617684
+
 class Conversions{
 public:
 

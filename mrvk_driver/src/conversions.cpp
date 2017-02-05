@@ -26,10 +26,12 @@ void Conversions::convertMsg(uint8_t *data, uint8_t device){
 }
 
 bool Conversions::getStatusMotorErrors(){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
     return statusMCB[0].i2c_communication_error && statusMCB[0].i2c_error_status && statusMCB[0].rs422_communication_error &&statusMCB[1].i2c_communication_error && statusMCB[1].i2c_error_status && statusMCB[1].rs422_communication_error;
 }
 
 bool Conversions::getPowerArm(){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
     return statusMB.power_managment.arm_5V && statusMB.power_managment.arm_12V;
 }
 
@@ -147,29 +149,35 @@ void Conversions::answerMCB(uint8_t *data, uint8_t device){
 }
 
 mrvk_driver::Mb_status Conversions::getStatusMB(){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
 	return statusMB;
 }
 
 mrvk_driver::Mcb_status Conversions::getStatusMCB(uint8_t device){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
 	if (device == LEFT_MOTOR_ADRESS)
 		return statusMCB[0];
 	else return statusMCB[1];
 }
 
 double Conversions::getSpeedLeftWheel(){
-	return speedWheels[0];
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+	return speedWheels[0] * ODOMETRY_CONSTANT;
 }
 
 double Conversions::getSpeedRightWheel(){
-	return speedWheels[1];
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+	return speedWheels[1] * ODOMETRY_CONSTANT;
 }
 
 double Conversions::getCameraPositionZ() {
-    return cameraPositionZ;
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+    return cameraPositionZ/180 *M_PI;
 	}
 
 double Conversions::getCameraPositionX(){
-    return cameraPositionX;
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+    return cameraPositionX/180 *M_PI;
 	}
 
 int16_t Conversions::char2BToInt16(unsigned char H, unsigned char L)

@@ -6,7 +6,7 @@ joint_limits:
     has_acceleration_limits: true
     max_acceleration: 20 #rad*s^(-2)
 
-transmissions: [mrvk_left_transmission, mrvk_right_transmission,camera_horizontal_transmission, camera_vertical_transmission]
+mrvk_joint_names: [wheel_joint_left, wheel_joint_right, scan_to_veza, camera_r_to_camera]
 #[main_board motor_control_board_left motor_control_bord_right]
 port_names: [/dev/ttyUSB0, /dev/ttyUSB2, /dev/ttyUSB3]
 

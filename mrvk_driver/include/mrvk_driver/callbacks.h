@@ -8,10 +8,6 @@
 #ifndef CALLBACKS_H_
 #define CALLBACKS_H_
 
-#include <stdio.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <ros/ros.h>
 #include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
@@ -21,14 +17,14 @@
 
 class MrvkCallbacks{
 	public:
-		MrvkCallbacks(CommunicationInterface *interface);
+		MrvkCallbacks(CommunicationInterface &communicationInterface);
 
 	void getMbFromParam(SET_MAIN_BOARD *config);
 	void getMotorParametersFromParam(REGULATOR_MOTOR *reg, bool *regulation_type);
 
 	private:
 
-	CommunicationInterface *interface;
+	CommunicationInterface &communicationInterface;
 
 		ros::ServiceServer shutdownSS;
 		ros::ServiceServer resetBatterySS;

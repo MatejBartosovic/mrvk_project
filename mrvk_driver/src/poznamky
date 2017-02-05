@@ -1,9 +1,3 @@
-zdielana struktura naco dve? a ak dve tak ku nej ma pristup viac vlakien -- riesi miso
-
-mb v callbacks a comunication interface je uplne nieco ine premenovat normalne
-
-conversions vyhodit rychlost a polohu motora / kamery
-
 prerobit classu commands na boost mutexi
 
 callbacky hodit do try catch VSETKY!!!!

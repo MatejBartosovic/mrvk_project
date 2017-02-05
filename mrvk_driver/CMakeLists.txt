@@ -131,7 +131,6 @@ include_directories(
 # add_library(mrvk_driver
 #   src/${PROJECT_NAME}/mrvk_driver.cpp
 # )
-add_library(${PROJECT_NAME}_hardware_interface_loader src/HwInterface.cpp )
 add_library(${PROJECT_NAME}_communication_interface src/communication_interface.cpp src/command.cpp src/conversions.cpp src/callbacks.cpp)
 
 ## Add cmake target dependencies of the library
@@ -140,13 +139,13 @@ add_library(${PROJECT_NAME}_communication_interface src/communication_interface.
 
 ## Declare a C++ executable
 # add_executable(mrvk_driver_node src/mrvk_driver_node.cpp)
-add_executable(mrvk_driver src/mrvk_driver.cpp )
+add_executable(mrvk_driver src/mrvk_driver.cpp src/hwInterface.cpp)
 add_executable(robot_control src/robot_control.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(mrvk_driver_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(mrvk_driver ${PROJECT_NAME}_hardware_interface_loader ${PROJECT_NAME}_communication_interface)
+add_dependencies(mrvk_driver ${PROJECT_NAME}_communication_interface)
 add_dependencies(mrvk_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(mrvk_driver mrvk_driver_generate_messages_cpp)
 add_dependencies(mrvk_driver mrvk_driver_gencpp)
@@ -155,9 +154,8 @@ add_dependencies(mrvk_driver mrvk_driver_gencpp)
 # target_link_libraries(mrvk_driver_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(${PROJECT_NAME}_hardware_interface_loader ${catkin_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}_communication_interface ${catkin_LIBRARIES})
-target_link_libraries(mrvk_driver ${catkin_LIBRARIES} ${PROJECT_NAME}_hardware_interface_loader ${PROJECT_NAME}_communication_interface)
+target_link_libraries(mrvk_driver ${catkin_LIBRARIES} ${PROJECT_NAME}_communication_interface)
 target_link_libraries(robot_control ${catkin_LIBRARIES})
 
 #############

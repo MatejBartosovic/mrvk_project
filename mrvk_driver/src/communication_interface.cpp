@@ -91,10 +91,10 @@ void CommunicationInterface::close(){
 
 bool CommunicationInterface::write(){
 
-	boost::mutex::scoped_lock locfk(broadcast_mutex);
+	boost::mutex::scoped_lock locfk(write_mutex);
 	succes =  writeMB();
 	succes |= writeMotors();
-    broadcast.notify_all();
+	write_complete.notify_all();
 }
 
 int CommunicationInterface::waitToRead(){
@@ -144,7 +144,7 @@ void CommunicationInterface::setMotorParameters(REGULATOR_MOTOR regulator, bool 
 void CommunicationInterface::setCameraPosition(double linearX, double angularZ){
 
 	//mb.setPosRotCam(true); // true poloha , false rychlost
-	mb.setKameraCommand(linearX,angularZ);
+	mb.setKameraCommand(linearX/180*M_PI,angularZ/180*M_PI);
 	return;
 }
 
@@ -155,8 +155,8 @@ void CommunicationInterface::setMotorsVel(double left_vel,double right_vel){
 		right_vel = 0;
 	}
 
-	lavy.setMotorSpeed(-left_vel);
-	pravy.setMotorSpeed(right_vel);
+	lavy.setMotorSpeed(-left_vel/ODOMETRY_CONSTANT);
+	pravy.setMotorSpeed(right_vel/ODOMETRY_CONSTANT);
 
 }
 

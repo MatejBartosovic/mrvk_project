@@ -5,9 +5,8 @@
 #include <serial/serial.h>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/make_shared.hpp>
-
 #include <mrvk_driver/conversions.h>
+
 
 class CommunicationInterface : public Conversions{
 public:
@@ -44,8 +43,8 @@ public:
 	MBCommand* getMainBoard();
 
 	//TODO daco s timto vymislet
-	boost::mutex broadcast_mutex;
-    boost::condition_variable broadcast;
+	boost::mutex write_mutex;
+    boost::condition_variable write_complete;
     int succes;
 private:
 
