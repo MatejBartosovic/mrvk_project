@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-	<param name="robot_description" command="$(find xacro)/xacro.py '$(find mrvk_description)/urdf/robot.urdf.xacro'" />
-	<rosparam file="$(find mrvk_driver)/config/mrvk_velocity_controller.conf" command="load" ns="mrvk"/>
-	<rosparam file="$(find mrvk_driver)/config/mrvk_limits.yaml" command="load" ns="mrvk/mrvk_driver"/>
-	<node  name="mrvk_driver" pkg="mrvk_driver" type="hw_interface" ns="mrvk"/>
-	
-
-</launch>
