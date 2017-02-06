@@ -3,7 +3,6 @@
 //
 
 #include "mrvk_driver/hwInterface.h"
-#include "../../../aubo_robot/aubo_driver/include/aubo_driver/control_api/metaType.h"
 #include <urdf/model.h>
 
 namespace Mrvk{

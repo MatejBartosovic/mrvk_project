@@ -8,7 +8,7 @@ joint_limits:
 
 mrvk_joint_names: [wheel_joint_left, wheel_joint_right, scan_to_veza, camera_r_to_camera]
 #[main_board motor_control_board_left motor_control_bord_right]
-port_names: [/dev/ttyUSB0, /dev/ttyUSB2, /dev/ttyUSB3]
+port_names: [/dev/MB, /dev/MCBL, /dev/MCBR]
 
 baudrate: 230400
 stop_bits: 1    #1 - stopBits 1  #2 - stopBits 2 #3 - stopBits 1.5 
