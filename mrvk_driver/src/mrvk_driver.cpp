@@ -22,7 +22,9 @@ namespace Mrvk{
 			double statusPeriod;
 			n.param<double>("status_period", statusPeriod, 5);
 			status_timer = n.createTimer(ros::Duration(statusPeriod), &Mrvk::Driver::statusTimerCallback, this);
-		}
+            last_time = ros::Time::now();
+            current_time = ros::Time::now();
+        }
 
 		bool init(){
 
@@ -47,19 +49,29 @@ namespace Mrvk{
 		}
 
 		void read(){
+            current_time = ros::Time::now();
 			vel[0] = comunication_interface.getSpeedLeftWheel();
 			vel[1] = -comunication_interface.getSpeedRightWheel();
+            /*vel[0] = vel_cmd[0];
+            vel[1] = vel_cmd[1];*/
+            pos[0] += vel[0] * getPeriod().toSec();
+            pos[1] += vel[1] * getPeriod().toSec();
 			pos[3] = comunication_interface.getCameraPositionX();
 			pos[4] = comunication_interface.getCameraPositionZ();
 		}
 
 		void write(){
+            last_time = current_time;
 			enforceLimits();
 			comunication_interface.setMotorsVel(vel_cmd[0],vel_cmd[1]);
 			comunication_interface.setCameraPosition(pos_cmd[0],pos_cmd[1]);
 			comunication_interface.write();
 			comunication_interface.waitToRead();
 		}
+
+        ros::Duration getPeriod(){
+            return current_time - last_time;
+        }
 
 	private:
 
@@ -69,6 +81,9 @@ namespace Mrvk{
 		//diagnostic updater variables
 		ros::Timer status_timer;
 		diagnostic_updater::Updater diagnostic;
+
+        ros::Time last_time;
+        ros::Time current_time;
 
 
 		void diagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat){
@@ -86,7 +101,6 @@ namespace Mrvk{
 		void statusTimerCallback(const ros::TimerEvent& timer_struct) {
 			diagnostic.update();
 		}
-
 	};
 }
 
@@ -111,8 +125,6 @@ int main (int argc, char **argv){
 	driver.init();
 
 	controller_manager::ControllerManager cm(&driver);
-	ros::Time last_time = ros::Time::now();
-	ros::Time current_time = ros::Time::now();
 
 	ros::AsyncSpinner spinner(4);
 	spinner.start();
@@ -123,9 +135,7 @@ int main (int argc, char **argv){
 	{
 		a.sleep();
 		driver.read();
-		current_time = ros::Time::now();
-		cm.update(ros::Time::now(), current_time - last_time);
-		last_time = current_time;
+		cm.update(ros::Time::now(), driver.getPeriod());
 		driver.write();
 	}
 	
