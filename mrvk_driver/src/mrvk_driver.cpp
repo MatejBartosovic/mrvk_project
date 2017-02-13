@@ -50,12 +50,14 @@ namespace Mrvk{
 
 		void read(){
             current_time = ros::Time::now();
-			vel[0] = comunication_interface.getSpeedLeftWheel();
-			vel[1] = -comunication_interface.getSpeedRightWheel();
+			vel[0] = comunication_interface.getVelLeftWheel();
+			vel[1] = -comunication_interface.getVelRightWheel();
+			pos[0] = comunication_interface.getPosLeftWheel();
+			pos[1] = comunication_interface.getPosRightWheel();
             /*vel[0] = vel_cmd[0];
-            vel[1] = vel_cmd[1];*/
+            vel[1] = vel_cmd[1];
             pos[0] += vel[0] * getPeriod().toSec();
-            pos[1] += vel[1] * getPeriod().toSec();
+            pos[1] += vel[1] * getPeriod().toSec();*/
 			pos[3] = comunication_interface.getCameraPositionX();
 			pos[4] = comunication_interface.getCameraPositionZ();
 		}

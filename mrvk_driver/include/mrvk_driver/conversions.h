@@ -28,16 +28,31 @@ public:
 	mrvk_driver::Mb_status getStatusMB();
 	mrvk_driver::Mcb_status getStatusMCB(uint8_t device);
 
-	double getSpeedLeftWheel();
-	double getSpeedRightWheel();
+	//return velocity in rad/s
+	double getVelLeftWheel();
+	double getVelRightWheel();
 
+	//return position in rad/s
+	double getPosLeftWheel();
+	double getPosRightWheel();
+
+	//return velocity in rad/s (only gear 1:1)
+	double getVelLeftMotor();
+	double getVelRightMotor();
+
+	//return position in rad/s (only gear 1:1)
+	double getPosLeftMotor();
+	double getPosRightMotor();
+
+	//return position in rad/s
 	double getCameraPositionZ();
 	double getCameraPositionX();
 
-    template <typename TMember,typename TValue>
-    TValue getStatus(TMember member,TValue nic){
+    template <typename TMember>
+	auto getStatus(TMember member){
         return statusMB.*member;
 	}
+
     //example getStatus(&mrvk_driver::Mb_status::central_stop,true);
 
     bool getPowerArm();
@@ -80,7 +95,11 @@ private:
 
 	void answerMCB(uint8_t *data, uint8_t device);
 
-	double speedWheels[2];
+	uint16_t velWheels[2];
+	uint16_t velActuators[2];
+
+	uint16_t posWheels[2];
+	uint16_t posActuators[2];
 
 	double cameraPositionX;
 	double cameraPositionZ;

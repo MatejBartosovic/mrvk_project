@@ -135,7 +135,11 @@ void Conversions::answerMCB(uint8_t *data, uint8_t device){
 		statusMCB[motorIndex].shifting = ((data[1] & 8) ? true : false);
 		statusMCB[motorIndex].shifting_error =  ((data[1] & 16) ? true : false);
 
-		speedWheels[motorIndex] = (float) char2BToInt16(data[4], data[5]);
+		velActuators[motorIndex] = char2BToInt16(data[2], data[3]);
+		velWheels[motorIndex] = char2BToInt16(data[4], data[5]);
+
+		posActuators[motorIndex] = char2BToInt16(data[6], data[7]);
+		posWheels[motorIndex] = char2BToInt16(data[8], data[9]);
 
 		statusMCB[motorIndex].gear_position = data[10];
 
@@ -159,14 +163,44 @@ mrvk_driver::Mcb_status Conversions::getStatusMCB(uint8_t device){
 	else return statusMCB[1];
 }
 
-double Conversions::getSpeedLeftWheel(){
+double Conversions::getVelLeftWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return speedWheels[0] * ODOMETRY_CONSTANT;
+	return velWheels[0] * ODOMETRY_CONSTANT;
 }
 
-double Conversions::getSpeedRightWheel(){
+double Conversions::getVelRightWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return speedWheels[1] * ODOMETRY_CONSTANT;
+	return velWheels[1] * ODOMETRY_CONSTANT;
+}
+
+double Conversions::getPosLeftWheel(){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+	return posWheels[0] * ODOMETRY_CONSTANT;
+}
+
+double Conversions::getPosRightWheel(){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+	return posWheels[1] * ODOMETRY_CONSTANT;
+}
+
+double Conversions::getVelLeftMotor(){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+	return velActuators[0] * ODOMETRY_CONSTANT;
+}
+
+double Conversions::getVelRightMotor(){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+	return velActuators[1] * ODOMETRY_CONSTANT;
+}
+
+double Conversions::getPosLeftMotor(){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+	return posActuators[0] * ODOMETRY_CONSTANT;
+}
+
+double Conversions::getPosRightMotor(){
+	boost::unique_lock<boost::mutex> lock(data_mutex);
+	return posActuators[1] * ODOMETRY_CONSTANT;
 }
 
 double Conversions::getCameraPositionZ() {

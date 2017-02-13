@@ -69,7 +69,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
         //wait to unblock
         for(int i =0;i<100;i++){
             if(communicationInterface.getNewDataStatus(CommunicationInterface::MainBoardFlag)){
-                if(!communicationInterface.getStatus(&mrvk_driver::Mb_status::central_stop,true)) {
+                if(!communicationInterface.getStatus(&mrvk_driver::Mb_status::central_stop)) {
                     communicationInterface.blockMovement(false);
                     res.success = true;
                     res.message = "Ok";
