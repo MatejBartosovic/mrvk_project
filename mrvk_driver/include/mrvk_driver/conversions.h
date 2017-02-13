@@ -50,6 +50,7 @@ public:
 
     template <typename TMember>
 	auto getStatus(TMember member){
+		boost::unique_lock<boost::mutex> lock(data_mutex);
         return statusMB.*member;
 	}
 
