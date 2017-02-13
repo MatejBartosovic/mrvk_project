@@ -11,16 +11,17 @@
 class CommunicationInterface : public Conversions{
 public:
 
+    typedef enum {
+        MainBoardFlag = 1,
+        LeftMotorBoardFlag = 2,
+        RightMotorBoardFlag = 4,
+        MotorBoardsFlag = 6,
+        AllDevicesFlag = 7
+    }StatusFlags;
+
 	const static int MAIN_BOARD = 0;
 	const static int LEFT_MOTOR = 1;
 	const static int RIGHT_MOTOR = 2;
-
-    const static int MAIN_BOARD_BROADCAST_FLAG = 1;
-    const static int LEFT_MOTOR_BROADCAST_FLAG = 2;
-    const static int RIGHT_MOTOR_BROADCAST_FLAG= 4;
-    const static int MOTORS_BROADCAST_FLAG= 6;
-    const static int ALL_BROADCAST_FLAG= 7;
-
 
 	CommunicationInterface(std::vector<std::string> ports, int baudrate, int stopBits, int parity, int byteSize);
 	~CommunicationInterface();
@@ -38,14 +39,15 @@ public:
 	void setMotorsVel(double left_vel,double right_vel);
 	void blockMovement(bool param);
 
+    bool getWriteStatus(StatusFlags flags, boost::unique_lock<boost::mutex>& mutex);
+    bool getNewDataStatus(StatusFlags flags);
+
 	MCBCommand* getMotorControlBoardLeft();
 	MCBCommand* getMotorControlBoardRight();
 	MBCommand* getMainBoard();
 
-	//TODO daco s timto vymislet
+	//command mutex
 	boost::mutex write_mutex;
-    boost::condition_variable write_complete;
-    int succes;
 private:
 
 	void setupPort(int sb,int p,int bs);
@@ -71,14 +73,16 @@ private:
     int MBSendControlCommd();
     int MBSendUnitedCommd();
 
-	bool active;
-	bool blocked;
-
 	std::vector<serial::Serial*> my_serials;
+
+    //command generation classes
 	MCBCommand lavy;
 	MCBCommand pravy;
 	MBCommand mb;
 
+    //communication config variables
+    bool active;
+    bool blocked;
 	std::vector<std::string> ports;
 	int fd_max;
 	std::vector<int> read_lengths;
@@ -86,6 +90,15 @@ private:
 	int byteSize;
 	int stopBits;
 	int parity;
+
+    //sinchronization variables
+    int new_data_status;
+    int write_status;
+
+    boost::mutex new_data_murex;
+
+    boost::condition_variable write_complete;
+    boost::condition_variable new_data;
 };
 
 

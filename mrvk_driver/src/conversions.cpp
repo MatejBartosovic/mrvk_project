@@ -22,7 +22,6 @@ void Conversions::convertMsg(uint8_t *data, uint8_t device){
 		answerMCB(data, device);
 		break;
 	}
-    this->data.notify_all();
 }
 
 bool Conversions::getStatusMotorErrors(){

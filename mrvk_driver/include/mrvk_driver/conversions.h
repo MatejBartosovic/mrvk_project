@@ -69,13 +69,10 @@ public:
 	static int16_t char2BToInt16(unsigned char H, unsigned char L);
 	static uint32_t char4BToUint32(uint8_t HH, uint8_t H, uint8_t L, uint8_t LL);
 
-	boost::mutex data_mutex;
-	boost::condition_variable data;
 
 protected:
 	void convertMsg(uint8_t *data, uint8_t device);
-//	const static double ODOMETRY_CONSTANT = 0.006546076617684;
-	//const static double WHEEL_RADIUS = 0.115;
+    boost::mutex data_mutex;
 
 private:
 	void answerMB_40_02(uint8_t *data);

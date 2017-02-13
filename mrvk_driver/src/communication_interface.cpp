@@ -92,8 +92,8 @@ void CommunicationInterface::close(){
 bool CommunicationInterface::write(){
 
 	boost::mutex::scoped_lock locfk(write_mutex);
-	succes =  writeMB();
-	succes |= writeMotors();
+    write_status =  writeMB();
+    write_status |= writeMotors();
 	write_complete.notify_all();
 }
 
@@ -102,18 +102,22 @@ int CommunicationInterface::waitToRead(){
 	fd_set read_set;
 	timeval timeout;
 	timeout.tv_sec = 0;
-	timeout.tv_usec = 50000; //500ms
+	timeout.tv_usec = 20000; //200ms
 	int readable_fds;
 	int sucesfull_readings = 0;
 	int index;
 	int setFlags = 0;
+    new_data_status = 0;        //reset received data status
+
 	while(sucesfull_readings != my_serials.size()){
 		setFds(&read_set,&setFlags);
 		readable_fds = select(fd_max+1,&read_set,NULL,NULL,&timeout);
 		if (readable_fds == -1){
 			ROS_ERROR("select failed");
-			if(timeout.tv_usec == 0)
+			if(timeout.tv_usec == 0){
+                new_data.notify_all();
 				return sucesfull_readings;
+            }
 			else
 				continue; //TODO nieco lebsie tu vymysliet
 		}
@@ -121,14 +125,16 @@ int CommunicationInterface::waitToRead(){
 			index = getReadableFd(&read_set,&setFlags); // vrati file descriptor, ktory je citatelny
 			if(index !=-1){
 				sucesfull_readings ++;
+                boost::mutex::scoped_lock lock(new_data_murex);
 				read(index);
 			}
 		}
 		if(timeout.tv_usec == 0){
-            ROS_ERROR("Receive TIMEOUT flags = '%d'",setFlags);
+            ROS_ERROR("Receive TIMEOUT flags = '%d'",setFlags);  //if flag is set device roesponded (1 mb, 2 mcbl, 4 mcbr )
 			break;
         }
 	}
+    new_data.notify_all();
 	return sucesfull_readings;
 }
 
@@ -176,6 +182,17 @@ MCBCommand* CommunicationInterface::getMotorControlBoardLeft(){
 }
 MCBCommand* CommunicationInterface::getMotorControlBoardRight(){
 	return &pravy;
+}
+
+bool CommunicationInterface::getNewDataStatus( StatusFlags flags){
+    boost::mutex::scoped_lock lock(new_data_murex);
+    new_data.wait(lock);
+    return ((new_data_status & flags) == flags);
+}
+
+bool CommunicationInterface::getWriteStatus(StatusFlags flags, boost::unique_lock<boost::mutex>& lock){
+    write_complete.wait(lock);
+    return ((write_status & flags) == flags);
 }
 
 /*
@@ -333,8 +350,9 @@ CommunicationInterface::~CommunicationInterface(){
 }
 
 int CommunicationInterface::write(int id,uint8_t *dataWrite, int lengthWrite){
+
 	if(active){
-		int count = -1;
+		int count;
 		try{
 			count = my_serials[id]->write(dataWrite, lengthWrite);
 			my_serials[id]->flush();
@@ -354,6 +372,7 @@ int CommunicationInterface::write(int id,uint8_t *dataWrite, int lengthWrite){
 }
 
 bool CommunicationInterface::read(int id){
+
 	if (active){
 		uint8_t dataRead[read_lengths[id]];
 
@@ -392,6 +411,7 @@ bool CommunicationInterface::read(int id){
 					//TODO navratova hodnota + osetrenie
 					convertMsg(&dataRead[ANSWER_ID], device);
 				}
+            new_data_status |= 1 < id;
 			return true;
 
 		}
@@ -400,6 +420,7 @@ bool CommunicationInterface::read(int id){
 }
 
 void CommunicationInterface::setFds(fd_set *set,int* flag){
+
 	FD_ZERO(set);
 	for(int i=0;i<my_serials.size();i++){
 		if(!(*flag & (1<<i)))
