@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <launch>
 	<rosparam file="$(find mrvk_driver)/config/mrvk_controllers.conf" command="load"/>
-	<node  name="controller_manager" pkg="controller_manager" type="controller_manager" args="spawn mrvk_joint_state_controller mrvk_diff_drive_controller mrvk_camera_group_controller"/>
+	<node  name="controller_manager" pkg="controller_manager" type="controller_manager" args="spawn mrvk_joint_state_controller diff_drive_controller mrvk_camera_group_controller"/>
 </launch>

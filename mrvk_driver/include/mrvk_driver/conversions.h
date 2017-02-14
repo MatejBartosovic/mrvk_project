@@ -96,8 +96,8 @@ private:
 
 	void answerMCB(uint8_t *data, uint8_t device);
 
-	uint16_t velWheels[2];
-	uint16_t velActuators[2];
+	int velWheels[2];
+	int velActuators[2];
 
 	uint16_t posWheels[2];
 	uint16_t posActuators[2];
