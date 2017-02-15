@@ -1,4 +1,5 @@
 #include <mrvk_driver/conversions.h>
+#include <ros/ros.h>
 
 Conversions::Conversions(){
 
@@ -165,42 +166,71 @@ mrvk_driver::Mcb_status Conversions::getStatusMCB(uint8_t device){
 
 double Conversions::getVelLeftWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return velWheels[0] * ODOMETRY_CONSTANT;
+	return velWheels[0] * ODOMETRY_CONSTANT_VELOCITY;
 }
 
 double Conversions::getVelRightWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return velWheels[1] * ODOMETRY_CONSTANT;
+	return velWheels[1] * ODOMETRY_CONSTANT_VELOCITY;
 }
 
 double Conversions::getPosLeftWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return posWheels[0] * ODOMETRY_CONSTANT;
+	int dif = (uint16_t)(posWheels[0] - posWheelsLast[0]);
+	if (dif > 32767){
+		dif = (uint16_t)(posWheelsLast[0] - posWheels[0]);
+	}
+	else
+		dif *= -1;
+	posWheelsLast[0] = posWheels[0];
+	return dif * ODOMETRY_CONSTANT_POSITION;
 }
 
 double Conversions::getPosRightWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return posWheels[1] * ODOMETRY_CONSTANT;
+	int dif = (uint16_t)(posWheels[1] - posWheelsLast[1]);
+	if (dif > 32767){
+		dif = (uint16_t)(posWheelsLast[1] - posWheels[1]);
+	}
+	else
+		dif *= -1;
+	posWheelsLast[1] = posWheels[1];
+	return dif * ODOMETRY_CONSTANT_POSITION;
 }
 
 double Conversions::getVelLeftMotor(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return velActuators[0] * ODOMETRY_CONSTANT;
+	int dif = (uint16_t)(posActuators[0] - posActuatorsLast[0]);
+	if (dif > 32767){
+		dif = (uint16_t)(posActuatorsLast[0] - posActuators[0]);
+	}
+	else
+		dif *= -1;
+	posActuatorsLast[0] = posActuators[0];
+	return dif * ODOMETRY_CONSTANT_POSITION;
 }
 
 double Conversions::getVelRightMotor(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return velActuators[1] * ODOMETRY_CONSTANT;
+	int dif = (uint16_t)(posActuators[1] - posActuatorsLast[1]);
+	if (dif > 32767){
+		dif = (uint16_t)(posActuatorsLast[1] - posActuators[1]);
+	}
+	else
+		dif *= -1;
+	posActuatorsLast[1] = posActuators[1];
+
+	return dif * ODOMETRY_CONSTANT_POSITION;
 }
 
 double Conversions::getPosLeftMotor(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return posActuators[0] * ODOMETRY_CONSTANT;
+	return posActuators[0] * ODOMETRY_CONSTANT_POSITION;
 }
 
 double Conversions::getPosRightMotor(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	return posActuators[1] * ODOMETRY_CONSTANT;
+	return posActuators[1] * ODOMETRY_CONSTANT_POSITION;
 }
 
 double Conversions::getCameraPositionZ() {

@@ -56,7 +56,10 @@ namespace Mrvk{
             vel[1] = vel_cmd[1];
             pos[0] += vel[0] * getPeriod().toSec();
             pos[1] += vel[1] * getPeriod().toSec();*/
-			ROS_ERROR("pos = %lf %lf",pos[0],pos[1]);
+			double lavy = -comunication_interface.getPosLeftWheel();
+			double pravy = comunication_interface.getPosRightWheel();
+			pos[0] += lavy;
+			pos[1] += pravy;
 			pos[3] = comunication_interface.getCameraPositionX();
 			pos[4] = comunication_interface.getCameraPositionZ();
 		}
@@ -64,6 +67,8 @@ namespace Mrvk{
 		void write(){
             last_time = current_time;
 			enforceLimits();
+			//ROS_ERROR("vel %lf %lf",vel[0],vel[1]);
+			//ROS_ERROR("vel cmd %lf %lf",vel_cmd[0],vel_cmd[1]);
 			comunication_interface.setMotorsVel(vel_cmd[0],vel_cmd[1]);
 			comunication_interface.setCameraPosition(pos_cmd[0],pos_cmd[1]);
 			comunication_interface.write();

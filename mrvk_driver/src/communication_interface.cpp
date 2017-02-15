@@ -161,8 +161,8 @@ void CommunicationInterface::setMotorsVel(double left_vel,double right_vel){
 		right_vel = 0;
 	}
 
-	lavy.setMotorSpeed(-left_vel/ODOMETRY_CONSTANT);
-	pravy.setMotorSpeed(right_vel/ODOMETRY_CONSTANT);
+	lavy.setMotorSpeed(-left_vel/ODOMETRY_CONSTANT_VELOCITY);
+	pravy.setMotorSpeed(right_vel/ODOMETRY_CONSTANT_VELOCITY);
 
 }
 
@@ -212,15 +212,15 @@ int CommunicationInterface::writeMB(){
 			break;
 		case PARTIAL_COMMAND_FLAG-1:
             succes |= MBSendPartialCommd();
-			ROS_ERROR("MB partial");
+			//ROS_ERROR("MB partial");
 			break;
 		case CONTROL_COMMAND_FLAG:
             succes |= MBSendControlCommd();
-			ROS_ERROR("MB control");
+			//ROS_ERROR("MB control");
 			break;
 		case UNITED_COMMAND_FLAG:
             succes |= MBSendUnitedCommd();
-			ROS_ERROR("MB united");
+			//ROS_ERROR("MB united");
 			break;
 		default:
 			ROS_ERROR("V Command ID Main boardy bola zla hodnota (toto by nikdy nemalo nastat)");
@@ -315,11 +315,11 @@ int CommunicationInterface::writeMotors(){
 			break;
 		case PARTIAL_COMMAND_FLAG-1:
             succes |= leftSendPartialCommand();
-			ROS_ERROR("partial");
+			//ROS_ERROR("partial");
 			break;
 		case CONTROL_COMMAND_FLAG:
             succes |= leftSendControlCommand();
-			ROS_ERROR("controll");
+			//ROS_ERROR("controll");
 			break;
 		default:
 			ROS_ERROR("V Command ID laveho motora bola zla hodnota (toto by nikdy nemalo nastat)");

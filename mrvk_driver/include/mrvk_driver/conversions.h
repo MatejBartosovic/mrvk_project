@@ -19,8 +19,8 @@
 #define MBZISK2 11.584
 #define MBNULPOL2 3495
 
-#define ODOMETRY_CONSTANT 0.006546076617684
-
+#define ODOMETRY_CONSTANT_VELOCITY 0.006546076617684
+#define ODOMETRY_CONSTANT_POSITION 0.00006546076617684
 class Conversions{
 public:
 
@@ -101,6 +101,9 @@ private:
 
 	uint16_t posWheels[2];
 	uint16_t posActuators[2];
+
+	uint16_t posWheelsLast[2];
+	uint16_t posActuatorsLast[2];
 
 	double cameraPositionX;
 	double cameraPositionZ;
