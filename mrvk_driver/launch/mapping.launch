@@ -8,30 +8,27 @@
 	
 	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
 	  <param name="output_frame" value="odom"/>
-	  <param name="base_footprint_frame" value="world"/>
+	  <param name="base_footprint_frame" value="base_link"/>
 	  <param name="freq" value="30.0"/>
 	  <param name="sensor_timeout" value="1.0"/>  
 	  <param name="odom_used" value="true"/>
 	  <param name="imu_used" value="true"/>
 	  <param name="vo_used" value="false"/> 
-	  <remap from="odom" to="/mrvk/mrvk_diff_drive_controller/odom"/>
+	  <remap from="odom" to="/mrvk/diff_drive_controller/odom"/>
 	  <remap from="imu_data" to="/adis16350/imu_data"/>
 	</node>
 	
 	<node name="gmapping" pkg="gmapping" type="slam_gmapping">
-		<param name="base_frame" value="world"/> 
-		<param name="map_frame" value="map"/>
+		<param name="base_frame" value="base_link"/> 
+		<param name="map_frame" value="/map"/>
 	</node>
-		
-	<param name="robot_description" command="$(find xacro)/xacro '$(find mrvk_description)/urdf/robot.urdf.xacro' --inorder" />
-	<!--param name="robot_description" textfile="$(find mrvk)/urdf/kv01.urdf" /-->
 	
 	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
  	 <param name="/use_gui" value="false"/> 
   	 <!--rosparam param="/source_list">[/kv01/joint_states] </rosparam--> 
   	</node>
 	
-	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+	<!--node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" /-->
 
 	<!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_driver)/mapping.rviz" required="true" /-->
 	

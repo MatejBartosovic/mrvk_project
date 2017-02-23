@@ -5,6 +5,7 @@
 	<rosparam file="$(find mrvk_driver)/config/mrvk_driver.yaml" command="load" ns="mrvk"/>
 	<!-- start robot driver-->
 	<node  name="mrvk_driver" pkg="mrvk_driver" type="mrvk_driver" ns="mrvk"/>
-	<!-- load all available controllers-->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+	<!-- start differencial controller-->
 	<include file="$(find mrvk_driver)/launch/spawn_diff_controller.launch" ns='mrvk'/>
 </launch>
