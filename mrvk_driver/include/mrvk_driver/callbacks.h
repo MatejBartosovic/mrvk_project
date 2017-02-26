@@ -12,6 +12,10 @@
 #include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
 
+//dynamic reconfigure
+#include <dynamic_reconfigure/server.h>
+#include <mrvk_driver/RobotDynParamConfig.h>
+
 #include <mrvk_driver/communication_interface.h>
 
 
@@ -36,6 +40,9 @@ class MrvkCallbacks{
 		ros::ServiceServer setPowerManagmentSS;
 		ros::ServiceServer setMotorParametersSS;
 
+    dynamic_reconfigure::Server<mrvk_driver::RobotDynParamConfig> server;
+    dynamic_reconfigure::Server<mrvk_driver::RobotDynParamConfig>::CallbackType f;
+
 		bool shutdownCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool resetBatteryCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool resetCentralStopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
@@ -44,6 +51,9 @@ class MrvkCallbacks{
 		bool toggleArmVoltageCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool toggleCameraSourceCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool setPowerManagmentCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
+
+		//dynamic reconfigure callback
+		void dynamicReconfigureCallback(mrvk_driver::RobotDynParamConfig &config, uint32_t level);
 
 };
 

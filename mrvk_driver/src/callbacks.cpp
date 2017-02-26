@@ -19,6 +19,10 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
     toggleArmVoltageSS = n.advertiseService("toggle_arm_voltage", &MrvkCallbacks::toggleArmVoltageCallback, this);
     toggleCameraSourceSS = n.advertiseService("toggle_camera_source", &MrvkCallbacks::toggleCameraSourceCallback, this);
 	setPowerManagmentSS = n.advertiseService("write_main_board_settings", &MrvkCallbacks::setPowerManagmentCallback, this);
+
+    //dynamic reconfigure
+    f = boost::bind(&MrvkCallbacks::dynamicReconfigureCallback, this, _1, _2);
+    server.setCallback(f);
 }
 
 	//todo overit funkcnost + ked bude na baterkach tak overit premennu full_battery
@@ -241,3 +245,12 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 		n.param<bool>("typ_regulacie_motora", *regulation_type, false);
 
 	}
+
+void MrvkCallbacks::dynamicReconfigureCallback(mrvk_driver::RobotDynParamConfig &config, uint32_t level) {
+
+    ROS_ERROR("Reconfigure Request: %d %f %s %s %d",
+             config.int_param, config.double_param,
+             config.str_param.c_str(),
+             config.arm_5v?"True":"False",
+             config.size);
+}
