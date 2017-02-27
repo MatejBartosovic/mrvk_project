@@ -24,7 +24,7 @@ class MrvkCallbacks{
 		MrvkCallbacks(CommunicationInterface &communicationInterface);
 
 	void getMbFromParam(SET_MAIN_BOARD *config);
-	void getMotorParametersFromParam(REGULATOR_MOTOR *reg, bool *regulation_type);
+	void getMotorParametersFromParam(REGULATOR_MOTOR *left_reg, REGULATOR_MOTOR *right_reg);
 
 	private:
 
@@ -41,7 +41,6 @@ class MrvkCallbacks{
 		ros::ServiceServer setMotorParametersSS;
 
     dynamic_reconfigure::Server<mrvk_driver::RobotDynParamConfig> server;
-    dynamic_reconfigure::Server<mrvk_driver::RobotDynParamConfig>::CallbackType f;
 
 		bool shutdownCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool resetBatteryCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);

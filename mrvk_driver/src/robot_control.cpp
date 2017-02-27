@@ -833,16 +833,16 @@ void main_board_menu()
 				c[0] = getch_timeout0();
 				//commandMB.setMCBsSB_5V(c[0] - 48);
 				printf("zapisal som %d\n",(bool)(c[0] - 48));
-				n.setParam("MCBsSB_5V", (bool)(c[0] - 48));
+				n.setParam("mcb_5V", (bool)(c[0] - 48));
 				zapisane_nastavenia_mb = false;
 				usleep(500000);
 				break;
 				case '1':
-				printf("MCBs_12V\n");
+				printf("mcb_12V\n");
 				c[0] = getch_timeout0();
 				//commandMB.setMCBs_12V(c[0] - 48);
 				printf("zapisal som %d\n",(bool)(c[0] - 48));
-				n.setParam("MCBs_12V", (bool)(c[0] - 48));
+				n.setParam("mcb_12V", (bool)(c[0] - 48));
 				zapisane_nastavenia_mb = false;
 				usleep(500000);
 				break;
@@ -883,20 +883,20 @@ void main_board_menu()
 				usleep(500000);
 				break;
 				case '6':
-				printf("arm5V\n");
+				printf("arm_5V\n");
 				c[0] = getch_timeout0();
 				//commandMB.setWifi(c[0] - 48);
 				printf("zapisal som %d\n",(bool)(c[0] - 48));
-				n.setParam("arm5V", (bool)(c[0] - 48));
+				n.setParam("arm_5V", (bool)(c[0] - 48));
 				zapisane_nastavenia_mb = false;
 				usleep(500000);
 				break;
 				case '7':
-				printf("arm12V\n");
+				printf("arm_12V\n");
 				c[0] = getch_timeout0();
 				//commandMB.setWifi(c[0] - 48);
 				printf("zapisal som %d\n",(bool)(c[0] - 48));
-				n.setParam("arm12V", (bool)(c[0] - 48));
+				n.setParam("arm_12V", (bool)(c[0] - 48));
 				zapisane_nastavenia_mb = false;
 				usleep(500000);
 				break;
@@ -1070,7 +1070,7 @@ void motor_board_menu()
  	 	//lavy.setMotorControl(c[0] - 48);
  		//pravy.setMotorControl(c[0] - 48);
  		printf("zapisal som %d\n",(bool)(c[0] - 48));
- 		n.setParam("typ_regulacie_motora", (bool)(c[0] - 48));
+ 		n.setParam("pwm_control", (bool)(c[0] - 48));
  		zapisane_nastavenia_mcb = false;
  		usleep(500000);
  			break;

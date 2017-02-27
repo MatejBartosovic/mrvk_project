@@ -687,6 +687,7 @@ void MCBCommand::setRegulatorPID(REGULATOR_MOTOR regulator)
 {
 	pthread_mutex_lock(&MCB_mutex);
 	Motor_set.regulator = regulator;
+    Motor_set.MotorControl = regulator.pwm_control;
 	Motor_set.commandID |= CONTROL_COMMAND_FLAG;
 	pthread_mutex_unlock(&MCB_mutex);
 }
