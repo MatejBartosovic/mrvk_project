@@ -38,17 +38,10 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
             res.message = "Write Failed";
             return true;
         }
-        return true;
 	}
 
 	bool MrvkCallbacks::resetCentralStopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
 
-        uint8_t MCB_command[21];
-        uint8_t MB_command[21];
-        uint8_t request[5];
-        int response;
-
-        {
             //send motors request
             boost::unique_lock<boost::mutex> write_lock(communicationInterface.write_mutex);
             communicationInterface.blockMovement(true);
@@ -62,11 +55,10 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 
             //send main board request
             communicationInterface.getMainBoard()->setCentralStop(false);
-            if(!communicationInterface.getWriteStatus(CommunicationInterface::AllDevicesFlag,write_lock)){
+            if(!communicationInterface.getWriteStatus(CommunicationInterface::AllDevicesFlag,write_lock)) {
                 res.message += "Main board write failed. ";
                 res.success = false;
             }
-        }
 
         //wait to unblock
         for(int i =0;i<100;i++){
@@ -81,6 +73,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
         }
         res.message = "TIMEOUT";
         res.success = false;
+        return true;
 	}
 
 
@@ -116,8 +109,9 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
                 }
             }
         }
-        res.message = "TIMEDOUT";
-        res.success = true;
+        res.message = "TIMEOUT";
+        res.success = false;
+        return true;
 	}
 
     bool MrvkCallbacks::toggleArmVoltageCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
@@ -146,8 +140,9 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
                 }
             }
         }
-            res.message = "TIMEDOUT";
+            res.message = "TIMEOUT";
             res.success = false;
+             return true;
     }
 
 	//TODO overit funkcnost prerobit na toggle + set a kontroly
@@ -213,10 +208,10 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 		n.param<int>("camera_iko", iko, 40);
 		n.param<int>("camera_ikk", ikk, 80);
 
-		config->pko = pko;
-		config->pkk = pkk;
-		config->iko = iko;
-		config->ikk = ikk;
+		config->pko = (uint8_t) pko;
+		config->pkk = (uint8_t) pkk;
+		config->iko = (uint8_t) iko;
+		config->ikk = (uint8_t) ikk;
 	}
 
 	void MrvkCallbacks::getMotorParametersFromParam(REGULATOR_MOTOR *left_reg, REGULATOR_MOTOR *right_reg){
