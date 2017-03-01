@@ -71,6 +71,8 @@ typedef struct request_command
 			uint8_t IH;
 			uint8_t IL;
 
+		    bool pwm_control;
+
 	}REGULATOR_MOTOR;
 typedef struct robll_set_motor { // MCB odomna pre ronyho - pouzijem len v sstatusa SS
 		double Speed;			//!<posielana ziadana rychlost v imulzoch/10ms

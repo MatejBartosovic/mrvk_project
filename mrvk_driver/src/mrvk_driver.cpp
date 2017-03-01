@@ -38,10 +38,12 @@ namespace Mrvk{
 			callbacks.getMbFromParam(&config);							//nastavi default parametre
 			comunication_interface.getMainBoard()->setParamaters(&config);
 
-			REGULATOR_MOTOR regulator;
-			bool regulation_type;
-			callbacks.getMotorParametersFromParam(&regulator, &regulation_type);			//nastavi default parametre
-			comunication_interface.setMotorParameters(regulator, regulation_type);
+			REGULATOR_MOTOR leftRegulator;
+            REGULATOR_MOTOR rightRegulator;
+
+			callbacks.getMotorParametersFromParam(&leftRegulator, &rightRegulator);			//nastavi default parametre
+			comunication_interface.getMotorControlBoardLeft()->setRegulatorPID(leftRegulator);
+            comunication_interface.getMotorControlBoardRight()->setRegulatorPID(rightRegulator);
 
 			//todo dorobit odblokovanie central stopu do initu
 

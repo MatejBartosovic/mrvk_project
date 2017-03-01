@@ -19,6 +19,9 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
     toggleArmVoltageSS = n.advertiseService("toggle_arm_voltage", &MrvkCallbacks::toggleArmVoltageCallback, this);
     toggleCameraSourceSS = n.advertiseService("toggle_camera_source", &MrvkCallbacks::toggleCameraSourceCallback, this);
 	setPowerManagmentSS = n.advertiseService("write_main_board_settings", &MrvkCallbacks::setPowerManagmentCallback, this);
+
+    //dynamic reconfigure
+    server.setCallback(boost::bind(&MrvkCallbacks::dynamicReconfigureCallback, this, _1, _2));
 }
 
 	//todo overit funkcnost + ked bude na baterkach tak overit premennu full_battery
@@ -35,18 +38,10 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
             res.message = "Write Failed";
             return true;
         }
-        return true;
 	}
 
 	bool MrvkCallbacks::resetCentralStopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
 
-        uint8_t MCB_command[21];
-        uint8_t MB_command[21];
-        uint8_t request[5];
-        int response;
-
-
-        {
             //send motors request
             boost::unique_lock<boost::mutex> write_lock(communicationInterface.write_mutex);
             communicationInterface.blockMovement(true);
@@ -60,11 +55,10 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 
             //send main board request
             communicationInterface.getMainBoard()->setCentralStop(false);
-            if(!communicationInterface.getWriteStatus(CommunicationInterface::AllDevicesFlag,write_lock)){
+            if(!communicationInterface.getWriteStatus(CommunicationInterface::AllDevicesFlag,write_lock)) {
                 res.message += "Main board write failed. ";
                 res.success = false;
             }
-        }
 
         //wait to unblock
         for(int i =0;i<100;i++){
@@ -79,6 +73,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
         }
         res.message = "TIMEOUT";
         res.success = false;
+        return true;
 	}
 
 
@@ -114,8 +109,9 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
                 }
             }
         }
-        res.message = "TIMEDOUT";
-        res.success = true;
+        res.message = "TIMEOUT";
+        res.success = false;
+        return true;
 	}
 
     bool MrvkCallbacks::toggleArmVoltageCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
@@ -144,8 +140,9 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
                 }
             }
         }
-            res.message = "TIMEDOUT";
+            res.message = "TIMEOUT";
             res.success = false;
+             return true;
     }
 
 	//TODO overit funkcnost prerobit na toggle + set a kontroly
@@ -177,12 +174,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
             }
             res.success = true;
 		    return true;
-
-        res.message = "Comunication is not active";
-        res.success = false;
-        return true;
 	}
-
 
 	bool MrvkCallbacks::shutdownCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
 
@@ -194,16 +186,16 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 	void MrvkCallbacks::getMbFromParam(SET_MAIN_BOARD *config){
 
 		ros::NodeHandle n;
-		n.param<bool>("MCBsSB_5V", config->MCBsSB_5V, true);
-		n.param<bool>("MCBs_12V", config->MCBs_12V, true);
+		n.param<bool>("mcb_5V", config->MCBsSB_5V, true);
+		n.param<bool>("mcb_12V", config->MCBs_12V, true);
 		n.param<bool>("wifi", config->wifi, true);
 		n.param<bool>("video_transmitter", config->videoTransmitter, false);
 		n.param<bool>("laser_scanner", config->laser, true);
 		n.param<bool>("gps", config->GPS, false);
 		n.param<bool>("pc2", config->PC2, true);
 		n.param<bool>("camera", config->kamera, false);
-		n.param<bool>("arm5V", config->ARM_5V, false);
-		n.param<bool>("arm12V", config->ARM_12V, false);
+		n.param<bool>("arm_5V", config->ARM_5V, false);
+		n.param<bool>("arm_12V", config->ARM_12V, false);
 		bool video;
 		n.param<bool>("video", video, true);
 		config->video1 = video;
@@ -211,33 +203,86 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 
 		int pko, pkk, iko, ikk;
 
-		n.param<int>("kamera_PID_pko", pko, 10);
-		n.param<int>("kamera_PID_pkk", pkk, 10);
-		n.param<int>("kamera_PID_iko", iko, 40);
-		n.param<int>("kamera_PID_ikk", ikk, 80);
+		n.param<int>("camera_pko", pko, 10);
+		n.param<int>("camera_pkk", pkk, 10);
+		n.param<int>("camera_iko", iko, 40);
+		n.param<int>("camera_ikk", ikk, 80);
 
-		config->pko = pko;
-		config->pkk = pkk;
-		config->iko = iko;
-		config->ikk = ikk;
+		config->pko = (uint8_t) pko;
+		config->pkk = (uint8_t) pkk;
+		config->iko = (uint8_t) iko;
+		config->ikk = (uint8_t) ikk;
 	}
 
-	void MrvkCallbacks::getMotorParametersFromParam(REGULATOR_MOTOR *reg, bool *regulation_type){
+	void MrvkCallbacks::getMotorParametersFromParam(REGULATOR_MOTOR *left_reg, REGULATOR_MOTOR *right_reg){
 
 		ros::NodeHandle n;
 
-		int ph, pl,ih, il;
-		n.param<int>("motor_PID_ph",ph, 0);
-		n.param<int>("motor_PID_pl",pl, 10);
-		n.param<int>("motor_PID_ih",ih, 0);
-		n.param<int>("motor_PID_il",il, 15);
+		int left_P, left_I, right_P, right_I;
+        bool control;
 
-		reg->PH = ph;
-		reg->PL = pl;
-		reg->IH = ih;
-		reg->IL = il;
+		n.param<int>("left_P",left_P, 10);
+		n.param<int>("left_I",left_I, 15);
+        n.param<int>("right_P",right_P, 10);
+        n.param<int>("right_I",right_I, 15);
 
-		//bool regulation_type;
-		n.param<bool>("typ_regulacie_motora", *regulation_type, false);
+        n.param<bool>("pwm_control", control, false);
+        left_reg->pwm_control = control;
+        right_reg->pwm_control = control;
+
+
+        left_reg->PL = ((uint16_t) left_P ) & 0x00FF;
+        left_reg->PH = (((uint16_t) left_P) & 0xFF00) >> 8;
+        left_reg->IL = ((uint16_t) left_I ) & 0x00FF;
+        left_reg->IH = (((uint16_t) left_I) & 0xFF00) >> 8;
+
+        right_reg->PL = ((uint16_t) right_P ) & 0x00FF;
+        right_reg->PH = (((uint16_t) right_P) & 0xFF00) >> 8;
+        right_reg->IL = ((uint16_t) right_I ) & 0x00FF;
+        right_reg->IH = (((uint16_t) right_I) & 0xFF00) >> 8;
 
 	}
+
+void MrvkCallbacks::dynamicReconfigureCallback(mrvk_driver::RobotDynParamConfig &config, uint32_t level) {
+
+    SET_MAIN_BOARD robot_config;
+    REGULATOR_MOTOR left_reg;
+    REGULATOR_MOTOR right_reg;
+
+    robot_config.MCBsSB_5V = config.mcb_5V;
+    robot_config.MCBs_12V = config.mcb_12V;
+    robot_config.wifi = config.wifi;
+    robot_config.GPS = config.gps;
+    robot_config.laser = config.laser_scanner;
+    robot_config.videoTransmitter = config.video_transmitter;
+    robot_config.ARM_5V = config.arm_5V;
+    robot_config.ARM_12V = config.arm_12V;
+    robot_config.PC2 = config.pc2;
+
+    robot_config.video1 = config.video;
+    robot_config.video2 = !config.video;
+
+    robot_config.pko = config.camera_pko;
+    robot_config.pkk = config.camera_pkk;
+    robot_config.iko = config.camera_iko;
+    robot_config.ikk = config.camera_ikk;
+
+    left_reg.PL = ((uint16_t) config.left_P ) & 0x00FF;
+    left_reg.PH = (((uint16_t) config.left_P) & 0xFF00) >> 8;
+    left_reg.IL = ((uint16_t) config.left_I ) & 0x00FF;
+    left_reg.IH = (((uint16_t) config.left_I) & 0xFF00) >> 8;
+
+    right_reg.PL = ((uint16_t) config.right_P ) & 0x00FF;
+    right_reg.PH = (((uint16_t) config.right_P) & 0xFF00) >> 8;
+    right_reg.IL = ((uint16_t) config.right_I ) & 0x00FF;
+    right_reg.IH = (((uint16_t) config.right_I) & 0xFF00) >> 8;
+
+    boost::unique_lock<boost::mutex> lock(communicationInterface.write_mutex);
+    communicationInterface.getMotorControlBoardLeft()->setRegulatorPID(left_reg);
+    communicationInterface.getMotorControlBoardLeft()->setRegulatorPID(right_reg);
+    communicationInterface.getMainBoard()->setParamaters(&robot_config);
+
+    if(!communicationInterface.getWriteStatus(CommunicationInterface::AllDevicesFlag,lock)){
+      ROS_ERROR("Parameters write failed.");
+    }
+}

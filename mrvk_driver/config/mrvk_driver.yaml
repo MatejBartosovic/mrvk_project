@@ -17,27 +17,29 @@ byte_size: 8    #5 - fivebits #6 - sixbits #7 - sevenbits #8 eightbits
  
 status_period: 5
  
-MCBsSB_5V: True
-MCBs_12V: True
+mcb_5V: True
+mcb_12V: True
 wifi: True
 video_transmitter: False
 laser_scanner: True
 gps: False
 pc2: False
 camera: True
-arm5V: False
-arm12V: False
+arm_5V: False
+arm_12V: False
 video: True      #true obraz z kamery na grabbery a z ramena na transmitter #false opacne
  
-motor_PID_ph: 0
-motor_PID_pl: 10
-motor_PID_ih: 0
-motor_PID_il: 15
-typ_regulacie_motora: False   #false - otackova regulacia #true - PWM
- 
-kamera_PID_pko: 10
-kamera_PID_pkk: 10
-kamera_PID_iko: 40
-kamera_PID_ikk: 80
+left_P: 10
+left_I: 15
+left_pwm_control: False   #false - otackova regulacia #true - PWM
+
+right_P: 10
+right_I: 15
+right_pwm_control: False   #false - otackova regulacia #true - PWM
+
+camera_pko: 10
+camera_pkk: 10
+camera_iko: 40
+camera_ikk: 80
 
 comunication_rate: 30 # 30 je asi max (default 30)

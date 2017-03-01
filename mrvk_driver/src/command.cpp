@@ -546,7 +546,6 @@ MCBCommand::MCBCommand(uint8_t adresa) : Command(adresa)
 //getery
 int MCBCommand::getControlCommand(uint8_t* command){
 	
-	unsigned char crc;
 	command[0] = adresa;
 	command[1] = 0x13;
 	command[2] = 0x80;
@@ -585,8 +584,7 @@ int MCBCommand::getControlCommand(uint8_t* command){
 }
 
 int MCBCommand::getPartialCommand(uint8_t* command){ //ciastocny command v datasheete uvadzani ako spojene citanie so zapisom, vyuzitelne pre zadavanie rychlosti motora a radenie
-	unsigned char crc;
-	
+
 	command[0] = adresa;
 	command[1] = 0x0B;
 	command[2] = 0x01;
@@ -687,6 +685,7 @@ void MCBCommand::setRegulatorPID(REGULATOR_MOTOR regulator)
 {
 	pthread_mutex_lock(&MCB_mutex);
 	Motor_set.regulator = regulator;
+    Motor_set.MotorControl = regulator.pwm_control;
 	Motor_set.commandID |= CONTROL_COMMAND_FLAG;
 	pthread_mutex_unlock(&MCB_mutex);
 }
