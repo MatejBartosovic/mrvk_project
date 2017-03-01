@@ -23,7 +23,7 @@
   <xacro:include filename="$(find mrvk_description)/urdf/kv01.urdf.xacro" />
   
   <!-- Used for fixing robot to Gazebo -->
-  <link name="world"/>
+  <!--link name="world"/-->
   <!-- arm -->
   <xacro:mrvk_base parent="world" end_point = "base_end_point">
      <origin xyz="0 0 0.13" rpy="0 0 0" /> 

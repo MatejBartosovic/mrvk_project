@@ -40,4 +40,4 @@ kamera_PID_pkk: 10
 kamera_PID_iko: 40
 kamera_PID_ikk: 80
 
-publish_rate: 50
+comunication_rate: 30 # 30 je asi max (default 30)

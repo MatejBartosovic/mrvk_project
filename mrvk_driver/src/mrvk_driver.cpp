@@ -120,12 +120,14 @@ int main (int argc, char **argv){
 	int stopBits;
 	int byteSize;
 	int parity;
+	int rate;
 
 	n.getParam("port_names",ports);
 	n.param<int>("baudrate", baud, 230400);
 	n.param<int>("stop_bits", stopBits, 1);
 	n.param<int>("parity", parity, 1);
 	n.param<int>("byte_size", byteSize, 8);
+	n.param<int>("comunication_rate", rate, 30);
 
 	Mrvk::Driver driver(ports,baud,stopBits,parity,byteSize);
 	driver.init();
@@ -135,7 +137,7 @@ int main (int argc, char **argv){
 	ros::AsyncSpinner spinner(4);
 	spinner.start();
 
-	ros::Rate a(10);
+	ros::Rate a(rate);
 
 	while (n.ok())
 	{

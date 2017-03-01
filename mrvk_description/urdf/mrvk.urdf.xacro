@@ -16,11 +16,11 @@
   
   <xacro:macro name="mrvk_base" params="parent *origin end_point">
     
-    <joint name="footprint_to_base" type="fixed">
+    <!--joint name="footprint_to_base" type="fixed">
       <xacro:insert_block name="origin" />
       <parent link="${parent}"/>
       <child link="base_link"/>
-    </joint>
+    </joint-->
 
     <link name="base_link"/>
 

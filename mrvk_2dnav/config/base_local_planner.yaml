@@ -1,11 +1,26 @@
 TrajectoryPlannerROS:
+  #base local planner
   max_vel_x: 0.45
-  min_vel_x: 0.1
-  max_vel_theta: 1.0
-  min_in_place_vel_theta: 0.4
+ # min_vel_x: -0.45
 
-  acc_lim_theta: 3.2
-  acc_lim_x: 2.5
-  acc_lim_y: 2.5
+  max_vel_theta: 0.5
+  #max_vel_theta: -0.5
+  
+  min_in_place_vel_theta: 0.1
+  max_in_place_vel_theta: 0.5
+  
+  escape_vel: -0.1
 
-  holonomic_robot: true
+  acc_lim_theta: 1
+  acc_lim_x: 2
+  acc_lim_y: 2
+
+  holonomic_robot: false
+
+  #goal tolerance
+  yaw_goal_tolerance: 0.05      # default 0.05
+  xy_goal_tolerance: 0.2        #default 0.1
+  latch_xy_goal_tolerance: true           #default false If goal tollerance is latched, if the robot ever reach the goal xy location it will simply rotate in place, even if it ends up outside the goal tolerance while it is doing so
+
+  #TODO add simulation parameters
+  meter_scoring: true
