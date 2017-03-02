@@ -287,7 +287,7 @@ int main(int argc, char **argv)
    clientServiceResetCentralStop = n.serviceClient<std_srvs::Trigger>("reset_central_stop");
     clientServiceMainSettings = n.serviceClient<std_srvs::Trigger>("write_main_board_settings");
     clientServiceMotorSettings = n.serviceClient<std_srvs::Trigger>("write_motor_boards_settings");
-   cmd_vel_pub = n.advertise<geometry_msgs::Twist>("mrvk_diff_drive_controller/cmd_vel", 1000);
+   cmd_vel_pub = n.advertise<geometry_msgs::Twist>("diff_drive_controller/cmd_vel", 1000);
   // cmd_vel_kamera_pub = n.advertise<geometry_msgs::Twist>("cmd_vel_kamera", 1000);
   //radenie_pub = n.advertise<std_msgs::UInt8>("gear_shifting", 1000);
   joystick_subscriber = n.subscribe("/joy", 50, &joyCallback);

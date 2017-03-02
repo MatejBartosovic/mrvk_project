@@ -46,7 +46,6 @@ namespace Mrvk{
             comunication_interface.getMotorControlBoardRight()->setRegulatorPID(rightRegulator);
 
 			//todo dorobit odblokovanie central stopu do initu
-
 			return true;
 		}
 
@@ -143,6 +142,7 @@ int main (int argc, char **argv){
 
 	while (n.ok())
 	{
+		//ROS_ERROR("jebem misa");
 		a.sleep();
 		driver.read();
 		cm.update(ros::Time::now(), driver.getPeriod());

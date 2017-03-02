@@ -21,7 +21,9 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 	setPowerManagmentSS = n.advertiseService("write_main_board_settings", &MrvkCallbacks::setPowerManagmentCallback, this);
 
     //dynamic reconfigure
-    server.setCallback(boost::bind(&MrvkCallbacks::dynamicReconfigureCallback, this, _1, _2));
+	ROS_ERROR("dynamic rec start ");
+    //server.setCallback(boost::bind(&MrvkCallbacks::dynamicReconfigureCallback, this, _1, _2));
+    ROS_ERROR("dynamic rec stop ");
 }
 
 	//todo overit funkcnost + ked bude na baterkach tak overit premennu full_battery
@@ -41,7 +43,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 	}
 
 	bool MrvkCallbacks::resetCentralStopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
-
+		{
             //send motors request
             boost::unique_lock<boost::mutex> write_lock(communicationInterface.write_mutex);
             communicationInterface.blockMovement(true);
@@ -55,11 +57,11 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 
             //send main board request
             communicationInterface.getMainBoard()->setCentralStop(false);
-            if(!communicationInterface.getWriteStatus(CommunicationInterface::AllDevicesFlag,write_lock)) {
+            if(!communicationInterface.getWriteStatus(CommunicationInterface::MainBoardFlag,write_lock)) {
                 res.message += "Main board write failed. ";
                 res.success = false;
             }
-
+		}
         //wait to unblock
         for(int i =0;i<100;i++){
             if(communicationInterface.getNewDataStatus(CommunicationInterface::MainBoardFlag)){
