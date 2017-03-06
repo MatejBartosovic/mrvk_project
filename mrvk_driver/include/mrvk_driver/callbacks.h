@@ -40,7 +40,7 @@ class MrvkCallbacks{
 		ros::ServiceServer setPowerManagmentSS;
 		ros::ServiceServer setMotorParametersSS;
 
-    dynamic_reconfigure::Server<mrvk_driver::RobotDynParamConfig> server;
+		dynamic_reconfigure::Server<mrvk_driver::RobotDynParamConfig> server;
 
 		bool shutdownCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool resetBatteryCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
@@ -53,6 +53,7 @@ class MrvkCallbacks{
 
 		//dynamic reconfigure callback
 		void dynamicReconfigureCallback(mrvk_driver::RobotDynParamConfig &config, uint32_t level);
+		void createDynamicReconf();
 
 };
 

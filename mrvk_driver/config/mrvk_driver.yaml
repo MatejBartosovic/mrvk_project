@@ -1,10 +1,10 @@
 joint_limits:
   wheel_joint_left:
     has_acceleration_limits: true
-    max_acceleration: 20 #rad*s^(-2)
+    max_acceleration: 55 #rad*s^(-2)
   wheel_joint_right:
     has_acceleration_limits: true
-    max_acceleration: 20 #rad*s^(-2)
+    max_acceleration: 55 #rad*s^(-2)
 
 mrvk_joint_names: [wheel_joint_left, wheel_joint_right, scan_to_veza, camera_r_to_camera]
 #[main_board motor_control_board_left motor_control_bord_right]
