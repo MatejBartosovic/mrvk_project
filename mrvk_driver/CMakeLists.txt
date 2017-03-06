@@ -110,7 +110,7 @@ generate_dynamic_reconfigure_options(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}_hardware_interface_loader ${PROJECT_NAME}_communication_interface
+  LIBRARIES ${PROJECT_NAME}_communication_interface
   CATKIN_DEPENDS controller_manager hardware_interface roscpp std_msgs urdf message_runtime
   DEPENDS system_lib boost
 )
