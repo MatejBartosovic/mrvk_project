@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+  <!-- Trajectory_execution_manager potrebuje najst kontroler -->
+  <arg name="moveit_controller_manager" default="moveit_simple_controller_manager/MoveItSimpleControllerManager" />
+  <param name="moveit_controller_manager" value="$(arg moveit_controller_manager)"/>
+  <!-- nacitanie kontrolerov -->
+  <rosparam file="$(find kv01_moveit_config)/config/controllers.yaml"/>
+</launch>

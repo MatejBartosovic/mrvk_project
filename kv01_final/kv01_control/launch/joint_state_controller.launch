@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  
+  <arg name="arm_name" default="/kv01"/>
+  
+  <rosparam file="$(find kv01_control)/config/joint_state_controller.yaml" command="load" ns="$(arg arm_name)"/> 
+
+  <node pkg="controller_manager" type="spawner" name="joint_state_controller_spawner" ns = "$(arg arm_name)" args="joint_state_controller" respawn="false" output="screen"/>
+
+</launch>

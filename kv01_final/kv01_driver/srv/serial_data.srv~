@@ -1,0 +1,4 @@
+uint8_t[15] spravaIn
+---
+uint8_t[15] spravaOut
+

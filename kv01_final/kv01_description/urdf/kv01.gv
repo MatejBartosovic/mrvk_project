@@ -1,0 +1,89 @@
+digraph G {
+node [shape=box];
+"base_footprint" [label="base_footprint"];
+"base_link" [label="base_link"];
+"base_stabilized" [label="base_stabilized"];
+"wheel_frame_l" [label="wheel_frame_l"];
+"wheel_lp" [label="wheel_lp"];
+"wheel_lz" [label="wheel_lz"];
+"wheel_frame_r" [label="wheel_frame_r"];
+"wheel_pp" [label="wheel_pp"];
+"wheel_pz" [label="wheel_pz"];
+"laser" [label="laser"];
+"veza" [label="veza"];
+"camera_l" [label="camera_l"];
+"camera_r" [label="camera_r"];
+"camera" [label="camera"];
+"model_klb0" [label="model_klb0"];
+"model_klb1" [label="model_klb1"];
+"model_klb2" [label="model_klb2"];
+"model_klb3" [label="model_klb3"];
+"model_klb4" [label="model_klb4"];
+"model_klb5" [label="model_klb5"];
+"gripper_end" [label="gripper_end"];
+"uchopenie_lavo" [label="uchopenie_lavo"];
+"uchopenie_pravo" [label="uchopenie_pravo"];
+"menic4_5" [label="menic4_5"];
+"link_3_4x" [label="link_3_4x"];
+"link_3_4" [label="link_3_4"];
+"link_2_3" [label="link_2_3"];
+"link_1_2" [label="link_1_2"];
+"menic1_2" [label="menic1_2"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"base_footprint" -> "footprint_to_base" [label="xyz: 0 0 0.13 \nrpy: 0 -0 0"]
+"footprint_to_base" -> "base_link"
+"base_link" -> "base_to_stabilizer" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"base_to_stabilizer" -> "base_stabilized"
+"base_stabilized" -> "base_link_to_wheel_frame_l" [label="xyz: 0 0.1775 -0.05 \nrpy: 0 -0 0"]
+"base_link_to_wheel_frame_l" -> "wheel_frame_l"
+"wheel_frame_l" -> "wheel_frame_l_to_wheel_lp" [label="xyz: 0.145 0.05 -0.01 \nrpy: 1.57079 -0 0"]
+"wheel_frame_l_to_wheel_lp" -> "wheel_lp"
+"wheel_frame_l" -> "wheel_frame_l_to_wheel_lz" [label="xyz: -0.145 0.05 -0.01 \nrpy: 1.57079 -0 0"]
+"wheel_frame_l_to_wheel_lz" -> "wheel_lz"
+"base_stabilized" -> "base_link_to_wheel_frame_r" [label="xyz: 0 -0.1775 -0.05 \nrpy: 0 -0 0"]
+"base_link_to_wheel_frame_r" -> "wheel_frame_r"
+"wheel_frame_r" -> "wheel_frame_r_to_wheel_pp" [label="xyz: 0.145 -0.05 -0.01 \nrpy: 1.57079 -0 0"]
+"wheel_frame_r_to_wheel_pp" -> "wheel_pp"
+"wheel_frame_r" -> "wheel_frame_r_to_wheel_pz" [label="xyz: -0.145 -0.05 -0.01 \nrpy: 1.57079 -0 0"]
+"wheel_frame_r_to_wheel_pz" -> "wheel_pz"
+"base_stabilized" -> "base_to_scan" [label="xyz: 0.2075 0 0.095 \nrpy: 0 -0 0"]
+"base_to_scan" -> "laser"
+"laser" -> "scan_to_veza" [label="xyz: -0.03 0 0.0375 \nrpy: 0 -0 0"]
+"scan_to_veza" -> "veza"
+"veza" -> "veza_to_camera_l" [label="xyz: 0 0.05 0.0575 \nrpy: 0 -0 0"]
+"veza_to_camera_l" -> "camera_l"
+"veza" -> "veza_to_camera_r" [label="xyz: 0 -0.05 0.0575 \nrpy: 0 -0 0"]
+"veza_to_camera_r" -> "camera_r"
+"camera_r" -> "camera_r_to_camera" [label="xyz: 0 0.05 0.01 \nrpy: 1.57079 -0 0"]
+"camera_r_to_camera" -> "camera"
+"base_stabilized" -> "klb0" [label="xyz: 0 0 0.08 \nrpy: 0 -0 0"]
+"klb0" -> "model_klb0"
+"model_klb0" -> "klb1" [label="xyz: 0 0 0.258 \nrpy: 1.57079 -0 0"]
+"klb1" -> "model_klb1"
+"model_klb1" -> "klb2" [label="xyz: 0 0.485 0 \nrpy: 0 -0 0"]
+"klb2" -> "model_klb2"
+"model_klb2" -> "klb3" [label="xyz: 0 0.35 -0.04 \nrpy: -1.57079 0 0"]
+"klb3" -> "model_klb3"
+"model_klb3" -> "klb4" [label="xyz: 0 0.036 0.155 \nrpy: 1.57079 -0 0"]
+"klb4" -> "model_klb4"
+"model_klb4" -> "klb5" [label="xyz: 0 0.19 0.025 \nrpy: -1.57079 0 0"]
+"klb5" -> "model_klb5"
+"model_klb5" -> "centrum_uchopu" [label="xyz: 0 0 0.07 \nrpy: 0 -0 0"]
+"centrum_uchopu" -> "gripper_end"
+"model_klb5" -> "uchopovacL" [label="xyz: 0 0 0.02 \nrpy: 0 -0 1.57079"]
+"uchopovacL" -> "uchopenie_lavo"
+"model_klb5" -> "uchopovacR" [label="xyz: 0 0 0.02 \nrpy: 0 -0 1.57079"]
+"uchopovacR" -> "uchopenie_pravo"
+"model_klb4" -> "spoj_menic4_5_gripper" [label="xyz: 0 0.055 0.015 \nrpy: -1.57079 0 0"]
+"spoj_menic4_5_gripper" -> "menic4_5"
+"model_klb3" -> "spoj_klb3_klb4x" [label="xyz: 0 -0.052 0.155 \nrpy: 1.57079 -0 0"]
+"spoj_klb3_klb4x" -> "link_3_4x"
+"model_klb3" -> "spoj_klb4_klb5" [label="xyz: 0 -0.076 0 \nrpy: 3.14159 -0 0"]
+"spoj_klb4_klb5" -> "link_3_4"
+"model_klb2" -> "spoj_klb2_klb3" [label="xyz: 0 0 -0.04 \nrpy: -1.57079 0 0"]
+"spoj_klb2_klb3" -> "link_2_3"
+"model_klb1" -> "spoj_klb1_klb2" [label="xyz: 0 0.2425 0.028 \nrpy: -1.57079 0 0"]
+"spoj_klb1_klb2" -> "link_1_2"
+"model_klb1" -> "spoj_klb1_klb2_menic" [label="xyz: 0 0.2425 0.088 \nrpy: -1.57079 0 0"]
+"spoj_klb1_klb2_menic" -> "menic1_2"
+}

@@ -1,0 +1,30 @@
+arm_controller:
+  type: effort_controllers/JointTrajectoryController
+  joints:
+    - klb0
+    - klb1
+    - klb2
+    - klb3
+    - klb4
+    - klb5
+  gains:
+    klb0: {p: 5000.0, i: 10, d: 50}
+    klb1: {p: 5000.0, i: 10, d: 50}
+    klb2: {p: 5000.0, i: 10, d: 50}
+    klb3: {p: 5000.0, i: 10, d: 50}
+    klb4: {p: 5000.0, i: 10, d: 50}
+    klb5: {p: 5000.0, i: 10, d: 50}
+  constraints:
+    goal_time: 0.6
+    klb0:
+      goal: 0.2
+    klb1:
+      goal: 0.2
+    klb2:
+      goal: 0.2
+    klb3:
+      goal: 0.2
+    klb4:
+      goal: 0.2
+    klb5:
+      goal: 0.2

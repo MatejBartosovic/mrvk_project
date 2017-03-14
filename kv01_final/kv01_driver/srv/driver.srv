@@ -1,0 +1,9 @@
+int32[6] joint
+uint8 command
+uint8 data
+float64 value
+float64 position
+---
+uint8 error
+int32 joint
+float64 speed

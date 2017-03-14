@@ -1,0 +1,11 @@
+controller_list:
+ - name: /kv01/arm_controller
+   action_ns: follow_joint_trajectory
+   type: FollowJointTrajectory
+   default: true
+   joints:
+     - klb0
+     - klb1
+     - klb2
+     - klb4
+     - klb5
