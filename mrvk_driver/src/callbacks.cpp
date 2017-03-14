@@ -19,6 +19,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
     toggleArmVoltageSS = n.advertiseService("toggle_arm_voltage", &MrvkCallbacks::toggleArmVoltageCallback, this);
     toggleCameraSourceSS = n.advertiseService("toggle_camera_source", &MrvkCallbacks::toggleCameraSourceCallback, this);
 	setPowerManagmentSS = n.advertiseService("write_main_board_settings", &MrvkCallbacks::setPowerManagmentCallback, this);
+    setCentralStopSS = n.advertiseService("setCentralStop", &MrvkCallbacks::setCentralStop,this);
 
     //dynamic reconfigure
 	ROS_ERROR("dynamic rec start ");
@@ -79,6 +80,18 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
         res.success = false;
         return true;
 	}
+
+    bool MrvkCallbacks::setCentralStop(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res){
+        boost::unique_lock<boost::mutex> write_lock(communicationInterface.write_mutex);
+        communicationInterface.blockMovement(true);
+        communicationInterface.getMainBoard()->setCentralStop(true);
+        if(!communicationInterface.getWriteStatus(CommunicationInterface::MotorBoardsFlag,write_lock)){
+            res.message += "Main board write failed ";
+            res.success = false;
+            return true;
+        }
+        return true;
+    }
 
 
 	bool MrvkCallbacks::blockMovementCallback(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res)

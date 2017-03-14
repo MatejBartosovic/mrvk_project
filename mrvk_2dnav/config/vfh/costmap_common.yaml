@@ -14,11 +14,18 @@ transform_tolerance:  0.5
 map_type: costmap
 cost_scaling_factor: 100 #this parameter set the scaling factor that applies over the inflation. This parameter can be adjusted  so the robot has a more aggresive or conservative behaviour near obstacle (Robot operating system Complete reference (Volume 1) page 145)
 
-observation_sources: laser_scan_sensor
+observation_sources: laser_scan_sensor point_cloud_sensor
 
 laser_scan_sensor: 
   sensor_frame: laser
   data_type: LaserScan
   topic: /scan
+  marking: true
+  clearing: true
+
+point_cloud_sensor: 
+  sensor_frame: frame_name
+  data_type: PointCloud
+  topic: /rrr
   marking: true
   clearing: true

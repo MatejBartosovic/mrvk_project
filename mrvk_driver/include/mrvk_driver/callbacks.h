@@ -33,6 +33,7 @@ class MrvkCallbacks{
 		ros::ServiceServer shutdownSS;
 		ros::ServiceServer resetBatterySS;
 		ros::ServiceServer resetCentralStopSS;
+		ros::ServiceServer setCentralStopSS;
 		ros::ServiceServer blockMovementSS;
 		ros::ServiceServer setArmVoltageSS;
 		ros::ServiceServer toggleArmVoltageSS;
@@ -45,6 +46,7 @@ class MrvkCallbacks{
 		bool shutdownCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool resetBatteryCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool resetCentralStopCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
+		bool setCentralStop(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
 		bool blockMovementCallback(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res);
 		bool setArmVoltageCallback(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res);
 		bool toggleArmVoltageCallback(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
