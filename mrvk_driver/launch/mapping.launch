@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+	<arg name="vo_used" default="false" />
 	<!-- zapina gmapping a vytvori model v rvize s kompletnou konfiguraciou -->	
 	<include file="$(find mrvk_driver)/launch/driver.launch" />
 	<node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" />
@@ -13,7 +14,7 @@
 	  <param name="sensor_timeout" value="1.0"/>  
 	  <param name="odom_used" value="true"/>
 	  <param name="imu_used" value="true"/>
-	  <param name="vo_used" value="false"/> 
+	  <param name="vo_used" value="$(arg vo_used)"/> 
 	  <remap from="odom" to="/mrvk/diff_drive_controller/odom"/>
 	  <remap from="imu_data" to="/adis16350/imu_data"/>
 	</node>
