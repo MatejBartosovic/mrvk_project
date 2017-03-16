@@ -22,11 +22,9 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
     setCentralStopSS = n.advertiseService("setCentralStop", &MrvkCallbacks::setCentralStop,this);
 
     //dynamic reconfigure
-	ROS_ERROR("dynamic rec start ");
 	boost::thread a = boost::thread(&MrvkCallbacks::createDynamicReconf,this);
 	a.detach();
 
-	ROS_ERROR("dynamic rec stop ");
 }
 
 	//todo overit funkcnost + ked bude na baterkach tak overit premennu full_battery
@@ -262,7 +260,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 
 void MrvkCallbacks::dynamicReconfigureCallback(mrvk_driver::RobotDynParamConfig &config, uint32_t level) {
 
-	ROS_ERROR("dynamic reconigure callback start ");
+	//ROS_ERROR("dynamic reconigure callback start ");
     SET_MAIN_BOARD robot_config;
     REGULATOR_MOTOR left_reg;
     REGULATOR_MOTOR right_reg;
@@ -303,7 +301,6 @@ void MrvkCallbacks::dynamicReconfigureCallback(mrvk_driver::RobotDynParamConfig 
     if(!communicationInterface.getWriteStatus(CommunicationInterface::AllDevicesFlag,lock)){
       ROS_ERROR("Parameters write failed.");
     }
-    ROS_ERROR("dynamic reconigure callback stop");
 }
 
 void MrvkCallbacks::createDynamicReconf(){
