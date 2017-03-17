@@ -28,7 +28,7 @@ add_action_files(
  )
 
 catkin_package(
-  INCLUDE_DIRS include
+  INCLUDE_DIRS
   LIBRARIES kv01_interface kv01_actionserver
   CATKIN_DEPENDS actionlib_msgs kv01_driver roscpp sensor_msgs trajectory_msgs
   DEPENDS system_lib

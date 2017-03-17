@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   joy
 )
 catkin_package(
-  INCLUDE_DIRS include
+  INCLUDE_DIRS
   LIBRARIES kv01_interface
   CATKIN_DEPENDS joy kv01_driver roscpp sensor_msgs std_msgs std_srvs
   DEPENDS system_lib
