@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /Status1
         - /Map1
-        - /Map1/Status1
       Splitter Ratio: 0.5
     Tree Height: 775
   - Class: rviz/Selection
@@ -28,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -69,7 +68,7 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz/LaserScan
       Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color Transformer: ""
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -78,149 +77,16 @@ Visualization Manager:
       Min Color: 0; 0; 0
       Min Intensity: 0
       Name: LaserScan
-      Position Transformer: XYZ
+      Position Transformer: ""
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.00999999978
       Style: Flat Squares
-      Topic: /scan
+      Topic: ""
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
-    - Class: rviz/TF
-      Enabled: true
-      Frame Timeout: 15
-      Frames:
-        All Enabled: true
-        base_end_point:
-          Value: true
-        base_link:
-          Value: true
-        base_stabilized:
-          Value: true
-        camera:
-          Value: true
-        camera_l:
-          Value: true
-        camera_r:
-          Value: true
-        imu:
-          Value: true
-        laser:
-          Value: true
-        link_1_2:
-          Value: true
-        link_2_3:
-          Value: true
-        link_3_4:
-          Value: true
-        link_3_4x:
-          Value: true
-        map:
-          Value: true
-        menic1_2:
-          Value: true
-        menic4_5:
-          Value: true
-        model_joint_1:
-          Value: true
-        model_joint_2:
-          Value: true
-        model_joint_3:
-          Value: true
-        model_joint_4:
-          Value: true
-        model_joint_5:
-          Value: true
-        model_joint_6:
-          Value: true
-        odom:
-          Value: true
-        tool_point:
-          Value: true
-        uchopenie_lavo:
-          Value: true
-        uchopenie_pravo:
-          Value: true
-        veza:
-          Value: true
-        wheel_frame_l:
-          Value: true
-        wheel_frame_l_rotation:
-          Value: true
-        wheel_frame_r:
-          Value: true
-        wheel_frame_r_rotation:
-          Value: true
-        wheel_lp:
-          Value: true
-        wheel_lz:
-          Value: true
-        wheel_pp:
-          Value: true
-        wheel_pz:
-          Value: true
-      Marker Scale: 1
-      Name: TF
-      Show Arrows: true
-      Show Axes: true
-      Show Names: true
-      Tree:
-        map:
-          odom:
-            base_link:
-              base_stabilized:
-                base_end_point:
-                  model_joint_1:
-                    model_joint_2:
-                      link_1_2:
-                        {}
-                      menic1_2:
-                        {}
-                      model_joint_3:
-                        link_2_3:
-                          {}
-                        model_joint_4:
-                          link_3_4:
-                            {}
-                          link_3_4x:
-                            {}
-                          model_joint_5:
-                            menic4_5:
-                              {}
-                            model_joint_6:
-                              tool_point:
-                                {}
-                              uchopenie_lavo:
-                                {}
-                              uchopenie_pravo:
-                                {}
-                imu:
-                  {}
-                laser:
-                  veza:
-                    camera_l:
-                      {}
-                    camera_r:
-                      camera:
-                        {}
-                wheel_frame_l:
-                  wheel_frame_l_rotation:
-                    {}
-                  wheel_lp:
-                    {}
-                  wheel_lz:
-                    {}
-                wheel_frame_r:
-                  wheel_frame_r_rotation:
-                    {}
-                  wheel_pp:
-                    {}
-                  wheel_pz:
-                    {}
-      Update Interval: 0
       Value: true
     - Alpha: 1
       Class: rviz/RobotModel
@@ -392,6 +258,224 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        base_end_point:
+          Value: true
+        base_link:
+          Value: true
+        base_stabilized:
+          Value: true
+        camera:
+          Value: true
+        camera_l:
+          Value: true
+        camera_r:
+          Value: true
+        imu:
+          Value: true
+        laser:
+          Value: true
+        link_1_2:
+          Value: true
+        link_2_3:
+          Value: true
+        link_3_4:
+          Value: true
+        link_3_4x:
+          Value: true
+        map:
+          Value: true
+        menic1_2:
+          Value: true
+        menic4_5:
+          Value: true
+        model_joint_1:
+          Value: true
+        model_joint_2:
+          Value: true
+        model_joint_3:
+          Value: true
+        model_joint_4:
+          Value: true
+        model_joint_5:
+          Value: true
+        model_joint_6:
+          Value: true
+        odom:
+          Value: true
+        tool_point:
+          Value: true
+        uchopenie_lavo:
+          Value: true
+        uchopenie_pravo:
+          Value: true
+        veza:
+          Value: true
+        wheel_frame_l:
+          Value: true
+        wheel_frame_l_rotation:
+          Value: true
+        wheel_frame_r:
+          Value: true
+        wheel_frame_r_rotation:
+          Value: true
+        wheel_lp:
+          Value: true
+        wheel_lz:
+          Value: true
+        wheel_pp:
+          Value: true
+        wheel_pz:
+          Value: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        map:
+          odom:
+            base_link:
+              base_stabilized:
+                base_end_point:
+                  model_joint_1:
+                    model_joint_2:
+                      link_1_2:
+                        {}
+                      menic1_2:
+                        {}
+                      model_joint_3:
+                        link_2_3:
+                          {}
+                        model_joint_4:
+                          link_3_4:
+                            {}
+                          link_3_4x:
+                            {}
+                          model_joint_5:
+                            menic4_5:
+                              {}
+                            model_joint_6:
+                              tool_point:
+                                {}
+                              uchopenie_lavo:
+                                {}
+                              uchopenie_pravo:
+                                {}
+                imu:
+                  {}
+                laser:
+                  veza:
+                    camera_l:
+                      {}
+                    camera_r:
+                      camera:
+                        {}
+                wheel_frame_l:
+                  wheel_frame_l_rotation:
+                    {}
+                  wheel_lp:
+                    {}
+                  wheel_lz:
+                    {}
+                wheel_frame_r:
+                  wheel_frame_r_rotation:
+                    {}
+                  wheel_pp:
+                    {}
+                  wheel_pz:
+                    {}
+      Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz/Path
+      Color: 255; 85; 255
+      Enabled: true
+      Head Diameter: 0.300000012
+      Head Length: 0.200000003
+      Length: 0.300000012
+      Line Style: Lines
+      Line Width: 0.0299999993
+      Name: Local plan
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Style: None
+      Radius: 0.0299999993
+      Shaft Diameter: 0.100000001
+      Shaft Length: 0.100000001
+      Topic: /move_base/TrajectoryPlannerROS/local_plan
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz/Path
+      Color: 255; 85; 255
+      Enabled: true
+      Head Diameter: 0.300000012
+      Head Length: 0.200000003
+      Length: 0.300000012
+      Line Style: Lines
+      Line Width: 0.0299999993
+      Name: Global plan
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Style: None
+      Radius: 0.0299999993
+      Shaft Diameter: 0.100000001
+      Shaft Length: 0.100000001
+      Topic: /move_base/TrajectoryPlannerROS/global_plan
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Class: rviz/Polygon
+      Color: 25; 255; 0
+      Enabled: true
+      Name: Robot footprint
+      Topic: /move_base/global_costmap/footprint
+      Unreliable: false
+      Value: true
+    - Alpha: 0.699999988
+      Class: rviz/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: true
+      Name: Global map
+      Topic: /move_base/global_costmap/costmap
+      Unreliable: false
+      Value: true
+    - Alpha: 0.699999988
+      Class: rviz/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: true
+      Name: Local map
+      Topic: /move_base/local_costmap/costmap
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.100000001
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.300000012
+      Head Radius: 0.100000001
+      Name: Goal
+      Shaft Length: 1
+      Shaft Radius: 0.0500000007
+      Shape: Arrow
+      Topic: /move_base/current_goal
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -416,7 +500,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 9.82933807
+      Distance: 10
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -430,10 +514,10 @@ Visualization Manager:
       Focal Shape Size: 0.0500000007
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.730398059
+      Pitch: 0.785398006
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.82358122
+      Yaw: 0.785398006
     Saved: ~
 Window Geometry:
   Displays:
