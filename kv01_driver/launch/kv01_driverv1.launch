@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<!--
+<launch>
+  SPustat len driver tam bezi vsetko
+    <node name="communication_servis" pkg="kv01_driver" type="communication_servis" />
+    <node name="kv01_state_publisher" pkg="kv01_driver" type="kv01_state_publisher" />
+    <node name="kv01_driver_servis" pkg="kv01_driver" type="kv01_driver_servis" /> 
+</launch>
+-->
+
+<launch>
+
+    <node name="kv01_driver_servis" pkg="kv01_driver" type="kv01_driver_servis" />
+</launch>

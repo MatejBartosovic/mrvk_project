@@ -32,5 +32,11 @@ include_directories(
   ${GSTREAMER_INCLUDE_DIRS}
 )
 
+add_library(${PROJECT_NAME}_communication_interface src/communication_interface.cpp)
+target_link_libraries(${PROJECT_NAME}_communication_interface ${catkin_LIBRARIES})
+
 add_executable(kv01_driver src/kv01_driver.cpp src/hwInterface.cpp)
-target_link_libraries(kv01_driver ${catkin_LIBRARIES})
+target_link_libraries(kv01_driver ${catkin_LIBRARIES} ${PROJECT_NAME}_communication_interface)
+
+add_dependencies(kv01_driver ${PROJECT_NAME}_communication_interface)
+

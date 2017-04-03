@@ -1,0 +1,32 @@
+joint_limits:
+  joint_1:
+    has_acceleration_limits: false
+    max_acceleration: 55 #rad*s^(-2)
+  joint_2:
+    has_acceleration_limits: false
+    max_acceleration: 55 #rad*s^(-2)
+  joint_3:
+    has_acceleration_limits: false
+    max_acceleration: 55 #rad*s^(-2)
+  joint_4:
+    has_acceleration_limits: false
+    max_acceleration: 55 #rad*s^(-2)
+  joint_5:
+    has_acceleration_limits: false
+    max_acceleration: 55 #rad*s^(-2)
+  joint_6:
+    has_acceleration_limits: false
+    max_acceleration: 55 #rad*s^(-2)
+
+
+kv01_joint_names: [joint_1,joint_2,joint_3,joint_4,joint_5,joint_6]
+#[main_board motor_control_board_left motor_control_bord_right]
+port_names: ["/dev/ttyUSB0"]
+
+baudrate: 115200
+stop_bits: 1    #1 - stopBits 1  #2 - stopBits 2 #3 - stopBits 1.5
+parity: 0       #0 - none #1 - odd parity #2 - even parity
+byte_size: 8    #5 - fivebits #6 - sixbits #7 - sevenbits #8 eightbits
+
+status_period: 5
+comunication_rate: 50 # 30 je asi max (default 30)

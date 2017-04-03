@@ -3,11 +3,11 @@
 #include "kv01_driver/hwInterface.h"
 
 namespace Kv01{
-    class Driver : public Mrvk::HwInterface{
+    class Driver : public Kv01::HwInterface{
 
 	public:
 		Driver(std::vector<std::string> ports, int baudrate, int stopBits, int parity, int byteSize):
-                Mrvk::HwInterface(){
+                Kv01::HwInterface(){
             last_time = ros::Time::now();
             current_time = ros::Time::now();
         }
@@ -29,7 +29,7 @@ namespace Kv01{
 //
 //			callbacks.getMotorParametersFromParam(&leftRegulator, &rightRegulator);			//nastavi default parametre
 //			comunication_interface.getMotorControlBoardLeft()->setRegulatorPID(leftRegulator);
-//            comunication_interface.getMotorControlBoardRight()->setRegulatorPID(rightRegulator);
+//          comunication_interface.getMotorControlBoardRight()->setRegulatorPID(rightRegulator);
 //
 //			//todo dorobit odblokovanie central stopu do initu
 			return true;
@@ -39,10 +39,10 @@ namespace Kv01{
             current_time = ros::Time::now();
 //			vel[0] = comunication_interface.getVelLeftWheel();
 //			vel[1] = -comunication_interface.getVelRightWheel();
-//            /*vel[0] = vel_cmd[0];
-//            vel[1] = vel_cmd[1];
-//            pos[0] += vel[0] * getPeriod().toSec();
-//            pos[1] += vel[1] * getPeriod().toSec();*/
+//          /*vel[0] = vel_cmd[0];
+//          vel[1] = vel_cmd[1];
+//          pos[0] += vel[0] * getPeriod().toSec();
+//          pos[1] += vel[1] * getPeriod().toSec();*/
 //			double lavy = -comunication_interface.getPosLeftWheel();
 //			double pravy = comunication_interface.getPosRightWheel();
 //			pos[0] += lavy;

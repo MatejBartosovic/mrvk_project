@@ -16,7 +16,7 @@
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include <joint_limits_interface/joint_limits_interface.h>
 
-namespace Mrvk{
+namespace Kv01{
     class HwInterface : public hardware_interface::RobotHW{
     public:
         HwInterface();
@@ -27,11 +27,11 @@ namespace Mrvk{
             last_time = current_time;
         }
 
-        std::vector<double> pos;                                        //joint positions (0,1 robot and 2.3 camera)
-        std::vector<double> vel;                                        //velocity (0,1 robot and 2.3 camera)
-        std::vector<double> eff;                                        //effort (0,1 robot and 2.3 camera)
-        std::vector<double> pos_cmd;                                    //velocity command to robot
-        std::vector<double> vel_cmd;                                    //position command to camera
+        std::vector<double> pos;                                        //joint positions (0-5 robot)
+        std::vector<double> vel;                                        //velocity (0-5 robot)
+        std::vector<double> eff;                                        //effort (0-5 robot)
+        std::vector<double> pos_cmd;                                    //position command to robot
+        std::vector<double> vel_cmd;                                    //velocity command to robot
 
     private:
         hardware_interface::JointStateInterface jointStatedInterface;   //state interface
