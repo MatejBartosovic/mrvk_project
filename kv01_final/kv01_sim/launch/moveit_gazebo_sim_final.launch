@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<launch>	  
-	<include file="$(find kv01_sim)/launch/gazebo_sim_trajectory.launch"/>
-	<include file="$(find kv01_moveit_config)/launch/demo_sim.launch"/>	
-</launch>

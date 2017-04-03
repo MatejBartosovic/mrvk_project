@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-
-<launch>
-<param name="topic" type="string" value="/joy_arm"/>
-<node name="kv01_joystick" pkg="kv01_interface" type="kv01_joystick" >
-</node>
-</launch>

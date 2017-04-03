@@ -1,8 +1,0 @@
-controller_list:
-  - name: fake_kv01_klb3off_controller
-    joints:
-      - klb0
-      - klb1
-      - klb2
-      - klb4
-      - klb5

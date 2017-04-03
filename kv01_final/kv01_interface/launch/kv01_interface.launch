@@ -1,6 +1,0 @@
-<?xml version ='1.0'?>
-<launch>
-    <node name="kv01_menu" pkg="kv01_interface" type="kv01_menu" output="screen" launch-prefix="xterm -e" />
-    <include file="$(find kv01_interface)/launch/kv01_joystick.launch"> </include>	
-   <!-- <node name="kv01_action" pkg="kv01_actionserver" type="kv01_actionserver_point" /> -->
-</launch>
