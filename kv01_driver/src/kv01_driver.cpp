@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <controller_manager/controller_manager.h>
+#include <kv01_driver/communication_interface.h>
 #include "kv01_driver/hwInterface.h"
 
 namespace Kv01{
@@ -7,7 +8,9 @@ namespace Kv01{
 
 	public:
 		Driver(std::vector<std::string> ports, int baudrate, int stopBits, int parity, int byteSize):
-                Kv01::HwInterface(){
+                Kv01::HwInterface(),
+				comunication_interface(ports, baudrate, stopBits, parity, byteSize)
+		{
             last_time = ros::Time::now();
             current_time = ros::Time::now();
         }
@@ -15,9 +18,8 @@ namespace Kv01{
 		bool init(){
 
 			ROS_INFO("Robot init");
-
-//			if (!comunication_interface.init())
-//				return false;
+			if (!comunication_interface.init())
+				return false;
 //
 //			SET_MAIN_BOARD config;
 //
@@ -31,7 +33,7 @@ namespace Kv01{
 //			comunication_interface.getMotorControlBoardLeft()->setRegulatorPID(leftRegulator);
 //          comunication_interface.getMotorControlBoardRight()->setRegulatorPID(rightRegulator);
 //
-//			//todo dorobit odblokovanie central stopu do initu
+//			//todo dorobit odblokovanie central stopu do initu*/
 			return true;
 		}
 
@@ -69,7 +71,7 @@ namespace Kv01{
 	private:
 
 		//MrvkCallbacks callbacks;
-		//CommunicationInterface comunication_interface;
+		CommunicationInterface comunication_interface;
 
 		//diagnostic updater variables
 		ros::Timer status_timer;

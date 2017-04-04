@@ -5,10 +5,9 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-
-class CommunicationInterface{
-public:
-
+namespace Kv01 {
+    class CommunicationInterface {
+    public:
 //    typedef enum {
 //        MainBoardFlag = 1,
 //        LeftMotorBoardFlag = 2,
@@ -21,12 +20,15 @@ public:
 //	const static int LEFT_MOTOR = 1;
 //	const static int RIGHT_MOTOR = 2;
 //
-	CommunicationInterface(std::vector<std::string> ports, int baudrate, int stopBits, int parity, int byteSize);
-	~CommunicationInterface();
-//
-//	bool init();
-//	bool isActive();
-//	void close();
+        CommunicationInterface(std::vector<std::string> ports, int baudrate, int stopBits, int parity, int byteSize);
+
+        ~CommunicationInterface(){}
+
+        bool init();
+
+        bool isActive();
+
+        void close();
 //
 //	bool write();
 //	int waitToRead();
@@ -46,9 +48,9 @@ public:
 //
 //	//command mutex
 //	boost::mutex write_mutex;
-private:
+    private:
 
-//	void setupPort(int sb,int p,int bs);
+	void setupPort(int sb,int p,int bs);
 //
 //	int write(int id,uint8_t *dataWrite, int lengthWrite);
 //	bool read(int lengthRead);
@@ -71,7 +73,7 @@ private:
 //    int MBSendControlCommd();
 //    int MBSendUnitedCommd();
 //
-//	std::vector<serial::Serial*> my_serials;
+        std::vector<serial::Serial *> my_serials;
 //
 //    //command generation classes
 //	MCBCommand lavy;
@@ -79,15 +81,15 @@ private:
 //	MBCommand mb;
 //
 //    //communication config variables
-//    bool active;
-//    bool blocked;
-//	std::vector<std::string> ports;
-//	int fd_max;
-//	std::vector<int> read_lengths;
-//	int baud;
-//	int byteSize;
-//	int stopBits;
-//	int parity;
+        bool active;
+        bool blocked;
+        std::vector<std::string> ports;
+        int fd_max;
+        std::vector<int> read_lengths;
+        int baud;
+        int byteSize;
+        int stopBits;
+        int parity;
 //
 //    //sinchronization variables
 //    int new_data_status;
@@ -97,7 +99,9 @@ private:
 //
 //    boost::condition_variable write_complete;
 //    boost::condition_variable new_data;
-};
+
+    };
+}
 
 
 #endif /* COMMUNICATION_INTERFACE_H_ */

@@ -1,7 +1,6 @@
 //
 // Created by matejko on 5.2.2017.
 //
-
 #include "kv01_driver/hwInterface.h"
 #include <urdf/model.h>
 
