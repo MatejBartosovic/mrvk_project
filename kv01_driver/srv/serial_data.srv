@@ -1,5 +1,0 @@
-uint8[15] spravaIn
----
-uint8[15] spravaOut
-int32 length
-

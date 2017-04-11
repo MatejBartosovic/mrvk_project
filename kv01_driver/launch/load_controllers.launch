@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+	<rosparam file="$(find kv01_driver)/config/kv01_controllers.conf" command="load"/>
+	<node  name="controller_manager" pkg="controller_manager" type="controller_manager" args="spawn kv01_joint_state_controller"/>
+</launch>

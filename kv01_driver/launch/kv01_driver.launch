@@ -1,9 +1,9 @@
-<?xml version="1.0"?>
 <launch>
 	<param name="robot_description" command="$(find xacro)/xacro '$(find mrvk_description)/urdf/robot.urdf.xacro' --inorder" />
 	<!--robot specific parameters -->
 	<rosparam file="$(find kv01_driver)/config/kv01_driver.yaml" command="load" ns="kv01"/>
 	<!-- start robot driver-->
-	<node  name="kv01_driverr" pkg="kv01_driver" type="kv01_driver" ns="kv01"/>
+	<node  name="kv01_driver" pkg="kv01_driver" type="kv01_driver" ns="kv01"/>
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" ns="kv01"/>
+	<include file="$(find kv01_driver)/launch/load_controllers.launch" ns='kv01'/>
 </launch>

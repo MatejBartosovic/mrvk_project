@@ -20,37 +20,26 @@ namespace Kv01{
 			ROS_INFO("Robot init");
 			if (!comunication_interface.init())
 				return false;
-//
-//			SET_MAIN_BOARD config;
-//
-//			callbacks.getMbFromParam(&config);							//nastavi default parametre
-//			comunication_interface.getMainBoard()->setParamaters(&config);
-//
-//			REGULATOR_MOTOR leftRegulator;
-//            REGULATOR_MOTOR rightRegulator;
-//
-//			callbacks.getMotorParametersFromParam(&leftRegulator, &rightRegulator);			//nastavi default parametre
-//			comunication_interface.getMotorControlBoardLeft()->setRegulatorPID(leftRegulator);
-//          comunication_interface.getMotorControlBoardRight()->setRegulatorPID(rightRegulator);
-//
-//			//todo dorobit odblokovanie central stopu do initu*/
+		/*todo spravit nejake inicializacie a zaciatocne nastavenia zatial nie je potrebne*/
 			return true;
 		}
 
 		void read(){
             current_time = ros::Time::now();
-//			vel[0] = comunication_interface.getVelLeftWheel();
-//			vel[1] = -comunication_interface.getVelRightWheel();
-//          /*vel[0] = vel_cmd[0];
-//          vel[1] = vel_cmd[1];
-//          pos[0] += vel[0] * getPeriod().toSec();
-//          pos[1] += vel[1] * getPeriod().toSec();*/
-//			double lavy = -comunication_interface.getPosLeftWheel();
-//			double pravy = comunication_interface.getPosRightWheel();
-//			pos[0] += lavy;
-//			pos[1] += pravy;
-//			pos[3] = comunication_interface.getCameraPositionX();
-//			pos[4] = comunication_interface.getCameraPositionZ();
+
+			vel[0] = 0;
+			vel[1] = 0;
+			vel[2] = 0;
+			vel[3] = 0;
+			vel[4] = 0;
+			vel[5] = 0;
+
+			pos[0] = 0.2;
+			pos[1] = 0.2;
+			pos[2] = 0.2;
+			pos[3] = 0.2;
+			pos[4] = 0.2;
+			pos[5] = 0.2;
 		}
 
 		void write(){
@@ -130,7 +119,6 @@ int main (int argc, char **argv){
 
 	while (n.ok())
 	{
-		//ROS_ERROR("jebem misa");
 		a.sleep();
 		driver.read();
 		cm.update(ros::Time::now(), driver.getPeriod());

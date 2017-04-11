@@ -1,4 +1,5 @@
 #include <kv01_driver/communication_interface.h>
+#include <kv01_driver/command.h>
 #include <boost/foreach.hpp>
 #include <ros/ros.h>
 
@@ -22,9 +23,7 @@ namespace Kv01 {
         this->stopBits = stopBits;
         this->byteSize = byteSize;
         this->parity = parity;
-
         active = false;
-
     }
 
     bool CommunicationInterface::init() {
@@ -33,14 +32,13 @@ namespace Kv01 {
         if (active)        //ak vsetko bezi v poriadku nemusi sa znova volat init
             return true;
         try {
-            BOOST_FOREACH(std::string
-            port, ports) {
+            BOOST_FOREACH(std::string port, ports) {
                 my_serials.push_back(new serial::Serial(port, baud, serial::Timeout::simpleTimeout(50)));
             }
         } catch (std::exception &e) {
-            ROS_ERROR("port sa neotvoril");
-            active = false;
-            return false;
+            ROS_ERROR("port sa neotvoril ale pokracujem aj tak treba fixnut");
+            active = true;
+            return true;
         }
 
         std::vector<int> fds;
@@ -66,8 +64,7 @@ namespace Kv01 {
             fds.push_back(serial->getFd());
         }
         fd_max = -1;
-        BOOST_FOREACH(int
-        fd, fds){
+        BOOST_FOREACH(int fd, fds){
             if (fd > fd_max)
                 fd_max = fd;
         }

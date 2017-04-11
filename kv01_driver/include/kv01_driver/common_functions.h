@@ -54,8 +54,8 @@
 #define common_functions_H_INCLUDED
 
 
-// zadefinovanie struktury pre inicializaciu premennych motora	
-	typedef struct har_arm_machine_data {	// konstatny na prepocty KK
+// zadefinovanie struktury pre inicializaciu premennych motora
+typedef struct har_arm_machine_data {	// konstatny na prepocty KK
 	short offset_j[6];
 	
 	double Ulimit_j[6];
@@ -238,18 +238,6 @@
 		uint8_t end;
 	} HAR_ARM_RES_D5;
 
-	using namespace std;
-	
-	pthread_mutex_t comm_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_mutex_t poss_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_mutex_t real_poss_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_mutex_t flag_mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_mutex_t wifi_mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_mutex_t speed_mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_mutex_t poloha_mimo_mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_mutex_t brzdy_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-	
 	
 class common_functions
 {
