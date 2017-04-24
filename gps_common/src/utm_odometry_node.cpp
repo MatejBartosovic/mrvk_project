@@ -16,6 +16,19 @@ static ros::Publisher odom_pub;
 std::string frame_id, child_frame_id;
 double rot_cov;
 
+double northing_init = 0;
+double easting_init = 0;
+
+
+void initCallback(const sensor_msgs::NavSatFixConstPtr& fix) {
+
+  std::string zone;
+
+  LLtoUTM(fix->latitude, fix->longitude, northing_init, easting_init, zone);
+
+}
+
+
 void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
   if (fix->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX) {
     ROS_INFO("No fix.");
@@ -42,8 +55,8 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
     odom.child_frame_id = child_frame_id;
 
-    odom.pose.pose.position.x = easting;
-    odom.pose.pose.position.y = northing;
+    odom.pose.pose.position.x = easting - easting_init;
+    odom.pose.pose.position.y = northing - northing_init;
     odom.pose.pose.position.z = fix->altitude;
     
     odom.pose.pose.orientation.x = 0;
@@ -88,6 +101,9 @@ int main (int argc, char **argv) {
   odom_pub = node.advertise<nav_msgs::Odometry>("odom", 10);
 
   ros::Subscriber fix_sub = node.subscribe("fix", 10, callback);
+
+  ros::Subscriber init_sub = node.subscribe("utm/init", 10, initCallback);
+
 
   ros::spin();
 }

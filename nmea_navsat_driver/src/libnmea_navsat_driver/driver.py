@@ -116,7 +116,6 @@ class RosNMEADriver(object):
             # Altitude is above ellipsoid, so adjust for mean-sea-level
             altitude = data['altitude'] + data['mean_sea_level']
             current_fix.altitude = altitude
-            rospy.logerr("fix")
 
             self.fix_pub.publish(current_fix)
 
@@ -165,7 +164,6 @@ class RosNMEADriver(object):
                     math.sin(data['true_course'])
                 current_vel.twist.linear.y = data['speed'] * \
                     math.cos(data['true_course'])
-                rospy.logerr("vel")
                 self.vel_pub.publish(current_vel)
         else:
             return False
