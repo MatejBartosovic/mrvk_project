@@ -2,12 +2,13 @@
 <launch>
   <node  name="utm_odometry_node" pkg="gps_common" type="utm_odometry_node">
     <param name="frame_id" value="base_link"/>
-    <param name="child_frame_id" value="imu"/>
+    <param name="child_frame_id" value="gps"/>
     <remap from="odom" to="vo"/>
   </node>
-  <node  name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver">
-    <param name="port" value="/dev/ttyUSB5"/>
-    <param name="baud" value="115200"/>
-    <param name="frame_id" value="imu"/>
+  <node  name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_topic_driver">
+    <!--param name="port" value="/dev/ttyUSB0"/>
+    <param name="baud" value="115200"/-->
+   <param name="useRMC" value="false"/>
+    <param name="frame_id" value="gps"/>
   </node>
 </launch>

@@ -42,18 +42,24 @@ from libnmea_navsat_driver.driver import RosNMEADriver
 if __name__ == '__main__':
     rospy.init_node('nmea_topic_serial_reader')
 
-    nmea_pub = rospy.Publisher("nmea_sentence", Sentence)
-
     serial_port = rospy.get_param('~port','/dev/ttyUSB0')
-    serial_baud = rospy.get_param('~baud',4800)
+    serial_baud = rospy.get_param('~baud',115200)
 
-    # Get the frame_id
+
+    nmea_pub = rospy.Publisher("nmea_sentence", Sentence)
+    rospy.logerr("jebem to")
+
+# Get the frame_id
     frame_id = RosNMEADriver.get_frame_id()
 
     try:
         GPS = serial.Serial(port=serial_port, baudrate=serial_baud, timeout=2)
+
         while not rospy.is_shutdown():
+            rospy.logerr("lkurva")
             data = GPS.readline().strip()
+            rospy.logerr("pica")
+            rospy.logerr(data)
 
             sentence = Sentence()
             sentence.header.stamp = rospy.get_rostime()
