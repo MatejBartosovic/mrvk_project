@@ -4,6 +4,7 @@
 #include <mrvk_driver/callbacks.h>
 #include <diagnostic_updater/diagnostic_updater.h>
 #include <mrvk_driver/hwInterface.h>
+#include <thread>
 
 namespace Mrvk{
 	class Driver : public Mrvk::HwInterface{
@@ -18,7 +19,6 @@ namespace Mrvk{
 			//setup diagnostic
 			diagnostic.add("mrvk_driver Status", this, &Mrvk::Driver::diagnostics);
 			diagnostic.setHardwareID("none");
-			ros::NodeHandle n;
 			double statusPeriod;
 			n.param<double>("status_period", statusPeriod, 5);
 			status_timer = n.createTimer(ros::Duration(statusPeriod), &Mrvk::Driver::statusTimerCallback, this);
@@ -45,7 +45,13 @@ namespace Mrvk{
 			comunication_interface.getMotorControlBoardLeft()->setRegulatorPID(leftRegulator);
             comunication_interface.getMotorControlBoardRight()->setRegulatorPID(rightRegulator);
 
-			//todo dorobit odblokovanie central stopu do initu
+			thread = std::thread([=](){
+				std_srvs::Trigger srv;
+				if(!ros::service::call(n.getNamespace() + "reset_central_stop",srv))
+					ROS_ERROR("%s service not available",(n.getNamespace() + "reset_central_stop").c_str());
+				if(!srv.response.success)
+					ROS_WARN("Faild to reset central stop %s",srv.response.message.c_str());
+			});
 			return true;
 		}
 
@@ -84,6 +90,8 @@ namespace Mrvk{
 
 		MrvkCallbacks callbacks;
 		CommunicationInterface comunication_interface;
+		std::thread thread;
+
 
 		//diagnostic updater variables
 		ros::Timer status_timer;
@@ -91,7 +99,7 @@ namespace Mrvk{
 
         ros::Time last_time;
         ros::Time current_time;
-
+		ros::NodeHandle n;
 
 		void diagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat){
 
@@ -142,7 +150,6 @@ int main (int argc, char **argv){
 
 	while (n.ok())
 	{
-		//ROS_ERROR("jebem misa");
 		a.sleep();
 		driver.read();
 		cm.update(ros::Time::now(), driver.getPeriod());
