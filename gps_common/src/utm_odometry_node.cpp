@@ -19,6 +19,8 @@ double rot_cov;
 double northing_init = 0;
 double easting_init = 0;
 
+bool initialized = false;
+bool initFromService;
 
 void initCallback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
@@ -26,6 +28,7 @@ void initCallback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
   LLtoUTM(fix->latitude, fix->longitude, northing_init, easting_init, zone);
 
+    initialized = true;
 }
 
 
@@ -39,10 +42,18 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
     return;
   }
 
+
   double northing, easting;
   std::string zone;
 
   LLtoUTM(fix->latitude, fix->longitude, northing, easting, zone);
+
+    if (!initialized) {
+        if (!initFromService) {
+            northing_init = northing;
+            easting_init = easting;
+        } else return;
+    }
 
   if (odom_pub) {
     nav_msgs::Odometry odom;
@@ -104,6 +115,8 @@ int main (int argc, char **argv) {
 
   ros::Subscriber init_sub = node.subscribe("utm/init", 10, initCallback);
 
+
+  node.param<bool>("init_from_service", initFromService, false);
 
   ros::spin();
 }

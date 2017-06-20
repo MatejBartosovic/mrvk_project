@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="init_from_service" default="true"/>
+
+  <node  name="utm_odometry_node" pkg="gps_common" type="utm_odometry_node">
+    <param name="frame_id" value="base_link"/>
+    <param name="child_frame_id" value="gps"/>
+    <param name="init_from_service" value="$(arg init_from_service)"/>
+    <remap from="odom" to="vo"/>
+  </node>
+
+  <node  name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver">
+    <param name="port" value="/dev/GPS"/>
+    <param name="baud" value="115200"/>
+   <param name="useRMC" value="false"/>
+    <param name="frame_id" value="gps"/>
+  </node>
+</launch>
