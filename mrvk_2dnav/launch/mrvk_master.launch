@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="use_dwa" default="false" />
+  <arg name="use_dwa_osm" default="true" />
+  <arg name="use_imu" default="true" />
+  <arg name="use_gmapping" default="true" />
+  <arg name="use_ekf" default="true" />
+  <arg name="use_joint_states_publisher" default="true" />
+  <arg name="use_gps" default="true" />
+  <arg name="use_user_interface" default="true"/>
+
+  <!--Start MRVK Driver, Gmapping, EKF, IMU, Hokuyo-->
+  <include file="$(find mrvk_driver)/launch/mapping.launch" >
+    <arg name="vo_used" default="$(arg use_gps)"/>
+    <arg name="use_imu" default="$(arg use_imu)"/>
+    <arg name="use_gmapping" default="$(arg use_gmapping)"/>
+    <arg name="use_ekf" default="$(arg use_ekf)"/>
+    <arg name="use_joint_states_publisher" default="$(arg use_joint_states_publisher)"/>
+  </include>
+
+  <!--Start GPS-->
+  <include file="$(find mrvk_2dnav)/launch/gps.launch" if="$(arg use_gps)">
+    <arg name="init_from_service" default="true"/>
+  </include>
+
+  <!--DWA navigation without osm global planner-->
+  <include file="$(find mrvk_2dnav)/launch/move_base_dwa.launch" if="$(arg use_dwa)"/>
+  <!--DWA navigation with osm global planner-->
+  <include file="$(find mrvk_2dnav)/launch/move_base_dwa_osm.launch" if="$(arg use_dwa_osm)"/>
+
+ <!--Start user interface (robot control)-->
+  <include file="$(find mrvk_driver)/launch/user_interface.launch" if="$(arg use_user_interface)"/>
+</launch>

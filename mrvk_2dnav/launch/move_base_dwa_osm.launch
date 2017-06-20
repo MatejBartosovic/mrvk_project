@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <master auto="start"/>
+
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
     <param name="controller_frequency" value="10"/>
@@ -13,5 +14,10 @@
     <!--remap from="odom" to="/mrvk/diff_drive_controller/odom"/-->
     <remap from="cmd_vel" to="/mrvk/diff_drive_controller/cmd_vel"/>
   </node>
-  <include file="$(find osm_planner)/launch/planner_setup.launch" />
+
+  <arg name="filepath" default="$(find osm_planner)/osm_example/fei.osm"/>
+  <include file="$(find osm_planner)/launch/planner_setup.launch" ns="move_base">
+    <arg name="filepath" default="$(arg filepath)"/>
+  </include>
+
 </launch>

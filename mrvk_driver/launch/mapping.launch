@@ -1,13 +1,18 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="vo_used" default="false" />
+	<arg name="use_imu" default="true"/>
+	<arg name="use_gmapping" default="true"/>
+	<arg name="use_ekf" default="true"/>
+	<arg name="use_joint_states_publisher" default="true"/>
+
 	<!-- zapina gmapping a vytvori model v rvize s kompletnou konfiguraciou -->	
 	<include file="$(find mrvk_driver)/launch/driver.launch" />
 	<node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" />
-	<include file="$(find adis16350)/launch/adis_driver.launch"/>
+	<include file="$(find adis16350)/launch/adis_driver.launch" if="$(arg use_imu)"/>
 
 	
-	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf" if="$(arg use_ekf)">
 	  <param name="output_frame" value="odom"/>
 	  <param name="base_footprint_frame" value="base_link"/>
 	  <param name="freq" value="30.0"/>
@@ -16,10 +21,10 @@
 	  <param name="imu_used" value="true"/>
 	  <param name="vo_used" value="$(arg vo_used)"/> 
 	  <remap from="odom" to="/mrvk/diff_drive_controller/odom"/>
-	  <remap from="imu_data" to="/adis16350/imu_data"/>
+	  <remap from="imu_data" to="/adis16350/imu_data" if="$(arg use_imu)"/>
 	</node>
 
-	<node name="gmapping" pkg="gmapping" type="slam_gmapping">
+	<node name="gmapping" pkg="gmapping" type="slam_gmapping" if="$(arg use_gmapping)">
 
 	  <param name="base_frame" value="base_link"/> 
 	  <param name="map_frame" value="map"/>
@@ -54,7 +59,7 @@
 		
 	</node>
 	
-	  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+	  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" if="$(arg use_joint_states_publisher)">
  	  <param name="/use_gui" value="false"/> 
   	  <!--rosparam param="/source_list">[/kv01/joint_states] </rosparam--> 
 	</node>
