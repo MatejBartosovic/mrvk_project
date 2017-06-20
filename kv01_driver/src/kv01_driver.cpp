@@ -68,23 +68,6 @@ namespace Kv01{
 
         ros::Time last_time;
         ros::Time current_time;
-
-
-//		void diagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat){
-//
-//			if (comunication_interface.isActive()){
-//
-//				stat.summary(0, "Connected");
-//				stat.add<mrvk_driver::Mb_status>("main board status",comunication_interface.getStatusMB());
-//				stat.add<mrvk_driver::Mcb_status>("left motor board status",comunication_interface.getStatusMCB(CommunicationInterface::LEFT_MOTOR_ADRESS));
-//				stat.add<mrvk_driver::Mcb_status>("right board status", comunication_interface.getStatusMCB(CommunicationInterface::RIGHT_MOTOR_ADRESS));
-//
-//			}else stat.summary(2, "Disconnected");
-//		}
-//
-//		void statusTimerCallback(const ros::TimerEvent& timer_struct) {
-//			diagnostic.update();
-//		}
 	};
 }
 

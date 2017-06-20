@@ -13,8 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
         message_generation
         dynamic_reconfigure
 )
-## Generate services in the 'srv' folder
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 generate_messages(DEPENDENCIES std_msgs)
@@ -27,15 +25,12 @@ catkin_package(
 )
 
 include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  ${${PROJECT_NAME}_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
-  ${GSTREAMER_INCLUDE_DIRS}
+        include
+        ${catkin_INCLUDE_DIRS}
 )
 
 
-add_library(${PROJECT_NAME}_communication_interface src/communication_interface.cpp )
+add_library(${PROJECT_NAME}_communication_interface src/communication_interface.cpp src/common_functions.cpp)
 target_link_libraries(${PROJECT_NAME}_communication_interface ${catkin_LIBRARIES} ${${PROJECT_NAME}_LIBRARIES})
 
 add_executable(kv01_driver src/kv01_driver.cpp src/hwInterface.cpp)

@@ -5,6 +5,9 @@
 #include<iostream>
 #include "ros/ros.h"
 
+#ifndef CommonFunctions_H_
+#define CommonFunctions_H_
+
 #define PHI 			3.14159265359
 
 // data pre prikazy unknow command / OK a time out
@@ -32,11 +35,11 @@
 
 #define comm_message		0xDD
 
-  #define comm_motory_en	  0xD1
-  #define comm_motory_dis	  0xD0
-  #define comm_motory_speed       0xD2
-  #define comm_position           0xD3
-  
+#define comm_motory_en	  0xD1
+#define comm_motory_dis	  0xD0
+#define comm_motory_speed       0xD2
+#define comm_position           0xD3
+
 #define comm_err_ok	 	0x11
 #define comm_err_communication 	0x22
 #define comm_err_command       	0x33 
@@ -50,8 +53,6 @@
 
 //Funkcie
 
-#ifndef common_functions_H_INCLUDED
-#define common_functions_H_INCLUDED
 
 
 // zadefinovanie struktury pre inicializaciu premennych motora
@@ -238,62 +239,69 @@ typedef struct har_arm_machine_data {	// konstatny na prepocty KK
 		uint8_t end;
 	} HAR_ARM_RES_D5;
 
-	
-class common_functions
-{
-private:
-  HAR_ARM_REQ_D5 requestD5;
-  HAR_ARM_REQ_D4 requestD4;
-  HAR_ARM_REQ_D3 requestD3;
-  HAR_ARM_REQ_D1 requestD1;
+
+	class CommonFunctions {
+
+	private:
+		HAR_ARM_REQ_D5 requestD5;
+		HAR_ARM_REQ_D4 requestD4;
+		HAR_ARM_REQ_D3 requestD3;
+		HAR_ARM_REQ_D1 requestD1;
 //   
-  uint8_t *requestD0;
-  DATA_OK_COMMAND *responsedata;
-  HAR_ARM_RES_D1 responseD1;
+		uint8_t *requestD0;
+		DATA_OK_COMMAND *responsedata;
+		HAR_ARM_RES_D1 responseD1;
 
- // ROBLL_DATA_ARM_POSITION	test;
-  ROBLL_DATA_ARM_POSITION	rob_arm_position;//=&test1;
-  
- // ROBLL_DATA_ARM_STATUS		test;
-  ROBLL_DATA_ARM_STATUS 	rob_arm_status;//=&test2;  
-  
-public:
+		// ROBLL_DATA_ARM_POSITION	test;
+		ROBLL_DATA_ARM_POSITION rob_arm_position;//=&test1;
+
+		// ROBLL_DATA_ARM_STATUS		test;
+		ROBLL_DATA_ARM_STATUS rob_arm_status;//=&test2;
+
+	public:
 // ROBLL_DATA_ARM_VOLTAGES	test;//=&test;
-HAR_ARM_MACHINE_DATA 	machine_data;
-ROBLL_DATA_ARM_VOLTAGES	rob_arm_voltages;
+		HAR_ARM_MACHINE_DATA machine_data;
+		ROBLL_DATA_ARM_VOLTAGES rob_arm_voltages;
 
-bool odbrzdene[6];
-  
-common_functions();
-~common_functions();
-  
-bool init_driver();
-uint8_t Calculate_CRC(uint8_t *buffer, unsigned int num);
-unsigned short Calculate_HL(uint8_t H, uint8_t L);
-std::string to_string(int i);
+		bool odbrzdene[6];
 
-uint8_t* ArmCreateD0(uint8_t data, int joint, double value);
-bool    ArmReceiveD0(uint8_t *buffer,int joint,uint8_t data);
+		CommonFunctions();
 
-uint8_t* ArmCreateD1(uint8_t *message,int joint,uint8_t data);
-bool ArmReceiveD1(uint8_t *buffer,uint8_t data, int joint);
+		~CommonFunctions();
 
-uint8_t* ArmCreateD3(uint8_t *message,int joint);
-double ArmReceiveD3(uint8_t *buffer,int joint);
+		bool init_driver();
 
-uint8_t* ArmCreateD4(uint8_t *message,int joint);
-void ArmReceiveD4(uint8_t *buffer);
+		uint8_t Calculate_CRC(uint8_t *buffer, unsigned int num);
 
-uint8_t* ArmCreateD5(uint8_t *message,int joint); 
+		unsigned short Calculate_HL(uint8_t H, uint8_t L);
+
+		std::string to_string(int i);
+
+		uint8_t *ArmCreateD0(uint8_t data, int joint, double value);
+
+		bool ArmReceiveD0(uint8_t *buffer, int joint, uint8_t data);
+
+		uint8_t *ArmCreateD1(uint8_t *message, int joint, uint8_t data);
+
+		bool ArmReceiveD1(uint8_t *buffer, uint8_t data, int joint);
+
+		uint8_t *ArmCreateD3(uint8_t *message, int joint);
+
+		double ArmReceiveD3(uint8_t *buffer, int joint);
+
+		uint8_t *ArmCreateD4(uint8_t *message, int joint);
+
+		void ArmReceiveD4(uint8_t *buffer);
+
+		uint8_t *ArmCreateD5(uint8_t *message, int joint);
+
+
+		bool check_response(uint8_t *buffer);
+
+
+	};
 
 
 
-bool check_response(uint8_t* buffer);
-
-
-
-};
-
-
-#endif /* common_functions */
+#endif /* CommonFunctions */
 
