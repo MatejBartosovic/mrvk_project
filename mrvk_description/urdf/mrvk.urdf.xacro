@@ -29,11 +29,11 @@
       <parent link="base_link"/>
       <child link="base_stabilized"/>
     </joint>
-
+<!--todo narazniky -->
     <link name="base_stabilized">
       <visual>
 	<geometry>
-        <box size="0.5 .31 .168"/>
+        <box size="0.47 .315 .168"/>
 	</geometry>
 	<origin xyz="0 0 0"/>
 	<material name="Blue"/>
@@ -74,13 +74,13 @@
     <joint name="base_to_scan" type="fixed">
     <parent link="base_stabilized"/>
     <child link="laser"/>
-    <origin xyz="0.2075 0 0.095"/>
+    <origin xyz="0.181 0 0.099"/>
     </joint>
 
     <link name="veza">
     <visual>
       <geometry>
-	<cylinder length="0.035" radius="0.065"/>				
+	<cylinder length="0.045" radius="0.0665"/>
       </geometry>
       <material name="White"/>
     </visual>
@@ -90,10 +90,10 @@
       </inertial>
     </link>
 
-    <joint name="scan_to_veza" type="revolute">
-      <parent link="laser"/>
+    <joint name="scan_to_veza" type="revolute"><!--todo premenovat na base_to_veza-->
+      <parent link="base_stabilized"/>
 	<child link="veza"/>
-	  <origin xyz="-0.03 0 0.0375"/>
+	  <origin xyz="0.14 0 0.136"/>
 	  <axis xyz="0 0 1"/>
 	  <limit effort="30.0" lower="-2.09439" upper="${M_PI}" velocity="0.5"/>
   </joint>
@@ -159,6 +159,36 @@
       <origin rpy=" ${M_PI/2} 0 0" xyz="0 0.05 0.01"/>
       <axis xyz="0 0 1"/>
     </joint>
+
+      <link name="kinect">
+          <visual>
+              <geometry>
+                  <box size=" .065 0.25 .075"/>
+              </geometry>
+              <material name="kinect"/>
+          </visual>
+          <inertial>
+              <mass value="1.5"/>
+              <inertia_zaklad/>
+
+          </inertial>
+      </link>
+
+      <joint name="kinect_to_veza" type="fixed">
+          <parent link="veza"/>
+          <child link="kinect"/>
+          <origin rpy=" 0 0 0" xyz="0 0 0.150"/>
+      </joint>
+
+      <link name="kinect_ir">
+
+      </link>
+
+      <joint name="kinect_ir_to_veza" type="fixed">
+          <parent link="veza"/>
+          <child link="kinect_ir"/>
+          <origin rpy="1.57 0 1.57" xyz="0.0 -0.070 0.158"/>
+      </joint>
 
     <link name="wheel_frame_l">
       <visual>

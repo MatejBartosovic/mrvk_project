@@ -21,4 +21,8 @@
     <color rgba="1.0 1.0 1.0 1.0"/>
 </material>
 
+    <material name= "kinect">
+        <color rgba="0.2 0.2 0.2 1.0"/>
+    </material>
+
 </robot>
