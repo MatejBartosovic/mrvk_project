@@ -26,8 +26,8 @@ void callback(const nav_msgs::Odometry& data) {
     }
 
     double dist = currentPose - startPose;
-
-    if (dist < targetDist) twist.linear.x = dist * Kp;
+    ROS_INFO("distance %f", dist);
+    if (dist < targetDist) twist.linear.x = (targetDist - dist) * Kp;
     else ros::shutdown();
 
     twist_pub.publish(twist);
