@@ -71,6 +71,7 @@ namespace Mrvk{
 			//ROS_ERROR("vel %lf %lf",vel[0],vel[1]);
 			//ROS_ERROR("vel cmd %lf %lf",vel_cmd[0],vel_cmd[1]);
 			comunication_interface.setMotorsVel(vel_cmd[0],vel_cmd[1]);
+			ROS_ERROR("% lf %lf",pos_cmd[0],pos_cmd[1]);
 			comunication_interface.setCameraPosition(pos_cmd[0],pos_cmd[1]);
 			comunication_interface.write();
 			comunication_interface.waitToRead();
