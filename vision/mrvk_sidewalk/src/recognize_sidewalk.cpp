@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 	std_msgs::Header header;
 
 	//init subscribers
-	ros::Subscriber sub = n.subscribe("/my_kinect/hd/image_color", 1, kinectImageCallback);
+	ros::Subscriber sub = n.subscribe("/kinect_ir/hd/image_color", 1, kinectImageCallback);
 
 	//init publishers
 	ros::Publisher pub_img = n.advertise<sensor_msgs::Image>("video_image_topic", 1);//output image publisher
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
     sensor_msgs::PointCloud pointCloud_msg;
     geometry_msgs::Point32 pavPoint;
     pointCloud_msg.header.stamp = ros::Time::now();
-    pointCloud_msg.header.frame_id = "map";
+    pointCloud_msg.header.frame_id = "kinect_ir";
 
     //generate some fake data for our point cloud
     /*for(unsigned int i = 0; i < 50; ++i)
