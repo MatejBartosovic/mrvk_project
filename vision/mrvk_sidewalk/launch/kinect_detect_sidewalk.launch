@@ -1,0 +1,7 @@
+<?xml version='1.0'?>
+
+<launch>
+	<include file="$(find kinect_test)/launch/kinect2_bridge.launch"/>
+	<node pkg="kinect_test" name="kinect_transform_node" type="kinect_transform"/>
+	<include file="$(find mrvk_sidewalk)/launch/recognize_sidewalk.launch"/>
+</launch>	

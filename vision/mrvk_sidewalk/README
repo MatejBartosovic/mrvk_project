@@ -1,0 +1,5 @@
+Github repository mrvk_sidewalk
+ROS package for recognition of sidewalk.
+Maintainer Adam Sojka adam.sojka@smadas.net
+
+Pre spustenie je potrebné aby v pričinku /Videos/MRVKroute/ bol súbor obed.mp4, ktorý obsahuje testovacie video.

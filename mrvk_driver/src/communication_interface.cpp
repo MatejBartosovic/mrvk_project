@@ -150,7 +150,7 @@ void CommunicationInterface::setMotorParameters(REGULATOR_MOTOR regulator, bool 
 void CommunicationInterface::setCameraPosition(double linearX, double angularZ){
 
 	//mb.setPosRotCam(true); // true poloha , false rychlost
-	mb.setKameraCommand(linearX/180*M_PI,angularZ/180*M_PI);
+	mb.setKameraCommand(linearX/M_PI*180,angularZ/M_PI*180);
 	return;
 }
 
@@ -159,7 +159,8 @@ void CommunicationInterface::setMotorsVel(double left_vel,double right_vel){
 	if (blocked){
 		left_vel = 0;
 		right_vel = 0;
-	}
+		ROS_ERROR("blocked");
+	} else ROS_ERROR("ok");
 
 	lavy.setMotorSpeed(-left_vel/ODOMETRY_CONSTANT_VELOCITY);
 	pravy.setMotorSpeed(right_vel/ODOMETRY_CONSTANT_VELOCITY);
