@@ -14,7 +14,8 @@ namespace Mrvk{
 					Mrvk::HwInterface(),
 					comunication_interface(ports, baudrate, stopBits, parity, byteSize),
 					callbacks(comunication_interface),
-					diagnostic() {
+					diagnostic(),
+					lastStopButtonVal(false) {
 
 			//setup diagnostic
 			diagnostic.add("mrvk_driver Status", this, &Mrvk::Driver::diagnostics);
@@ -45,12 +46,9 @@ namespace Mrvk{
 			comunication_interface.getMotorControlBoardLeft()->setRegulatorPID(leftRegulator);
             comunication_interface.getMotorControlBoardRight()->setRegulatorPID(rightRegulator);
 
+			//reset centralstop on startup
 			thread = std::thread([=](){
-				std_srvs::Trigger srv;
-				if(!ros::service::call(n.getNamespace() + "reset_central_stop",srv))
-					ROS_ERROR("%s service not available",(n.getNamespace() + "reset_central_stop").c_str());
-				if(!srv.response.success)
-					ROS_WARN("Faild to reset central stop %s",srv.response.message.c_str());
+				callResetCentralStopService();
 			});
 			return true;
 		}
@@ -77,7 +75,7 @@ namespace Mrvk{
 			//ROS_ERROR("vel %lf %lf",vel[0],vel[1]);
 			//ROS_ERROR("vel cmd %lf %lf",vel_cmd[0],vel_cmd[1]);
 			comunication_interface.setMotorsVel(vel_cmd[0],vel_cmd[1]);
-			ROS_ERROR("% lf %lf",pos_cmd[0],pos_cmd[1]);
+			//ROS_ERROR("% lf %lf",pos_cmd[0],pos_cmd[1]);
 			comunication_interface.setCameraPosition(pos_cmd[0],pos_cmd[1]);
 			comunication_interface.write();
 			comunication_interface.waitToRead();
@@ -101,6 +99,7 @@ namespace Mrvk{
         ros::Time last_time;
         ros::Time current_time;
 		ros::NodeHandle n;
+		bool lastStopButtonVal;
 
 		void diagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat){
 
@@ -115,7 +114,19 @@ namespace Mrvk{
 		}
 
 		void statusTimerCallback(const ros::TimerEvent& timer_struct) {
+			bool tmp = comunication_interface.getStatusMB().hardware_central_stop;
+			if(!tmp && lastStopButtonVal){
+				callResetCentralStopService();
+			}
+			lastStopButtonVal = tmp;
 			diagnostic.update();
+		}
+		void callResetCentralStopService(){
+			std_srvs::Trigger srv;
+			if(!ros::service::call(n.getNamespace() + "/reset_central_stop",srv))
+			ROS_ERROR("%s service not available",(n.getNamespace() + "reset_central_stop").c_str());
+			if(!srv.response.success)
+			ROS_WARN("Faild to reset central stop %s",srv.response.message.c_str());
 		}
 	};
 }
