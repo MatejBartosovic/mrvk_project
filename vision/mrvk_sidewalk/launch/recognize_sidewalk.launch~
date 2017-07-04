@@ -1,0 +1,14 @@
+<?xml version='1.0'?>
+
+<launch>
+	<node pkg="mrvk_sidewalk" name="recognize_sidewalk_node" type="recognize_sidewalk"/>
+
+	<node pkg="image_view" name="image_view_processed" type="image_view">
+		<remap from="image" to="video_image_topic" />
+	</node>
+	<node pkg="image_view" name="image_view_raw_orig" type="image_view">
+		<remap from="image" to="video_image_orig_topic" />
+	</node>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_sidewalk)/launch/
+
+</launch>	

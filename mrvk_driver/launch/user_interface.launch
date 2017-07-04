@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="joy" default="/dev/input/js1" />
+	<arg name="joy" default="/dev/input/js0" />
 	<!-- zapina gmapping a vytvori model v rvize s kompletnou konfiguraciou -->
 	
 	<node name="robot_control" pkg="mrvk_driver" type="robot_control" output="screen" ns="mrvk" launch-prefix="xterm -e"/>

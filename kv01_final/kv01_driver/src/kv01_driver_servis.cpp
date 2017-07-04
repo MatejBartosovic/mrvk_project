@@ -4,6 +4,7 @@
 #include "sensor_msgs/JointState.h"
 #include "std_msgs/Int8.h"
 #include "std_srvs/Trigger.h"
+#include "std_srvs/SetBool.h"
 #include "std_srvs/Empty.h"
 #include "kv01_driver/joint_speed.h"
 #include <serial/serial.h>
@@ -19,7 +20,7 @@ int poloha_mimo[6] ={0, 0, 0, 0, 0, 0};// mutex
 bool flag_position_setup[6] = {false,false,false,false,false,false};//zamutexovane
 
 ros::ServiceClient reset_voltage;
-std_srvs::Trigger reset_voltage_data;  //netreba mutex
+std_srvs::SetBool reset_voltage_data;  //netreba mutex
 
 
 bool serial_comm(uint8_t *wBuffer,uint8_t *response)
@@ -63,6 +64,7 @@ bool serial_comm(uint8_t *wBuffer,uint8_t *response)
       else if ((ros::Time::now() - begin) > ros::Duration(2,0))
       {
 	ROS_ERROR("Logicka cast vypnuta zapinam napajanie");
+	reset_voltage_data.request.data = true;
 	if (reset_voltage.call(reset_voltage_data))
 	{  
 	 ROS_ERROR("Napajanie zapnute");
@@ -89,6 +91,7 @@ bool serial_comm(uint8_t *wBuffer,uint8_t *response)
     if (rBuffer[1] == TO_data1 && rBuffer[2] == TO_data2)
     {
       ROS_ERROR("Time out komunikacie: Resetujem napajanie");
+      reset_voltage_data.request.data = true;
       if (reset_voltage.call(reset_voltage_data))
       {  
 	ROS_ERROR("Napajanie Vypnute");
@@ -99,8 +102,8 @@ bool serial_comm(uint8_t *wBuffer,uint8_t *response)
 	ros::shutdown();  
       } 
       usleep(100000);
-      
       ROS_ERROR("Time out komunikacie: Resetujem napajanie");
+      reset_voltage_data.request.data = false;
       if (reset_voltage.call(reset_voltage_data))
       {  
 	ROS_ERROR("Napajanie opatovne zapnute");
@@ -700,7 +703,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "kv01_driver_servis");
   ros::NodeHandle n;
   
-  std::string port = "/dev/ttyUSB0";
+  std::string port = "/dev/ARM";
   long int baud = 115200;
   
   kv01_fun = new common_functions();
@@ -711,7 +714,7 @@ int main(int argc, char **argv)
   pthread_attr_t control_param,wifi_param,joint_states_param;
   ros::MultiThreadedSpinner spinner(4);
  
-  reset_voltage=n.serviceClient<std_srvs::Trigger>("/mrvk/set_arm_voltage");
+  reset_voltage=n.serviceClient<std_srvs::SetBool>("/mrvk/set_arm_voltage");
   
   my_serial= new serial::Serial(port,baud, serial::Timeout::simpleTimeout(2));
   sleep(2);
