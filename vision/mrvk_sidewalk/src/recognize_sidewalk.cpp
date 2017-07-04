@@ -121,26 +121,24 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
     pavFragmentC.pix.left.end = lineEnd;
     pavFragmentC.pix.right.start = lineStartRight;
     pavFragmentC.pix.right.end = lineEndRight;
-    ROS_ERROR("kokotina1");
     //changeToCmX(&pavFragmentC);
-    ROS_ERROR("kokotina2");
     pavFragmentC.cm.left.start.x = pavFragmentC.cm.left.end.x;
     pavFragmentC.cm.right.start.x = pavFragmentC.cm.right.end.x;
-    ROS_ERROR("kokotina3");
     //putPavementFragmentIntoCloud(&pointCloud_msg, &pavFragmentC);
-    ROS_ERROR("kokotina4");
 
-    for (int i = 0; i < num_of_edge_points; i++)
-    //int edge_cursor = 0;
-    //while (edge_cursor*)
+    //for (int i = 0; i < num_of_edge_points; i++)
+    int edge_cursor = 0;
+    int edge_increment = 0;
+    while (edge_cursor > EDGE_END)
     {
+        edge_cursor = edge_cursor + pow(edge_increment*10.0, -0.5)*200;
         lineStart = lineEnd;
-        lineEnd = Point(getLeftPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - EDGE_MARKER_VERTICAL_POINT_DIST*i), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - EDGE_MARKER_VERTICAL_POINT_DIST*i);
+        lineEnd = Point(getLeftPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor);
         line(imageResult, lineStart, lineEnd, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
         line(imageOrig, lineStart, lineEnd, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
 
         lineStartRight = lineEndRight;
-        lineEndRight = Point(getRightPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - EDGE_MARKER_VERTICAL_POINT_DIST*i), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - EDGE_MARKER_VERTICAL_POINT_DIST*i);
+        lineEndRight = Point(getRightPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor);
         line(imageResult, lineStartRight, lineEndRight, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
         line(imageOrig, lineStartRight, lineEndRight, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
 
