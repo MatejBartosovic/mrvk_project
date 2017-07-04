@@ -1,13 +1,18 @@
 <?xml version="1.0"?>
 <launch>
+	<!-- zapina gmapping a vytvori model v rvize s kompletnou konfiguraciou -->
+
 	<arg name="vo_used" default="false" />
 	<arg name="use_imu" default="true"/>
 	<arg name="use_gmapping" default="true"/>
 	<arg name="use_ekf" default="true"/>
 	<arg name="use_joint_states_publisher" default="true"/>
 
-	<!-- zapina gmapping a vytvori model v rvize s kompletnou konfiguraciou -->	
-	<include file="$(find mrvk_driver)/launch/driver.launch" />
+	<!--run driver-->
+	<include file="$(find mrvk_driver)/launch/driver.launch" >
+		<arg name="off_map_tf" value="$(arg use_gmapping)" />
+		<arg name="off_odom_tf" value="$(arg use_ekf)" />
+	</include>
 	<node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" />
 	<include file="$(find adis16350)/launch/adis_driver.launch" if="$(arg use_imu)"/>
 
@@ -19,8 +24,7 @@
 	  <param name="sensor_timeout" value="1.0"/>  
 	  <param name="odom_used" value="true"/>
 	  <param name="imu_used" value="true"/>
-	  <param name="vo_used" value="$(arg vo_used)"/> 
-	  <remap from="odom" to="/mrvk/diff_drive_controller/odom"/>
+	  <param name="vo_used" value="$(arg vo_used)"/>
 	  <remap from="imu_data" to="/adis16350/imu_data" if="$(arg use_imu)"/>
 	</node>
 

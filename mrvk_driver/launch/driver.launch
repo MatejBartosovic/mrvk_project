@@ -1,11 +1,19 @@
 <?xml version="1.0"?>
 <launch>
+	<arg name="off_map_tf" default="false" />
+	<arg name="off_odom_tf" default="false" />
+
 	<param name="robot_description" command="$(find xacro)/xacro '$(find mrvk_description)/urdf/robot.urdf.xacro' --inorder" />
 	<!--robot specific parameters -->
-	<rosparam file="$(find mrvk_driver)/config/mrvk_driver.yaml" command="load" ns="mrvk"/>
+	<rosparam file="$(find mrvk_driver)/config/mrvk_driver.yaml" command="load"/>
 	<!-- start robot driver-->
-	<node  name="mrvk_driver" pkg="mrvk_driver" type="mrvk_driver" ns="mrvk"/>
+	<node  name="mrvk_driver" pkg="mrvk_driver" type="mrvk_driver">
+		<remap from="/diff_drive_controller/odom" to="odom"/>
+	</node>
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 	<!-- start differencial controller-->
-	<include file="$(find mrvk_driver)/launch/spawn_diff_controller.launch" ns='mrvk'/>
+	<include file="$(find mrvk_driver)/launch/spawn_diff_controller.launch">
+		<arg name="off_odom_tf" value="$(arg off_odom_tf)" />
+	</include>
+	<node pkg="tf" type="static_transform_publisher" name="map_to_odom_publisher" args="0 0 0 0 0 0 1 map odom 10" unless="$(arg off_map_tf)" />
 </launch>
