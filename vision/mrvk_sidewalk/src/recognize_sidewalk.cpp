@@ -130,9 +130,9 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
     //putPavementFragmentIntoCloud(&pointCloud_msg, &pavFragmentC);
     ROS_ERROR("kokotina4");
 
-    //for (int i = 0; i < num_of_edge_points; i++)
-    int edge_cursor = 0;
-    while (edge_cursor*)
+    for (int i = 0; i < num_of_edge_points; i++)
+    //int edge_cursor = 0;
+    //while (edge_cursor*)
     {
         lineStart = lineEnd;
         lineEnd = Point(getLeftPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - EDGE_MARKER_VERTICAL_POINT_DIST*i), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - EDGE_MARKER_VERTICAL_POINT_DIST*i);
