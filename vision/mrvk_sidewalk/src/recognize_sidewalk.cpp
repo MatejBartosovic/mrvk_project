@@ -45,9 +45,11 @@
 #define EDGE_MARKER_VERTICAL_POINT_DIST 50
 
 #define EDGE_START_OFFSET 30
-#define EDGE_END 300
+#define EDGE_END 500
 
 #define DIST_GRAD -1
+
+//#define DEBUG 1
 
 using namespace cv;
 
@@ -128,9 +130,13 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
 
     //for (int i = 0; i < num_of_edge_points; i++)
     int edge_cursor = 0;
-    int edge_increment = 0;
-    while (edge_cursor > EDGE_END)
+    int edge_increment = 1;
+    while (edge_cursor < EDGE_END)
     {
+        edge_increment++;
+#ifdef DEBUG
+        ROS_ERROR("edge_cursor %d", edge_cursor);
+#endif
         edge_cursor = edge_cursor + pow(edge_increment*10.0, -0.5)*200;
         lineStart = lineEnd;
         lineEnd = Point(getLeftPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor);

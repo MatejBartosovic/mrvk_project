@@ -154,7 +154,7 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 link_directories(${PCL_LIBRARY_DIRS})
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
 add_definitions(-std=c++14)
 add_definitions(${PCL_DEFINITIONS})
 #############
