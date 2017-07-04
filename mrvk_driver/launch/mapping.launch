@@ -12,11 +12,14 @@
 	<include file="$(find mrvk_driver)/launch/driver.launch" >
 		<arg name="off_map_tf" value="$(arg use_gmapping)" />
 		<arg name="off_odom_tf" value="$(arg use_ekf)" />
+		<arg name="use_joint_states_publisher" value="$(arg use_joint_states_publisher)"/>
 	</include>
+
+	<!--run hokuyo node-->
 	<node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" />
 	<include file="$(find adis16350)/launch/adis_driver.launch" if="$(arg use_imu)"/>
 
-	
+	<!--run robot pose ekf node-->
 	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf" if="$(arg use_ekf)">
 	  <param name="output_frame" value="odom"/>
 	  <param name="base_footprint_frame" value="base_link"/>
@@ -28,6 +31,7 @@
 	  <remap from="imu_data" to="/adis16350/imu_data" if="$(arg use_imu)"/>
 	</node>
 
+	<!--run gmapping node-->
 	<node name="gmapping" pkg="gmapping" type="slam_gmapping" if="$(arg use_gmapping)">
 
 	  <param name="base_frame" value="base_link"/> 
@@ -54,23 +58,14 @@
 	  <param name="linearUpdate" value="1.0"/> <!--default 1.0 Process a scan each time the robot translates this far -->
 	  <param name="angularUpdate" value="0.5"/> <!--default 0.5 Process a scan each time the robot rotates this far -->
 	  <param name="temporalUpdate" value="10.0"/> <!--default -1.0 Process a scan if the last scan processed is older than the update time in seconds. A value less than zero will turn time based updates off. -->
-
-
+		
 	  <param name="xmin" value="-100"/> <!--default -100-->
 	  <param name="ymin" value="-100"/> <!--default -100-->
 	  <param name="xmax" value="100"/> <!--default 5-->
 	  <param name="ymax" value="100"/> <!--default 5-->
 		
 	</node>
-	
-	  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" if="$(arg use_joint_states_publisher)">
- 	  <param name="/use_gui" value="false"/> 
-  	  <!--rosparam param="/source_list">[/kv01/joint_states] </rosparam--> 
-	</node>
-	
-	<!--node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" /-->
 
 	<!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_driver)/mapping.rviz" required="true" /-->
-	
 	
 </launch>
