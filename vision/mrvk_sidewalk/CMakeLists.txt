@@ -196,8 +196,8 @@ add_executable(recognize_sidewalk_video src/recognize_sidewalk_video.cpp src/rec
 target_link_libraries(recognize_sidewalk_video ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 #add_dependencies(recognize_sidewalk recognize_sidewalk_generate_messages_cpp)
 
-add_executable(recognize_sidewalk_kinect src/recognize_sidewalk.cpp src/pavement_to_marker/pavement_to_marker.cpp src/pavement_to_cloud/pavement_to_cloud.cpp src/recognize_sidewalk_kinect.cpp src/misc_tools/misc_tools.cpp)
-target_link_libraries(recognize_sidewalk_kinect ${PCL_LIBRARIES} ${catkin_LIBRARIES})
+#add_executable(recognize_sidewalk_kinect src/recognize_sidewalk.cpp src/pavement_to_marker/pavement_to_marker.cpp src/pavement_to_cloud/pavement_to_cloud.cpp src/recognize_sidewalk_kinect.cpp src/misc_tools/misc_tools.cpp)
+#target_link_libraries(recognize_sidewalk_kinect ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 #add_dependencies(recognize_sidewalk_kinect recognize_sidewalk_kinect_generate_messages_cpp)
 
 #############

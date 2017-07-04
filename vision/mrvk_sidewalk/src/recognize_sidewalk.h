@@ -34,6 +34,10 @@
 #include "std_msgs/String.h"
 #include "sensor_msgs/Image.h"
 
-sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageResultOut);
+struct recognizeSidewalkParams{
+    int ros_parameter = 0;
+};
+
+sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageResultOut, recognizeSidewalkParams params);
 int getLeftPavementPoint(cv::Mat image, int line);
 int getRightPavementPoint(cv::Mat image, int line);

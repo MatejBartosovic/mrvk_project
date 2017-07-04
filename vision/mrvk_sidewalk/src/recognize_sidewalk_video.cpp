@@ -62,6 +62,14 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "get_video_image_meddle");
     ros::NodeHandle n;
 
+    //START get parameters
+    recognizeSidewalkParams params;
+    n.getParam("my_param", params.ros_parameter);
+#ifdef DEBUG
+    ROS_ERROR("ros_parameter %d", params.ros_parameter);
+#endif
+    //END get parameters
+
     cv_bridge::CvImage img_bridge;
     sensor_msgs::Image img_msg;
     sensor_msgs::Image img_msg_orig;
@@ -108,7 +116,7 @@ int main(int argc, char **argv) {
         cap >> image;
         imageOrig = image.clone();
 
-        pointCloud_msg = recognize_sidewalk_frame(image, &imageResult);
+        pointCloud_msg = recognize_sidewalk_frame(image, &imageResult, params);
 
         //publish processed image
         header.stamp = ros::Time::now();

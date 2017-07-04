@@ -53,7 +53,7 @@
 
 using namespace cv;
 
-sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageResultOut)
+sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageResultOut, recognizeSidewalkParams params)
 {
 
     //point cloud
@@ -131,11 +131,13 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
     //for (int i = 0; i < num_of_edge_points; i++)
     int edge_cursor = 0;
     int edge_increment = 1;
+
     while (edge_cursor < EDGE_END)
     {
         edge_increment++;
 #ifdef DEBUG
-        ROS_ERROR("edge_cursor %d", edge_cursor);
+        //ROS_ERROR("edge_cursor %d", edge_cursor);
+        ROS_ERROR("recognition param %d", params.ros_parameter);
 #endif
         edge_cursor = edge_cursor + pow(edge_increment*10.0, -0.5)*200;
         lineStart = lineEnd;
