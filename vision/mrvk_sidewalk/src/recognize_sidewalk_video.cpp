@@ -65,9 +65,7 @@ int main(int argc, char **argv) {
     //START get parameters
     recognizeSidewalkParams params;
     n.getParam("my_param", params.ros_parameter);
-#ifdef DEBUG
-    ROS_ERROR("ros_parameter %d", params.ros_parameter);
-#endif
+
     //END get parameters
 
     cv_bridge::CvImage img_bridge;
