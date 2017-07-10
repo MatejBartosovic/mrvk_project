@@ -28,11 +28,13 @@
 #include <fstream>
 
 //local libraries
-#include "pavement_to_marker/pavement_to_marker.h"
-#include "pavement_to_cloud/pavement_to_cloud.h"
+#include "../pavement_to_marker/pavement_to_marker.h"
+#include "../pavement_to_cloud/pavement_to_cloud.h"
 #include "recognize_sidewalk.h"
-#include "misc_tools/misc_tools.h"
+#include "../misc_tools/misc_tools.h"
+#include "picture_segmentation.h"
 
+//messages
 #include "std_msgs/String.h"
 #include "sensor_msgs/Image.h"
 
@@ -48,8 +50,6 @@
 #define EDGE_END 500
 
 #define DIST_GRAD -1
-
-//#define DEBUG 1
 
 using namespace cv;
 
@@ -77,26 +77,8 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
 
     imageOrig = image.clone();
 
-    cv::blur(image,imageResult,cv::Size(60, 60));//blurr image
-    //remove red and blue
-    for(int i = 0; i < imageResult.size().width; i++)
-    {
-        for(int j = 0; j < imageResult.size().height; j++)
-        {
-            //imageResult.at<cv::Vec3b>(j,i)[0]= 0;
-            imageResult.at<cv::Vec3b>(j,i)[1]= 0;
-            imageResult.at<cv::Vec3b>(j,i)[2]= 0;
-            //increase contrast
-            if (imageResult.at<cv::Vec3b>(j,i)[0] > 120)
-            {
-                imageResult.at<cv::Vec3b>(j,i)[0] = 255;
-            }
-            else
-            {
-                imageResult.at<cv::Vec3b>(j,i)[0] = 0;
-            }
-        }
-    }
+    //frame segmentation
+    imageResult = picture_segmentation_frame(image);
 
     //START draw pavement boundaries
     //left

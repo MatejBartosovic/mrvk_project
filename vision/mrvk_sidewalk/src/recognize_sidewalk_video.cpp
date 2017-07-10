@@ -31,7 +31,7 @@
 #include "pavement_to_marker/pavement_to_marker.h"
 #include "pavement_to_cloud/pavement_to_cloud.h"
 #include "misc_tools/misc_tools.h"
-#include "recognize_sidewalk.h"
+#include "recognize_sidewalk/recognize_sidewalk.h"
 
 #include "std_msgs/String.h"
 #include "sensor_msgs/Image.h"

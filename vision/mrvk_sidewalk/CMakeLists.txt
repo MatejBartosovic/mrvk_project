@@ -192,7 +192,7 @@ add_definitions(${PCL_DEFINITIONS})
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-add_executable(recognize_sidewalk_video src/recognize_sidewalk_video.cpp src/recognize_sidewalk.cpp src/pavement_to_marker/pavement_to_marker.cpp src/pavement_to_cloud/pavement_to_cloud.cpp src/misc_tools/misc_tools.cpp)
+add_executable(recognize_sidewalk_video src/recognize_sidewalk_video.cpp src/recognize_sidewalk/recognize_sidewalk.cpp src/pavement_to_marker/pavement_to_marker.cpp src/pavement_to_cloud/pavement_to_cloud.cpp src/misc_tools/misc_tools.cpp src/recognize_sidewalk/picture_segmentation.cpp)
 target_link_libraries(recognize_sidewalk_video ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 #add_dependencies(recognize_sidewalk recognize_sidewalk_generate_messages_cpp)
 
