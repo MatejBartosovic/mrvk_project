@@ -118,8 +118,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
     {
         edge_increment++;
 #ifdef DEBUG
-        //ROS_ERROR("edge_cursor %d", edge_cursor);
-        ROS_ERROR("recognition param %d", params.ros_parameter);
+        //ROS_ERROR("recognition param %d", params.ros_parameter);
 #endif
         edge_cursor = edge_cursor + pow(edge_increment*10.0, -0.5)*200;
         lineStart = lineEnd;
