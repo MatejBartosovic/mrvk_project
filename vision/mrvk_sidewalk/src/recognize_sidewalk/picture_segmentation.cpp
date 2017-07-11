@@ -6,6 +6,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <sensor_msgs/Image.h>
 
+
+
 cv::Mat picture_segmentation_frame(cv::Mat frame)
 {
     cv::Mat segmented;
@@ -32,4 +34,72 @@ cv::Mat picture_segmentation_frame(cv::Mat frame)
         }
     }
     return segmented;
+}
+
+/**
+ *Performs HSV image conversion, inRange segmenation, morphological ops (errode/dillate),
+ *finds object contours, reduces small contours (impurities)
+ *TO DO: kalibracia farieb/svetla, kontury-DoneOK, scitavanie framov- Kalman??, adaptacia na svetlo
+*/
+cv::Mat picture_segmentation_frame_HSV(cv::Mat frame);
+{
+	Mat imageHSV;		//Create Matrix to store processed image
+	Mat imageCont;
+	Mat imageThresh;
+
+	cvtColor(frame,imageHSV,CV_BGR2HSV);
+	//cv::blur(image,imageThresh,cv::Size(60, 60));//blurr image
+		
+	// HSV segmentation
+	// ok values  0 175 1 82 36 255 - TODO: update adaptation
+	int iLowH = 30;
+	int iHighH = 170;
+	int iLowS = 1;
+	int iHighS = 68;
+	int iLowV = 36;
+	int iHighV = 255;
+
+	inRange(imageHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imageThresh); //Threshold the image	
+		
+	//morphological opening (remove small objects from the foreground)
+	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
+	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size, dilate_size)) );
+	
+	//morphological closing (fill small holes in the foreground)
+	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size*3, dilate_size*3)) );
+	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
+	
+	//contours
+ 	vector<vector<Point> > contours;
+  	vector<Vec4i> hierarchy;
+  	RNG rng(12345);
+  	imageCont=imageThresh.clone();
+	findContours( imageCont, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+		
+		
+	// Approximate contours to polygons + get bounding circles
+    vector<vector<Point> > contours_poly( contours.
+    vector<Point2f> center( contours.size() );
+    vector<float> radius( contours.size() );
+    
+    for( int i = 0; i < contours.size(); i++ )
+    { 
+        approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
+        minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
+    }
+
+	/// Draw contours*/
+	  Mat imageContFiltered = Mat::zeros( imageCont.size(), CV_8UC3 );
+	for( int i = 0; i< contours.size(); i++ )
+	{
+		if (radius[i]>180)
+		{
+			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+			drawContours( imageContFiltered, contours, i, color, 2, 8, hierarchy, 0, Point() );
+			 floodFill(imageContFiltered, center[i], Scalar(255)); // unsafe function - please detect hranice chodnika podla krajnych kontur, nie color fill
+		}
+	}
+		
+
+    return imageContFiltered;
 }
