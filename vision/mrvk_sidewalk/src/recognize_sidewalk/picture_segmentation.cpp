@@ -6,6 +6,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <sensor_msgs/Image.h>
 
+#define dilate_size 10
+#define erode_size 10
 
 
 cv::Mat picture_segmentation_frame(cv::Mat frame)
