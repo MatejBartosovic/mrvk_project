@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 
     //START get parameters
     recognizeSidewalkParams params;
-    n.getParam("my_param", params.ros_parameter);
+    n.getParam("image_topic", params.ros_parameter);
 
     //END get parameters
 

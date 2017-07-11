@@ -36,6 +36,7 @@
 
 struct recognizeSidewalkParams{
     int ros_parameter = 0;
+    std::string image_topic = "/my_kinect/hd/image_color";
 };
 
 sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageResultOut, recognizeSidewalkParams params);

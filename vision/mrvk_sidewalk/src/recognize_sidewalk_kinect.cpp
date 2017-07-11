@@ -70,13 +70,18 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "recognize_sidewalk_kinect");
     ros::NodeHandle n;
 
+    //START get parameters
+    recognizeSidewalkParams params;
+    n.getParam("my_param", params.ros_parameter);
+    n.getParam("image_topic", params.ros_parameter);
+
     cv_bridge::CvImage img_bridge;
     sensor_msgs::Image img_msg;
     sensor_msgs::Image img_msg_orig;
     std_msgs::Header header;
 
     //init subscribers
-    ros::Subscriber sub = n.subscribe("/my_kinect/hd/image_color", 1, kinectImageCallback);
+    ros::Subscriber sub = n.subscribe(params.image_topic, 1, kinectImageCallback);
 
     //init publishers
     ros::Publisher pub_img = n.advertise<sensor_msgs::Image>("video_image_topic", 1);//output image publisher
@@ -112,7 +117,7 @@ int main(int argc, char **argv) {
             //cap >> image;
             imageOrig = kinectImage.clone();
 
-            pointCloud_msg = recognize_sidewalk_frame(kinectImage, &imageResult);
+            pointCloud_msg = recognize_sidewalk_frame(kinectImage, &imageResult, params);
 
             //publish processed image
             header.stamp = ros::Time::now();
