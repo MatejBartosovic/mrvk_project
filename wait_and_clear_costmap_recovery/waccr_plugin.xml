@@ -1,0 +1,7 @@
+<library path="lib/libwait_and_clear_costmap_recovery">
+  <class name="wait_and_clear_costmap_recovery/WaitAndClearCostmapRecovery" type="wait_and_clear_costmap_recovery::WaitAndClearCostmapRecovery" base_class_type="nav_core::RecoveryBehavior">
+    <description>
+      A recovery behavior that wait foe specified time and reverts the costmap to the static map outside of a user specified window.
+    </description>
+  </class>
+</library>
