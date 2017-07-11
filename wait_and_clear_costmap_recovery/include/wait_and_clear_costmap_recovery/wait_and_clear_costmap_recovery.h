@@ -80,6 +80,7 @@ namespace wait_and_clear_costmap_recovery{
       tf::TransformListener* tf_;
       bool initialized_;
       double reset_distance_;
+      int wait_time_;
       std::set<std::string> clearable_layers_; ///< Layer names which will be cleared.
   };
 };

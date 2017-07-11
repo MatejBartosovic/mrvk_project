@@ -1,0 +1,7 @@
+<library path="lib/libreverse_movement_recovery">
+  <class name="libreverse_movement_recovery/ReverseMovementRecovery" type="libreverse_movement_recovery::ReverseMovementRecovery" base_class_type="nav_core::RecoveryBehavior">
+    <description>
+      A recovery behavior that move robot backward for specified ditance.
+    </description>
+  </class>
+</library>

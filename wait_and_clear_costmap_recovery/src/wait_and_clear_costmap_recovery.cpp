@@ -58,7 +58,8 @@ void WaitAndClearCostmapRecovery::initialize(std::string name, tf::TransformList
     //get some parameters from the parameter server
     ros::NodeHandle private_nh("~/" + name_);
 
-    private_nh.param("reset_distance", reset_distance_, 3.0);
+    private_nh.param("waccr/reset_distance", reset_distance_, 3.0);
+    private_nh.param("waccr/wait_time", wait_time_, 2);
     
     std::vector<std::string> clearable_layers_default, clearable_layers;
     clearable_layers_default.push_back( std::string("obstacles") );
@@ -88,6 +89,7 @@ void WaitAndClearCostmapRecovery::runBehavior(){
     return;
   }
   ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
+  sleep(wait_time_);
   clear(global_costmap_);
   clear(local_costmap_);
 }
