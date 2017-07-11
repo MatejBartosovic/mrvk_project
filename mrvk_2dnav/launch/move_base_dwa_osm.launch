@@ -12,7 +12,7 @@
     <rosparam file="$(find mrvk_2dnav)/config/dwa/global_costmap.yaml" command="load" />
     <rosparam file="$(find mrvk_2dnav)/config/dwa/base_local_planner.yaml" command="load" />
     <!--remap from="odom" to="/mrvk/diff_drive_controller/odom"/-->
-    <remap from="cmd_vel" to="/mrvk/diff_drive_controller/cmd_vel"/>
+    <!--remap from="cmd_vel" to="/mrvk/diff_drive_controller/cmd_vel"/-->
   </node>
 
   <arg name="filepath" default="$(find osm_planner)/osm_example/fei.osm"/>

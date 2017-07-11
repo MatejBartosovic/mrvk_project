@@ -13,6 +13,7 @@
     <!-- run mrvk driver node-->
 	<node  name="mrvk_driver" pkg="mrvk_driver" type="mrvk_driver">
 		<remap from="/diff_drive_controller/odom" to="odom"/>
+		<remap from="/diff_drive_controller/cmd_vel" to="cmd_vel"/>
 	</node>
 
     <!-- run robot state publisher node-->
