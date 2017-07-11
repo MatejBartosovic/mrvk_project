@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     //START get parameters
     recognizeSidewalkParams params;
     n.getParam("my_param", params.ros_parameter);
-    n.getParam("image_topic", params.ros_parameter);
+    n.getParam("image_topic", params.image_topic);
 
     cv_bridge::CvImage img_bridge;
     sensor_msgs::Image img_msg;

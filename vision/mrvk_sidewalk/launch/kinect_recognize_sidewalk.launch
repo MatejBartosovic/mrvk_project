@@ -1,0 +1,10 @@
+<?xml version='1.0'?>
+
+<launch>
+    <rosparam command="load" file="$(find mrvk_sidewalk)/config/sidewalk_config.yaml" />
+
+    <node pkg="mrvk_sidewalk" name="recognize_sidewalk_kinect" type="recognize_sidewalk_kinect"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_sidewalk)/launch/pavement_config.rviz" />
+
+</launch>

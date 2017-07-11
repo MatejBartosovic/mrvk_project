@@ -1,2 +1,2 @@
 my_param: 1000
-image_topic: /kinect_ir/
+image_topic: /kinect2/qhd/image_color
