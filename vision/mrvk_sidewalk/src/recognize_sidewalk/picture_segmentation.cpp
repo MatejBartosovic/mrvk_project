@@ -9,6 +9,7 @@
 #define dilate_size 10
 #define erode_size 10
 
+using namespace cv;
 
 cv::Mat picture_segmentation_frame(cv::Mat frame)
 {
@@ -43,7 +44,7 @@ cv::Mat picture_segmentation_frame(cv::Mat frame)
  *finds object contours, reduces small contours (impurities)
  *TO DO: kalibracia farieb/svetla, kontury-DoneOK, scitavanie framov- Kalman??, adaptacia na svetlo
 */
-cv::Mat picture_segmentation_frame_HSV(cv::Mat frame);
+cv::Mat picture_segmentation_frame_HSV(cv::Mat frame)
 {
 	Mat imageHSV;		//Create Matrix to store processed image
 	Mat imageCont;
@@ -80,11 +81,11 @@ cv::Mat picture_segmentation_frame_HSV(cv::Mat frame);
 		
 		
 	// Approximate contours to polygons + get bounding circles
-    vector<vector<Point> > contours_poly( contours.
-    vector<Point2f> center( contours.size() );
-    vector<float> radius( contours.size() );
+    vector<vector<Point> > contours_poly( contours.size() );
+	vector<Point2f> center( contours.size() );
+	vector<float> radius( contours.size() );  
     
-    for( int i = 0; i < contours.size(); i++ )
+	for( int i = 0; i < contours.size(); i++ )
     { 
         approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
         minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
