@@ -55,10 +55,10 @@ cv::Mat picture_segmentation_frame_HSV(cv::Mat frame)
 		
 	// HSV segmentation
 	// ok values  0 175 1 82 36 255 - TODO: update adaptation
-	int iLowH = 30;
-	int iHighH = 170;
-	int iLowS = 1;
-	int iHighS = 68;
+	int iLowH = 75;
+	int iHighH = 130;
+	int iLowS = 0;
+	int iHighS = 162;
 	int iLowV = 36;
 	int iHighV = 255;
 
