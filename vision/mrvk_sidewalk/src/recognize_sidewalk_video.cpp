@@ -59,13 +59,16 @@ class CvImage
 int main(int argc, char **argv) {
 
     //START ros init
-    ros::init(argc, argv, "get_video_image_meddle");
+    ros::init(argc, argv, "recognize_sidewalk_video");
     ros::NodeHandle n;
 
     //START get parameters
     recognizeSidewalkParams params;
     n.getParam("image_topic", params.ros_parameter);
-
+    n.getParam("side_offset", params.sideOffest);
+    n.getParam("spin_freq", params.spinFreq);
+    n.getParam("edge_marker_width", params.edge_marker_width);
+    ros::Rate loop_rate(params.spinFreq);
     //END get parameters
 
     cv_bridge::CvImage img_bridge;
@@ -112,6 +115,11 @@ int main(int argc, char **argv) {
     while (ros::ok())
     {
         cap >> image;
+        if (image.empty())
+        {
+            //end of video
+            break;
+        }
         imageOrig = image.clone();
 
         pointCloud_msg = recognize_sidewalk_frame(image, &imageResult, params);
@@ -132,6 +140,7 @@ int main(int argc, char **argv) {
 
         //check ros events
         ros::spinOnce();
+        loop_rate.sleep();
     }
 
 

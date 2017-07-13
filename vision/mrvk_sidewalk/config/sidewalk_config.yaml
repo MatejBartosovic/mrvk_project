@@ -1,2 +1,5 @@
 my_param: 1000
 image_topic: /kinect2/qhd/image_color
+side_offset: 50
+spin_freq: 20
+edge_marker_width: 6

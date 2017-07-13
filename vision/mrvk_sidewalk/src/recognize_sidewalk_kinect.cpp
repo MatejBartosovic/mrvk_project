@@ -74,6 +74,11 @@ int main(int argc, char **argv) {
     recognizeSidewalkParams params;
     n.getParam("my_param", params.ros_parameter);
     n.getParam("image_topic", params.image_topic);
+    n.getParam("side_offset", params.sideOffest);
+    n.getParam("spin_freq", params.spinFreq);
+    n.getParam("edge_marker_width", params.edge_marker_width);
+    ros::Rate loop_rate(params.spinFreq);
+    //END get parameters
 
     cv_bridge::CvImage img_bridge;
     sensor_msgs::Image img_msg;
@@ -136,6 +141,7 @@ int main(int argc, char **argv) {
         }
         //check ros events
         ros::spinOnce();
+        loop_rate.sleep();
     }
 
 

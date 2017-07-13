@@ -38,12 +38,9 @@
 #include "std_msgs/String.h"
 #include "sensor_msgs/Image.h"
 
-#define EDGE_MARKER_WIDTH 6
 #define EDGE_MARKER_TYPE 8
 #define EDGE_MARKER_SHIFT 0
 
-#define EDGE_PAV_VERTICAL_START 150
-#define EDGE_PAV_VERTICAL_END 650
 #define EDGE_MARKER_VERTICAL_POINT_DIST 50
 
 #define EDGE_START_OFFSET 30
@@ -70,7 +67,6 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
     Point lineEnd = Point(300, 300);
     Point lineStartRight = Point(100, 100);
     Point lineEndRight = Point(300, 300);
-    int num_of_edge_points = 10;//(EDGE_PAV_VERTICAL_END - EDGE_PAV_VERTICAL_START - EDGE_MARKER_VERTICAL_POINT_DIST)/EDGE_MARKER_VERTICAL_POINT_DIST;
     int leftPoint = 0;
     int rightPoint = 0;
     int pavementCenter = 0;
@@ -84,25 +80,25 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
 
     //START draw pavement boundaries
     pavementCenter = imageResult.cols/2;
-#ifdef DEBUG
-    ROS_ERROR("Initial pavementCenter %d", pavementCenter);
-#endif
 
     //left
     lineStart = Point( getLeftPavementPoint(imageResult, EDGE_START_OFFSET + image.rows, pavementCenter), EDGE_START_OFFSET + image.rows);
     lineEnd = Point( getLeftPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST, pavementCenter), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST);
-    line(imageResult, lineStart, lineEnd, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
-    line(imageOrig, lineStart, lineEnd, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+    if (!isOpeningLeft(lineStart.x, lineEnd.x, params.sideOffest))
+    {
+        line(imageResult, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+        line(imageOrig, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+    }
 
     //right
     lineStartRight = Point( getRightPavementPoint(imageResult, EDGE_START_OFFSET + image.rows, pavementCenter), EDGE_START_OFFSET + image.rows);
     lineEndRight = Point( getRightPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST, pavementCenter), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST);
-    line(imageResult, lineStartRight, lineEndRight, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
-    line(imageOrig, lineStartRight, lineEndRight, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+    if (!isOpeningRight(imageResult.cols, lineStartRight.x, lineEndRight.x, params.sideOffest))
+    {
+        line(imageResult, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+        line(imageOrig, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+    }
     pavementCenter = getPavementCenter(lineEnd.x, lineEndRight.x, pavementCenter);
-#ifdef DEBUG
-    ROS_ERROR("pavementCenter %d", pavementCenter);
-#endif
 
     //putPavementFragmentIntoCloud
     ///vypocet prvych pozicii x
@@ -121,7 +117,6 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
     pavFragmentC.cm.right.start.x = pavFragmentC.cm.right.end.x;
     //putPavementFragmentIntoCloud(&pointCloud_msg, &pavFragmentC);
 
-    //for (int i = 0; i < num_of_edge_points; i++)
     int edge_cursor = 0;
     int edge_increment = 1;
 
@@ -134,18 +129,20 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageRe
         edge_cursor = edge_cursor + pow(edge_increment*10.0, -0.5)*200;
         lineStart = lineEnd;
         lineEnd = Point(getLeftPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor, pavementCenter), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor);
-        line(imageResult, lineStart, lineEnd, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
-        line(imageOrig, lineStart, lineEnd, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
-
+        if (!isOpeningLeft(lineStart.x, lineEnd.x, params.sideOffest))
+        {
+            line(imageResult, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+            line(imageOrig, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+        }
         lineStartRight = lineEndRight;
         lineEndRight = Point(getRightPavementPoint(imageResult, EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor, pavementCenter), EDGE_START_OFFSET + image.rows - EDGE_MARKER_VERTICAL_POINT_DIST - edge_cursor);
-        line(imageResult, lineStartRight, lineEndRight, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
-        line(imageOrig, lineStartRight, lineEndRight, Scalar(0, 255, 0), EDGE_MARKER_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+        if (!isOpeningRight(imageResult.cols, lineStartRight.x, lineEndRight.x, params.sideOffest))
+        {
+            line(imageResult, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+            line(imageOrig, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+        }
 
         pavementCenter = getPavementCenter(lineEnd.x, lineEndRight.x, pavementCenter);
-#ifdef DEBUG
-        ROS_ERROR("pavementCenter %d", pavementCenter);
-#endif
 
         //put pavement fragment into cloud
         pavFragmentC.pix.left.start = lineStart;
@@ -200,4 +197,24 @@ int getPavementCenter(int leftPoint, int rightPoint, int pavementCenterLast)
         }
     }
     return pavementCenter;
+}
+
+bool isOpeningLeft(int startPoint, int endPoint, int sideOffset)
+{
+    bool opening = false;
+    if ((startPoint < sideOffset)&&(endPoint < sideOffset))
+    {
+        opening = true;
+    }
+    return opening;
+}
+
+bool isOpeningRight(int imgCols, int startPoint, int endPoint, int sideOffset)
+{
+    bool opening = false;
+    if ((startPoint > (imgCols - sideOffset))&&(endPoint > (imgCols - sideOffset)))
+    {
+        opening = true;
+    }
+    return opening;
 }

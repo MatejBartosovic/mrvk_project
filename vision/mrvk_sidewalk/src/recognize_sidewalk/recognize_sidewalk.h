@@ -37,9 +37,14 @@
 struct recognizeSidewalkParams{
     int ros_parameter = 0;
     std::string image_topic = "/my_kinect/hd/image_color";
+    int sideOffest = 1;
+    int spinFreq = 20;
+    int edge_marker_width = 6;
 };
 
 sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageResultOut, recognizeSidewalkParams params);
 int getLeftPavementPoint(cv::Mat image, int line, int pavementCenter);
 int getRightPavementPoint(cv::Mat image, int line, int pavementCenter);
 int getPavementCenter(int leftPoint, int rightPoint, int pavementCenterLast);
+bool isOpeningLeft(int startPoint, int endPoint, int sideOffset);
+bool isOpeningRight(int imgCols, int startPoint, int endPoint, int sideOffset);
