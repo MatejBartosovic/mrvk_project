@@ -10,6 +10,7 @@
 #define erode_size 10
 
 using namespace cv;
+using namespace std;
 
 cv::Mat picture_segmentation_frame(cv::Mat frame)
 {

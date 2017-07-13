@@ -40,5 +40,6 @@ struct recognizeSidewalkParams{
 };
 
 sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageResultOut, recognizeSidewalkParams params);
-int getLeftPavementPoint(cv::Mat image, int line);
-int getRightPavementPoint(cv::Mat image, int line);
+int getLeftPavementPoint(cv::Mat image, int line, int pavementCenter);
+int getRightPavementPoint(cv::Mat image, int line, int pavementCenter);
+int getPavementCenter(int leftPoint, int rightPoint, int pavementCenterLast);
