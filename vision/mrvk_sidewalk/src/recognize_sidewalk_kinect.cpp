@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
             //cap >> image;
             imageOrig = kinectImage.clone();
 
-            pointCloud_msg = recognize_sidewalk_frame(kinectImage, &imageResult, params);
+            pointCloud_msg = recognize_sidewalk_frame(&kinectImage, &imageResult, params);
 
             //publish processed image
             header.stamp = ros::Time::now();

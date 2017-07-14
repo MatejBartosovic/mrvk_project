@@ -42,7 +42,7 @@ struct recognizeSidewalkParams{
     int edge_marker_width = 6;
 };
 
-sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat image, cv::Mat *imageResultOut, recognizeSidewalkParams params);
+sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, recognizeSidewalkParams params);
 int getLeftPavementPoint(cv::Mat image, int line, int pavementCenter);
 int getRightPavementPoint(cv::Mat image, int line, int pavementCenter);
 int getPavementCenter(int leftPoint, int rightPoint, int pavementCenterLast);
