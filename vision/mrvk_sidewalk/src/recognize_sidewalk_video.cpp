@@ -63,11 +63,8 @@ int main(int argc, char **argv) {
     ros::NodeHandle n;
 
     //START get parameters
-    recognizeSidewalkParams params;
-    n.getParam("image_topic", params.ros_parameter);
-    n.getParam("side_offset", params.sideOffest);
-    n.getParam("spin_freq", params.spinFreq);
-    n.getParam("edge_marker_width", params.edge_marker_width);
+    RecognizeSidewalkParams params;
+    params.getParametersFromServer(n);
     ros::Rate loop_rate(params.spinFreq);
     //END get parameters
 

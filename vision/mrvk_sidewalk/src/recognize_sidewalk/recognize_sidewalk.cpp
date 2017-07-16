@@ -50,7 +50,7 @@
 
 using namespace cv;
 
-sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, recognizeSidewalkParams params)
+sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams params)
 {
 
     //point cloud
