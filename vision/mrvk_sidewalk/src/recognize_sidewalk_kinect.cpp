@@ -125,10 +125,9 @@ void Sidewalk::sidewalkPublish()
 {
     if (gotImage)
     {
-        //cap >> image;
         imageOrig = kinectImage.clone();
 
-        pointCloud_msg = recognize_sidewalk_frame(&kinectImage, &imageResult, params);
+        pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, params);
 
         //publish processed image
         header.stamp = ros::Time::now();
@@ -138,7 +137,6 @@ void Sidewalk::sidewalkPublish()
         img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::RGB8, imageOrig);
         img_bridge.toImageMsg(img_msg_orig);
         pub_img_orig.publish(img_msg_orig);//publish original image
-        //usleep(10000);
 
         //publish point cloud
         pointCloud_msg.header.stamp = ros::Time::now();
