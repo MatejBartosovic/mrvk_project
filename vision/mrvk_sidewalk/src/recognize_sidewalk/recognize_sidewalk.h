@@ -42,4 +42,4 @@ int getRightPavementPoint(cv::Mat image, int line, int pavementCenter, int edge_
 int getPavementCenter(int leftPoint, int rightPoint, int pavementCenterLast);
 bool isOpeningLeft(int startPoint, int endPoint, int sideOffset);
 bool isOpeningRight(int imgCols, int startPoint, int endPoint, int sideOffset);
-bool notPavement(int startPoint, int endPoint, int pavementCenter);
+bool notPavement(int startPoint, int endPoint, int pavementCenter, int sideOffset);

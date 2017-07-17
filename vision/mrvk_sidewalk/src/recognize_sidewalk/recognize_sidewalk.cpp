@@ -108,6 +108,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
 
     int edge_cursor = 0;
     int edge_increment = 1;
+    int sideOffset = (params.edge_side_offset_promile*imageResult.cols)/1000;
 
     while (edge_cursor < ((imageOrig->rows*params.detect_percent_of_image)/100.0))
     {
@@ -120,10 +121,10 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
         lineEnd = Point(getLeftPavementPoint(imageResult, params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor, pavementCenter, params.edge_side_offset_promile), params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor);
         if (!isOpeningLeft(lineStart.x, lineEnd.x, params.sideOffest))
         {
-            if (!notPavement(lineStart.x, lineEnd.x, pavementCenter))
+            lineEnd.x += sideOffset;
+            lineEnd.y += sideOffset;
+            if (!notPavement(lineStart.x, lineEnd.x, pavementCenter, sideOffset))
             {
-                lineEnd.x += (params.edge_side_offset_promile*imageResult.cols)/1000;
-                lineEnd.y += (params.edge_side_offset_promile*imageResult.cols)/1000;
                 line(imageResult, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
                 line(*imageOrig, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
             }
@@ -133,10 +134,10 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
         lineEndRight = Point(getRightPavementPoint(imageResult, params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor, pavementCenter, params.edge_side_offset_promile), params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor);
         if (!isOpeningRight(imageResult.cols, lineStartRight.x, lineEndRight.x, params.sideOffest))
         {
-            if (!notPavement(lineStart.x, lineEnd.x, pavementCenter))
+            lineEndRight.x -= sideOffset;
+            lineEndRight.y += sideOffset;
+            if (!notPavement(lineStart.x, lineEnd.x, pavementCenter, sideOffset))
             {
-                lineEndRight.x -= (params.edge_side_offset_promile*imageResult.cols)/1000;
-                lineEndRight.y += (params.edge_side_offset_promile*imageResult.cols)/1000;
                 line(imageResult, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
                 line(*imageOrig, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
             }
@@ -219,12 +220,15 @@ bool isOpeningRight(int imgCols, int startPoint, int endPoint, int sideOffset)
     return opening;
 }
 
-bool notPavement(int startPoint, int endPoint, int pavementCenter)
+bool notPavement(int startPoint, int endPoint, int pavementCenter, int sideOffset)
 {
     bool notPavement = false;
-    if (startPoint == pavementCenter && endPoint == pavementCenter)
+    if ((startPoint >= pavementCenter - sideOffset)&&(startPoint <= pavementCenter + sideOffset))
     {
-        notPavement = true;
+        if ((endPoint >= pavementCenter - sideOffset)&&(endPoint <= pavementCenter + sideOffset))
+        {
+            notPavement = true;
+        }
     }
     return notPavement;
 }
