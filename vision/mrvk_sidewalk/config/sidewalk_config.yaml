@@ -6,7 +6,7 @@ sidewalk_params:
   edge_side_offset: 50
   edge_marker_width: 6
   edge_points_dist: 10
-  edge_start_offset: 30
+  edge_start_offset: 35
   edge_side_offset_promile: 10
   detect_percent_of_image: 80
 

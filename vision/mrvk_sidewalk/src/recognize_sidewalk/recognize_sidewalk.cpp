@@ -58,7 +58,6 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     pointCloud_msg.header.frame_id = "map";
 
     Mat imageResult;		//Create Matrix to store processed image
-    //Mat imageOrig;			//Create Matrix to store orig image with detected pavement
 
     //START edge detection variables
     Point lineStart = Point(100, 100);
@@ -70,8 +69,6 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     int pavementCenter = 0;
     //END edge detection variables
 
-    //imageOrig = image.clone();
-
     //frame segmentation
     //imageResult = picture_segmentation_frame(image);
     imageResult = picture_segmentation_frame_HSV(*imageOrig);
@@ -80,12 +77,12 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     pavementCenter = imageResult.cols/2;
 
     //left
-    lineStart = Point( getLeftPavementPoint(imageResult, params.edge_start_offset + imageOrig->rows, pavementCenter, params.edge_side_offset_promile), params.edge_start_offset + imageOrig->rows);
-    lineEnd = Point( getLeftPavementPoint(imageResult, params.edge_start_offset + imageOrig->rows - params.edge_points_dist, pavementCenter, params.edge_side_offset_promile), params.edge_start_offset + imageOrig->rows - params.edge_points_dist);
+    lineStart = Point( getLeftPavementPoint(imageResult, -params.edge_start_offset + imageOrig->rows, pavementCenter, params.edge_side_offset_promile), -params.edge_start_offset + imageOrig->rows);
+    lineEnd = Point( getLeftPavementPoint(imageResult, -params.edge_start_offset + imageOrig->rows - params.edge_points_dist, pavementCenter, params.edge_side_offset_promile), -params.edge_start_offset + imageOrig->rows - params.edge_points_dist);
 
     //right
-    lineStartRight = Point( getRightPavementPoint(imageResult, params.edge_start_offset + imageOrig->rows, pavementCenter, params.edge_side_offset_promile), params.edge_start_offset + imageOrig->rows);
-    lineEndRight = Point( getRightPavementPoint(imageResult, params.edge_start_offset + imageOrig->rows - params.edge_points_dist, pavementCenter, params.edge_side_offset_promile), params.edge_start_offset + imageOrig->rows - params.edge_points_dist);
+    lineStartRight = Point( getRightPavementPoint(imageResult, -params.edge_start_offset + imageOrig->rows, pavementCenter, params.edge_side_offset_promile), -params.edge_start_offset + imageOrig->rows);
+    lineEndRight = Point( getRightPavementPoint(imageResult, -params.edge_start_offset + imageOrig->rows - params.edge_points_dist, pavementCenter, params.edge_side_offset_promile), -params.edge_start_offset + imageOrig->rows - params.edge_points_dist);
 
     pavementCenter = getPavementCenter(lineEnd.x, lineEndRight.x, pavementCenter);
 
@@ -118,7 +115,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
 #endif
         edge_cursor = edge_cursor + pow(edge_increment*params.edge_points_dist, -0.5)*200;
         lineStart = lineEnd;
-        lineEnd = Point(getLeftPavementPoint(imageResult, params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor, pavementCenter, params.edge_side_offset_promile), params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor);
+        lineEnd = Point(getLeftPavementPoint(imageResult, -params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor, pavementCenter, params.edge_side_offset_promile), -params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor);
         if (!isOpeningLeft(lineStart.x, lineEnd.x, params.sideOffest))
         {
             lineEnd.x += sideOffset;
@@ -131,7 +128,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
         }
         cv::circle(*imageOrig, lineStart, EDGE_MARKER_POINT_RADIUS, Scalar(0, 0, 255), EDGE_MARKER_POINT_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
         lineStartRight = lineEndRight;
-        lineEndRight = Point(getRightPavementPoint(imageResult, params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor, pavementCenter, params.edge_side_offset_promile), params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor);
+        lineEndRight = Point(getRightPavementPoint(imageResult, -params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor, pavementCenter, params.edge_side_offset_promile), -params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor);
         if (!isOpeningRight(imageResult.cols, lineStartRight.x, lineEndRight.x, params.sideOffest))
         {
             lineEndRight.x -= sideOffset;
