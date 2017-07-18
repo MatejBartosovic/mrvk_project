@@ -92,7 +92,6 @@ int getWidthCm(int widthPix, int heightPix) ///Done
     heightPix = heightPix*PIC_CALIB_HEIGHT_PIX/PIC_HEIGHT_PIX;
     widthPix = widthPix*PIC_CALIB_WIDTH_PIX/PIC_WIDTH_PIX;
     double pixWidthCm = CALIB_OBJ_WIDTH_MM/10.0/(heightPix*WIDTH_K + WIDTH_Q);
-    ROS_ERROR("pixWidthCm %f", pixWidthCm);
     int width = widthPix*pixWidthCm;
     return width;
 }
@@ -155,17 +154,14 @@ int getFragmentLengthCmY(int startLineY, int endLineY, pointCm *startLine, point
     //prepocet video rozlisenie na kalibracne rozlisenie, treba invertovat hodnotu kvoli suradnej sustave obrazu
     startLineY = PIC_CALIB_HEIGHT_PIX - (startLineY*PIC_CALIB_HEIGHT_PIX/PIC_HEIGHT_PIX);
     endLineY = PIC_CALIB_HEIGHT_PIX - (endLineY*PIC_CALIB_HEIGHT_PIX/PIC_HEIGHT_PIX);
-    ROS_ERROR("KKKKKK startY %d endY %d", startLineY, endLineY);
 
     //vypocet bodov ciary v priestore na pomyslenej ploche obrazu - cez cos, sin
     pointCm startPoint;
     pointCm endPoint;
     startPoint.x = cos(CAMERA_ANGLE/180.0*PI)*startLineY + IMG_OFFSET;
     startPoint.y = sin(CAMERA_ANGLE/180.0*PI)*startLineY;
-    ROS_ERROR("RRRR startX %d startY %d", startPoint.x, startPoint.y);
     endPoint.x = cos(CAMERA_ANGLE/180.0*PI)*endLineY + IMG_OFFSET;
     endPoint.y = sin(CAMERA_ANGLE/180.0*PI)*endLineY;
-    ROS_ERROR("RRRR endX %d endY %d", endPoint.x, endPoint.y);
 
     //vypocet priamok prechadzajucich bodmi na obraze
     pointCm cameraPoint;
@@ -173,27 +169,20 @@ int getFragmentLengthCmY(int startLineY, int endLineY, pointCm *startLine, point
     cameraPoint.x = CAMERA_POSE_X;
     cameraPoint.y = CAMERA_POSE_Y;
     lineEquation lineEquationStartPt = computeLineSlope(cameraPoint, startPoint);
-    ROS_ERROR("FFFF slope %f q %f", lineEquationStartPt.slope, lineEquationStartPt.yIntercept);
     lineEquation lineEquationEndPt = computeLineSlope(cameraPoint, endPoint);
-    ROS_ERROR("FFFF slope %f q %f", lineEquationEndPt.slope, lineEquationEndPt.yIntercept);
     //Vypocet realnych bodov v cm na urovni vysky 0 cm - priesecnik vypocitanych priamok s osou x
     startPoint.x = -lineEquationStartPt.yIntercept/lineEquationStartPt.slope;
     endPoint.x = -lineEquationEndPt.yIntercept/lineEquationEndPt.slope;
     length = abs(startPoint.x - endPoint.x)/10; //10 from mm to cm
     startLine->y = startPoint.x/10.0;//10 from mm to cm
     endLine->y = endPoint.x/10.0;//10 from mm to cm
-    ROS_ERROR("QQQQ startY %f endY %f", startPoint.x/10.0, endPoint.x/10.0);
     return length;
 }
 void changeToCmY(pavFragment *pavFragmentC)
 {
     int fragmentLengthCmLeftY = getFragmentLengthCmY(pavFragmentC->pix.left.start.y, pavFragmentC->pix.left.end.y, &(pavFragmentC->cm.left.start), &(pavFragmentC->cm.left.end));
     int fragmentLengthCmRightY = getFragmentLengthCmY(pavFragmentC->pix.right.start.y, pavFragmentC->pix.right.end.y, &(pavFragmentC->cm.right.start), &(pavFragmentC->cm.right.end));
-    ROS_ERROR("QQQQT starY %d endY %d", pavFragmentC->cm.left.start.y, pavFragmentC->cm.left.end.y);
-    ROS_ERROR("QQQQT starY %d endY %d", pavFragmentC->cm.right.start.y, pavFragmentC->cm.right.end.y);
-    ROS_ERROR("OOOO left height y %d", fragmentLengthCmLeftY);
 
-    ROS_ERROR("OOOO right height y %d", fragmentLengthCmRightY);
     /*pavFragmentC->cm.left.end.y = -fragmentLengthCmLeftY + pavFragmentC->cm.left.start.y/1000;
     ROS_ERROR("OOOO %d", pavFragmentC->cm.left.end.y);
     pavFragmentC->cm.right.end.y = -fragmentLengthCmRightY + pavFragmentC->cm.right.start.y/1000;
@@ -224,59 +213,74 @@ lineEquation computeLineSlope(pointCm lineCmStart, pointCm lineCmEnd)///Done
 }
 void putPointsOfLineToCloud(sensor_msgs::PointCloud *pointCloud_msg, lineEquation lineEquationC, pointCm lineCmStart, pointCm lineCmEnd)///Done
 {
-    ROS_ERROR("k = %f q = %f; startX %d startY %d endX %d endY %d", lineEquationC.slope, lineEquationC.yIntercept, lineCmStart.x, lineCmStart.y, lineCmEnd.x, lineCmEnd.y);
     //point cloud
     geometry_msgs::Point32 pavPoint;
-    pavPoint.x = 0;
+    pavPoint.x = lineCmStart.x;
     pavPoint.y = lineCmStart.y;
     pavPoint.z = DEFAULT_PAV_Z;
     pointCm pointCm1;
-    pointCm1.x = 0;
+    pointCm1.x = lineCmStart.x;
     pointCm1.y = lineCmStart.y;
     pointCm1.z = DEFAULT_PAV_Z;
 
-    /*while ((pointCm1.y < MAX_DISTANCE_CM) && (pointCm1.y < lineCmEnd.y))
+    double lineDirection = 1.0;
+    if (lineCmStart.x > lineCmEnd.x)
     {
-        pointCm1.y = pointCm1.y + PAV_LINE_RESOLUTION*100;
+        lineDirection = -1.0;
+    }
 
+    while ( (fabs(pointCm1.y - lineCmEnd.y) > m2cm(PAV_LINE_RESOLUTION))||(fabs(pointCm1.x - lineCmEnd.x) > m2cm(PAV_LINE_RESOLUTION)) )
+    {
         if (lineCmEnd.x == lineCmStart.x)
         {
             pointCm1.x = lineCmEnd.x;
+            pointCm1.y = pointCm1.y - m2cm(PAV_LINE_RESOLUTION);
         }
         else
         {
-            pointCm1.x = (pointCm1.y - lineEquationC.yIntercept)/lineEquationC.slope;
-        }
-        pavPoint.x = pointCm1.x/100.0;
-        pavPoint.y = pointCm1.y/100.0;
-        pointCloud_msg->points.push_back(pavPoint);
-        if (pointCloud_msg->points.size() > MAX_NUM_POINTS_POINTCLOUD)
-        {
-            ROS_ERROR("Point count overload!");
-            break;
-        }
-    }*/
-    while ( (pointCm1.y > lineCmEnd.y))
-    {//draws from the top to bottom
-        pointCm1.y = pointCm1.y - PAV_LINE_RESOLUTION*100;
+            if ((B_KVADR*B_KVADR - 4.0*A_KVADR*C_KVADR) == 0)
+            {
+                pointCm1.x = -B_KVADR/2/A_KVADR;
+                pointCm1.y = pointCm1.x*lineEquationC.slope + lineEquationC.yIntercept;
+                pavPoint.x = cm2m(pointCm1.x);
+                pavPoint.y = cm2m(pointCm1.y);
+                pointCloud_msg->points.push_back(pavPoint);
+                if (pointCloud_msg->points.size() > MAX_NUM_POINTS_POINTCLOUD)
+                {
+                    ROS_ERROR("Point count overload!");
+                    break;
+                }
+            }
+            else if ((B_KVADR*B_KVADR - 4.0*A_KVADR*C_KVADR) > 0)
+            {
+                pointCm1.x = (-B_KVADR + lineDirection*sqrt(B_KVADR*B_KVADR - 4.0*A_KVADR*C_KVADR))/2/A_KVADR;
 
-        if (lineCmEnd.x == lineCmStart.x)
-        {
-            pointCm1.x = lineCmEnd.x;
-        }
-        else
-        {
-            pointCm1.x = (pointCm1.y - lineEquationC.yIntercept)/lineEquationC.slope;
-        }
-        pavPoint.x = pointCm1.x/100.0;
-        pavPoint.y = pointCm1.y/100.0;
-        pointCloud_msg->points.push_back(pavPoint);
-        if (pointCloud_msg->points.size() > 1000)
-        {
-            ROS_ERROR("Point count overload!");
-            //break;
+                pointCm1.y = pointCm1.x*lineEquationC.slope + lineEquationC.yIntercept;
+                pavPoint.x = cm2m(pointCm1.x);
+                pavPoint.y = cm2m(pointCm1.y);
+                pointCloud_msg->points.push_back(pavPoint);
+                if (pointCloud_msg->points.size() > MAX_NUM_POINTS_POINTCLOUD)
+                {
+                    ROS_ERROR("Point count overload!");
+                    break;
+                }
+            }
+            else
+            {
+                ROS_ERROR("Couldn't put line point to cloud!");
+                break;
+            }
         }
     }
+}
+double cm2m(double cm)
+{
+    return cm/100.0;
+}
+
+double m2cm(double m)
+{
+    return m*100.0;
 }
 
 //v buducnosti sa iba zadaju kalibracne udaje sirka v dvoch vyskach obrazu toho isteho objektu

@@ -3,6 +3,7 @@ project(mrvk_sidewalk)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
 # add_definitions(-std=c++11)
+set(LOCAL_INCLUDES src/recognize_sidewalk/recognize_sidewalk.cpp src/pavement_to_marker/pavement_to_marker.cpp src/pavement_to_cloud/pavement_to_cloud.cpp src/misc_tools/misc_tools.cpp src/recognize_sidewalk/picture_segmentation.cpp src/RecognizeSidewalkParams.cpp src/RecognizeSidewalkParams.h)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -154,8 +155,8 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 link_directories(${PCL_LIBRARY_DIRS})
-
-add_definitions(-std=c++14)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+add_definitions(-std=c++11)
 add_definitions(${PCL_DEFINITIONS})
 #############
 ## Install ##
@@ -192,9 +193,13 @@ add_definitions(${PCL_DEFINITIONS})
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-add_executable(recognize_sidewalk src/recognize_sidewalk.cpp src/pavement_to_marker/pavement_to_marker.cpp src/pavement_to_cloud/pavement_to_cloud.cpp)
-target_link_libraries(recognize_sidewalk ${PCL_LIBRARIES} ${catkin_LIBRARIES})
-#add_dependencies(get_video_image_meddle get_video_image_meddle_generate_messages_cpp)
+add_executable(recognize_sidewalk_video src/recognize_sidewalk_video.cpp ${LOCAL_INCLUDES})#src/recognize_sidewalk_video.cpp src/recognize_sidewalk/recognize_sidewalk.cpp src/pavement_to_marker/pavement_to_marker.cpp src/pavement_to_cloud/pavement_to_cloud.cpp src/misc_tools/misc_tools.cpp src/recognize_sidewalk/picture_segmentation.cpp)
+target_link_libraries(recognize_sidewalk_video ${PCL_LIBRARIES} ${catkin_LIBRARIES})
+#add_dependencies(recognize_sidewalk recognize_sidewalk_generate_messages_cpp)
+
+add_executable(recognize_sidewalk_kinect src/recognize_sidewalk_kinect.cpp ${LOCAL_INCLUDES})#src/recognize_sidewalk/recognize_sidewalk.cpp src/pavement_to_marker/pavement_to_marker.cpp src/pavement_to_cloud/pavement_to_cloud.cpp src/recognize_sidewalk_kinect.cpp src/misc_tools/misc_tools.cpp src/recognize_sidewalk/picture_segmentation.cpp)
+target_link_libraries(recognize_sidewalk_kinect ${PCL_LIBRARIES} ${catkin_LIBRARIES})
+#add_dependencies(recognize_sidewalk_kinect recognize_sidewalk_kinect_generate_messages_cpp)
 
 #############
 ## Testing ##

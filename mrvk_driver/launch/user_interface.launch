@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="joy" default="/dev/input/js0" />
+	<arg name="joy" default="/dev/input/js1" />
 	<!-- zapina gmapping a vytvori model v rvize s kompletnou konfiguraciou -->
 	
 	<node name="robot_control" pkg="mrvk_driver" type="robot_control" output="screen" launch-prefix="xterm -e"/>
@@ -8,6 +8,6 @@
 	<node name="joy_node" pkg="joy" type="joy_node">
 		<param name="dev" type="string" value="$(arg joy)"/>
 	</node>
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find osm_planner)/rviz/osm_node.rviz" required="false"/>
+	<node name="rviz" pkg="rviz" type="rviz"/>
 	
 </launch>

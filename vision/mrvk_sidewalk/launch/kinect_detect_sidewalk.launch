@@ -1,8 +1,8 @@
 <?xml version='1.0'?>
 
 <launch>
-	<include file="$(find mrvk_driver)/launch/mapping.launch"/>
 	<include file="$(find kinect_test)/launch/kinect2_bridge.launch"/>
-	<!--node pkg="kinect_test" name="kinect_transform_node" type="kinect_transform"/-->
-	<include file="$(find mrvk_sidewalk)/launch/recognize_sidewalk.launch"/>
+	<node pkg="kinect_test" name="kinect_transform_node" type="kinect_transform"/>
+	<node pkg="mrvk_sidewalk" name="recognize_sidewalk_kinect_node" type="recognize_sidewalk_kinect"/>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_sidewalk)/launch/pavement_config.rviz" />
 </launch>	
