@@ -1,5 +1,7 @@
-#recovery_behaviors:  [{name: conservative_reset, type: clear_costmap_recovery/ClearCostmapRecovery}, {name: rotate_recovery, type: rotate_recovery/RotateRecovery},{name: aggressive_reset, type: clear_costmap_recovery/ClearCostmapRecovery}] 
-#{name: rotate_recovery, type: rotate_recovery/RotateRecovery},
+recovery_behaviors:  [{name: conservative_reset, type: clear_costmap_recovery/ClearCostmapRecovery},{name: reverse_movement_recovery, type: reverse_movement_recovery/ReverseMovementRecovery}, {name: aggressive_reset, type: clear_costmap_recovery/ClearCostmapRecovery}, {name: reverse_movement_recovery, type: reverse_movement_recovery/ReverseMovementRecovery},{name: wait_and_clear_costmap_recovery, type: wait_and_clear_costmap_recovery/WaitAndClearCostmapRecovery}]
 waccr:
   reset_distance: 3.0
   wait_time: 2
+rmr:
+  distance: 0.2
+  escape_vel: 0.2
