@@ -16,6 +16,7 @@ catkin_package(
         CATKIN_DEPENDS
         roscpp
         pluginlib
+        geometry_msgs
 )
 
 ###########

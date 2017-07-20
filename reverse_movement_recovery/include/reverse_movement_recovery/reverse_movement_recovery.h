@@ -40,9 +40,14 @@ namespace reverse_movement_recovery{
         void runBehavior();
 
     private:
+        void pubVel(double vel = -0.2);
         costmap_2d::Costmap2DROS* global_costmap_, *local_costmap_;
-        // todo prec std::string name_;
+        std::string name_;
         tf::TransformListener* tf_;
+        double distance_;
+        double escape_vel_;
+        bool initialized_;
+        ros::Publisher vel_pub_;
     };
 };
 

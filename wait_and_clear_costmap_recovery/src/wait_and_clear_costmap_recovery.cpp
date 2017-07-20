@@ -59,7 +59,7 @@ void WaitAndClearCostmapRecovery::initialize(std::string name, tf::TransformList
     ros::NodeHandle private_nh("~/" + name_);
 
     private_nh.param("waccr/reset_distance", reset_distance_, 3.0);
-    private_nh.param("waccr/wait_time", wait_time_, 2);
+    private_nh.param("waccr/wait_time", wait_time_, 2.0);
     
     std::vector<std::string> clearable_layers_default, clearable_layers;
     clearable_layers_default.push_back( std::string("obstacles") );
@@ -89,9 +89,12 @@ void WaitAndClearCostmapRecovery::runBehavior(){
     return;
   }
   ROS_WARN("Clearing costmap to unstuck robot (%fm).", reset_distance_);
-  sleep(wait_time_);
-  clear(global_costmap_);
-  clear(local_costmap_);
+
+  while (ros::ok() && checkForObstacle(local_costmap_) && checkForObstacle(global_costmap_)){
+    ros::Duration(wait_time_).sleep();
+    clear(global_costmap_);
+    clear(local_costmap_);
+  }
 }
 
 void WaitAndClearCostmapRecovery::clear(costmap_2d::Costmap2DROS* costmap){
@@ -156,5 +159,61 @@ void WaitAndClearCostmapRecovery::clearMap(boost::shared_ptr<costmap_2d::Costmap
   costmap->addExtraBounds(ox, oy, ox + width, oy + height);
   return;
 }
+  bool WaitAndClearCostmapRecovery::checkForObstacle(costmap_2d::Costmap2DROS* costmap){
+    std::vector<boost::shared_ptr<costmap_2d::Layer> >* plugins = costmap->getLayeredCostmap()->getPlugins();
 
-};
+    tf::Stamped<tf::Pose> pose;
+
+    if(!costmap->getRobotPose(pose)){
+      ROS_ERROR("Abborting wait and clear costmap recovery. Pose cannot be retrieved");
+      return false;
+    }
+
+    double x = pose.getOrigin().x();
+    double y = pose.getOrigin().y();
+
+    bool status = true;
+    for (std::vector<boost::shared_ptr<costmap_2d::Layer> >::iterator pluginp = plugins->begin(); pluginp != plugins->end(); ++pluginp) {
+      boost::shared_ptr<costmap_2d::Layer> plugin = *pluginp;
+      std::string name = plugin->getName();
+      int slash = name.rfind('/');
+      if( slash != std::string::npos ){
+        name = name.substr(slash+1);
+      }
+
+      if(clearable_layers_.count(name)!=0){
+        boost::shared_ptr<costmap_2d::CostmapLayer> costmap;
+        costmap = boost::static_pointer_cast<costmap_2d::CostmapLayer>(plugin);
+        status &= checkForObstacles(costmap, x, y);
+      }
+    }
+    return status;
+  }
+    bool WaitAndClearCostmapRecovery::checkForObstacles(boost::shared_ptr<costmap_2d::CostmapLayer> costmap, double pose_x, double pose_y){
+      boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(costmap->getMutex()));
+
+      double start_point_x = pose_x - check_distance_ / 2;
+      double start_point_y = pose_y - check_distance_ / 2;
+      double end_point_x = start_point_x + check_distance_;
+      double end_point_y = start_point_y + check_distance_;
+
+      int start_x, start_y, end_x, end_y;
+      costmap->worldToMapNoBounds(start_point_x, start_point_y, start_x, start_y);
+      costmap->worldToMapNoBounds(end_point_x, end_point_y, end_x, end_y);
+
+      unsigned char* grid = costmap->getCharMap();
+      for(int x=0; x<(int)costmap->getSizeInCellsX(); x++){
+        bool xrange = x>start_x && x<end_x;
+
+        for(int y=0; y<(int)costmap->getSizeInCellsY(); y++){
+          if(xrange && y>start_y && y<end_y)
+            continue;
+          int index = costmap->getIndex(x,y);
+          if(grid[index]!=costmap_2d::LETHAL_OBSTACLE){
+            return true;
+          }
+        }
+      }
+    }
+
+  };

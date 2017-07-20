@@ -73,14 +73,17 @@ namespace wait_and_clear_costmap_recovery{
       void runBehavior();
 
     private:
-      void clear(costmap_2d::Costmap2DROS* costmap);      
+      void clear(costmap_2d::Costmap2DROS* costmap);
       void clearMap(boost::shared_ptr<costmap_2d::CostmapLayer> costmap, double pose_x, double pose_y);
+      bool checkForObstacle(costmap_2d::Costmap2DROS* costmap);
+      bool checkForObstacles(boost::shared_ptr<costmap_2d::CostmapLayer> costmap, double pose_x, double pose_y);
       costmap_2d::Costmap2DROS* global_costmap_, *local_costmap_;
       std::string name_;
       tf::TransformListener* tf_;
       bool initialized_;
       double reset_distance_;
-      int wait_time_;
+      double wait_time_;
+      double check_distance_;
       std::set<std::string> clearable_layers_; ///< Layer names which will be cleared.
   };
 };
