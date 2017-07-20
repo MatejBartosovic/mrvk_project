@@ -1,7 +1,8 @@
 <?xml version='1.0'?>
 
 <launch>
-	<node pkg="mrvk_sidewalk" name="recognize_sidewalk_node" type="recognize_sidewalk"/>
+	<rosparam command="load" file="$(find mrvk_sidewalk)/config/sidewalk_config.yaml" />
+	<node pkg="mrvk_sidewalk" name="recognize_sidewalk_video_node" type="recognize_sidewalk_video"/>
 
 	<node pkg="image_view" name="image_view_processed" type="image_view">
 		<remap from="image" to="video_image_topic" />

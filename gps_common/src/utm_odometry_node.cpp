@@ -10,6 +10,8 @@
 #include <gps_common/conversions.h>
 #include <nav_msgs/Odometry.h>
 
+#include <osm_planner/newTarget.h>
+
 using namespace gps_common;
 
 static ros::Publisher odom_pub;
@@ -20,7 +22,31 @@ double northing_init = 0;
 double easting_init = 0;
 
 bool initialized = false;
-bool initFromService;
+
+class Launcher{
+
+public: Launcher(){
+
+      ros::NodeHandle nh;
+      osm_init_client = nh.serviceClient<osm_planner::newTarget>("move_base/osm/init");
+
+    }
+
+    bool initOSM(const sensor_msgs::NavSatFixConstPtr& fix){
+
+      osm_planner::newTarget initPose;
+      initPose.request.longitude = fix->longitude;
+      initPose.request.latitude = fix->latitude;
+      initPose.request.bearing = 0;
+
+      return osm_init_client.call(initPose);
+    }
+
+private:
+  ros::ServiceClient osm_init_client;
+};
+
+
 
 void initCallback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
@@ -34,7 +60,7 @@ void initCallback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
 void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
   if (fix->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX) {
-    ROS_INFO("No fix.");
+    ROS_WARN("GPS No fix.");
     return;
   }
 
@@ -49,10 +75,13 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
   LLtoUTM(fix->latitude, fix->longitude, northing, easting, zone);
 
     if (!initialized) {
-        if (!initFromService) {
             northing_init = northing;
             easting_init = easting;
-        } else return;
+
+            Launcher launcher;
+            launcher.initOSM(fix);
+            initialized = true;
+
     }
 
   if (odom_pub) {
@@ -68,7 +97,7 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
     odom.pose.pose.position.x = easting - easting_init;
     odom.pose.pose.position.y = northing - northing_init;
-    odom.pose.pose.position.z = fix->altitude;
+    odom.pose.pose.position.z = 0;
     
     odom.pose.pose.orientation.x = 0;
     odom.pose.pose.orientation.y = 0;
@@ -116,7 +145,6 @@ int main (int argc, char **argv) {
   ros::Subscriber init_sub = node.subscribe("utm/init", 10, initCallback);
 
 
-  node.param<bool>("init_from_service", initFromService, false);
 
   ros::spin();
 }

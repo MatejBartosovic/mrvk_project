@@ -1,5 +1,5 @@
-obstacle_range: 4
-raytrace_range: 5
+obstacle_range: 3
+raytrace_range: 3.5
 
 min_obstacle_height: 0.5
 max_obstacle_height: 1
@@ -8,7 +8,7 @@ footprint: [[-0.33, -0.28], [-0.33, 0.28], [0.33, 0.28], [0.33, -0.28]]
 footprint_padding: 0
 
 #robot_radius: 0.4
-inflation_radius: 0.45
+inflation_radius: 0.6
 
 transform_tolerance:  0.5
 map_type: costmap

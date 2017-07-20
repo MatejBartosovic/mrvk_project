@@ -8,7 +8,7 @@
   <arg name="use_ekf" default="true" />
   <arg name="use_joint_states_publisher" default="true" />
   <arg name="use_gps" default="true" />
-  <arg name="use_user_interface" default="true"/>
+  <arg name="use_user_interface" default="false"/>
 
   <!--Start MRVK Driver, Gmapping, EKF, IMU, Hokuyo-->
   <include file="$(find mrvk_driver)/launch/mapping.launch" >

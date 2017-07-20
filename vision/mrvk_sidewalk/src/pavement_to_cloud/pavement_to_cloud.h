@@ -9,7 +9,7 @@
 
 //Cm - centimeters
 
-#define DEFAULT_PAV_Z 0 //10cm
+#define DEFAULT_PAV_Z 0.01 //10cm
 #define PAV_LINE_RESOLUTION 0.1 //5cm
 #define MAX_DISTANCE_CM 500000 //500m
 #define MAX_NUM_POINTS_POINTCLOUD 10000
@@ -28,11 +28,15 @@
 #define CAMERA_ANGLE 30 //old value 60//degrees
 #define IMG_OFFSET 1000 //550 //mm
 
+#define A_KVADR (lineEquationC.slope*lineEquationC.slope + 1)
+#define B_KVADR (-(2.0*pointCm1.x + 2.0*lineEquationC.slope*(pointCm1.y - lineEquationC.yIntercept)))
+#define C_KVADR (pointCm1.x*pointCm1.x - m2cm(PAV_LINE_RESOLUTION)*m2cm(PAV_LINE_RESOLUTION) + (pointCm1.y - lineEquationC.yIntercept)*(pointCm1.y - lineEquationC.yIntercept))
+
 struct pointCm
 {
-    int x = 0;
-    int y = 0;
-    int z = DEFAULT_PAV_Z;
+    double x = 0;
+    double y = 0;
+    double z = DEFAULT_PAV_Z;
 };
 struct lineEquation
 {
@@ -80,6 +84,8 @@ void putPavementLineIntoCloud(sensor_msgs::PointCloud *pointCloud_msg, pointCm l
 lineEquation computeLineSlope(pointCm lineCmStart, pointCm lineCmEnd);
 void putPointsOfLineToCloud(sensor_msgs::PointCloud *pointCloud_msg, lineEquation lineEquationC, pointCm lineCmStart, pointCm lineCmEnd);
 
+double cm2m(double cm);
+double m2cm(double m);
 
 lineEquation calibrationWidth();
 void calibrationDistance();

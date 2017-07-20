@@ -370,7 +370,22 @@
     
     <link name="${end_point}"/> 
     
-    
+    <joint name="base_to_gps" type="fixed">
+      <parent link="base_link"/>
+      <child link="gps"/>
+      <origin rpy="0 0 0" xyz="0 0 2"/>
+    </joint>
+
+    <link name="gps"/>
+
+<joint name="gps_to_vo" type="fixed">
+      <parent link="gps"/>
+      <child link="vo"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </joint>
+
+    <link name="vo"/>
+
       
   <transmission name="mrvk_left_transmission">
     <type>transmission_interface/SimpleTransmission</type>
