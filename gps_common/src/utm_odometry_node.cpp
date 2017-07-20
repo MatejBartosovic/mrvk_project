@@ -97,7 +97,7 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
     odom.pose.pose.position.x = easting - easting_init;
     odom.pose.pose.position.y = northing - northing_init;
-    odom.pose.pose.position.z = fix->altitude;
+    odom.pose.pose.position.z = 0;
     
     odom.pose.pose.orientation.x = 0;
     odom.pose.pose.orientation.y = 0;
