@@ -97,6 +97,7 @@ void WaitAndClearCostmapRecovery::runBehavior(){
     ros::Duration(wait_time_).sleep();
     clear(global_costmap_);
     clear(local_costmap_);
+    ROS_INFO("Waitnig to clear obstacle");
   }
   ROS_INFO("Obstacel cleared");
 
