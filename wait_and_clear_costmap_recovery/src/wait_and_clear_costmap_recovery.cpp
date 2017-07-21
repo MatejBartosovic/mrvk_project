@@ -59,7 +59,7 @@ void WaitAndClearCostmapRecovery::initialize(std::string name, tf::TransformList
     ros::NodeHandle private_nh("~/" + name_);
     ROS_INFO("waccr name = %s",name_.c_str());
     private_nh.param("reset_distance", reset_distance_, 3.0);
-    private_nh.param("reset_distance", check_distance_, 0.8);
+    private_nh.param("check_distance", check_distance_, 0.8);
     private_nh.param("wait_time", wait_time_, 2.0);
     
     std::vector<std::string> clearable_layers_default, clearable_layers;
