@@ -24,6 +24,7 @@ namespace reverse_movement_recovery{
             local_costmap_ = local_costmap;
 
             ros::NodeHandle private_nh("~/" + name_);
+            ROS_INFO("rmr name = %s",name_.c_str());
             private_nh.param("rmr/distance", distance_, 0.2);
             private_nh.param("rmr/escape_vel", escape_vel_, 0.2);
 
