@@ -30,6 +30,7 @@ namespace reverse_movement_recovery{
             vel_pub_ = private_nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
             initialized_ = true;
+	    ROS_INFO("reverse_movement_recovery inicialized");
         }
         else{
             ROS_ERROR("You should not call initialize twice on this object, doing nothing");

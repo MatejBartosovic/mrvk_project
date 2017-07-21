@@ -72,6 +72,7 @@ void WaitAndClearCostmapRecovery::initialize(std::string name, tf::TransformList
 
 
     initialized_ = true;
+    ROS_INFO("wait_and_clear_costmap_recovery inicialized");
   }
   else{
     ROS_ERROR("You should not call initialize twice on this object, doing nothing");
