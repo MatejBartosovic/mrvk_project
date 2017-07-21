@@ -80,6 +80,7 @@ void WaitAndClearCostmapRecovery::initialize(std::string name, tf::TransformList
 }
 
 void WaitAndClearCostmapRecovery::runBehavior(){
+  ROS_WARN("Waiting to clear obstacle");
   if(!initialized_){
     ROS_ERROR("This object must be initialized before runBehavior is called");
     return;
@@ -96,6 +97,8 @@ void WaitAndClearCostmapRecovery::runBehavior(){
     clear(global_costmap_);
     clear(local_costmap_);
   }
+  ROS_INFO("Obstacel cleared");
+
 }
 
 void WaitAndClearCostmapRecovery::clear(costmap_2d::Costmap2DROS* costmap){

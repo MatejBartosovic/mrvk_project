@@ -38,7 +38,7 @@ namespace reverse_movement_recovery{
     }
 
     void ReverseMovementRecovery::runBehavior(){
-
+        ROS_WARN("Starting reverse movement");
         tf::StampedTransform transform;
         try{
             tf_->lookupTransform("/map","/base_link", ros::Time(0), transform);
@@ -70,6 +70,7 @@ namespace reverse_movement_recovery{
             }
             if(fabs(dif.x()) < tolerance){
                 pubVel(0);
+                ROS_INFO("Reversed movement recovery finished");
                 return;
             }
             tf::Stamped<tf::Pose> pose;

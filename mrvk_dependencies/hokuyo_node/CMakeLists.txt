@@ -42,7 +42,8 @@ add_dependencies(libhokuyo ${catkin_EXPORTED_TARGETS})
 #sour
 # hokuyo_node
 add_executable(hokuyo_node src/hokuyo_node.cpp)
-add_dependencies(hokuyo_node ${PROJECT_NAME}_gencfg)
+add_dependencies(${PROJECT_NAME}_gencfg ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(hokuyo_node ${PROJECT_NAME}_gencfg  )
 target_link_libraries(hokuyo_node
   libhokuyo
   ${Boost_LIBRARIES}
