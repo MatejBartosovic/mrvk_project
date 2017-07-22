@@ -9,8 +9,31 @@
 #include <sensor_msgs/NavSatFix.h>
 #include <gps_common/conversions.h>
 #include <nav_msgs/Odometry.h>
-
+#include <std_msgs/Float32.h>
 #include <osm_planner/newTarget.h>
+
+class Launcher{
+
+public: Launcher(){
+
+      ros::NodeHandle nh;
+      osm_init_client = nh.serviceClient<osm_planner::newTarget>("move_base/osm/init");
+
+    }
+
+    bool initOSM(const sensor_msgs::NavSatFixConstPtr& fix, double bearing){
+
+      osm_planner::newTarget initPose;
+      initPose.request.longitude = fix->longitude;
+      initPose.request.latitude = fix->latitude;
+      initPose.request.bearing = bearing;
+
+      return osm_init_client.call(initPose);
+    }
+
+private:
+  ros::ServiceClient osm_init_client;
+};
 
 using namespace gps_common;
 
@@ -23,39 +46,17 @@ double easting_init = 0;
 
 bool initialized = false;
 
-class Launcher{
 
-public: Launcher(){
-
-      ros::NodeHandle nh;
-      osm_init_client = nh.serviceClient<osm_planner::newTarget>("move_base/osm/init");
-
-    }
-
-    bool initOSM(const sensor_msgs::NavSatFixConstPtr& fix){
-
-      osm_planner::newTarget initPose;
-      initPose.request.longitude = fix->longitude;
-      initPose.request.latitude = fix->latitude;
-      initPose.request.bearing = 0;
-
-      return osm_init_client.call(initPose);
-    }
-
-private:
-  ros::ServiceClient osm_init_client;
-};
+bool hasAngle = false;
+double angle;
 
 
-
-void initCallback(const sensor_msgs::NavSatFixConstPtr& fix) {
+void initCallback(const std_msgs::Float32& msg) {
 
   std::string zone;
-
-  LLtoUTM(fix->latitude, fix->longitude, northing_init, easting_init, zone);
-
-    initialized = true;
-}
+    hasAngle = true;
+    angle = msg.data;
+    }
 
 
 void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
@@ -68,18 +69,17 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
     return;
   }
 
-
   double northing, easting;
   std::string zone;
 
   LLtoUTM(fix->latitude, fix->longitude, northing, easting, zone);
 
-    if (!initialized) {
+    if (!initialized && hasAngle) {
             northing_init = northing;
             easting_init = easting;
 
             Launcher launcher;
-            launcher.initOSM(fix);
+            launcher.initOSM(fix, angle);
             initialized = true;
 
     }
@@ -143,8 +143,6 @@ int main (int argc, char **argv) {
   ros::Subscriber fix_sub = node.subscribe("fix", 10, callback);
 
   ros::Subscriber init_sub = node.subscribe("utm/init", 10, initCallback);
-
-
 
   ros::spin();
 }
