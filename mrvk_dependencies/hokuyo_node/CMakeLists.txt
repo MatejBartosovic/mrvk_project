@@ -25,6 +25,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 # Dynamic reconfigure support
+
 generate_dynamic_reconfigure_options(cfg/Hokuyo.cfg)
 
 # Export with catkin_package
@@ -41,6 +42,8 @@ target_link_libraries(libhokuyo ${rosconsole_LIBRARIES})
 add_dependencies(libhokuyo ${catkin_EXPORTED_TARGETS})
 #sour
 # hokuyo_node
+add_dependencies(${PROJECT_NAME}_gencfg ${catkin_EXPORTED_TARGETS})
+
 add_executable(hokuyo_node src/hokuyo_node.cpp)
 add_dependencies(${PROJECT_NAME}_gencfg ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(hokuyo_node ${PROJECT_NAME}_gencfg  )
