@@ -42,7 +42,6 @@ target_link_libraries(libhokuyo ${rosconsole_LIBRARIES})
 add_dependencies(libhokuyo ${catkin_EXPORTED_TARGETS})
 #sour
 # hokuyo_node
-add_dependencies(${PROJECT_NAME}_gencfg ${catkin_EXPORTED_TARGETS})
 
 add_executable(hokuyo_node src/hokuyo_node.cpp)
 add_dependencies(${PROJECT_NAME}_gencfg ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
