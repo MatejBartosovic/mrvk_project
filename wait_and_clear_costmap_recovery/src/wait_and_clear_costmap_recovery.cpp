@@ -61,6 +61,11 @@ void WaitAndClearCostmapRecovery::initialize(std::string name, tf::TransformList
     private_nh.param("reset_distance", reset_distance_, 3.0);
     private_nh.param("check_distance", check_distance_, 0.8);
     private_nh.param("wait_time", wait_time_, 2.0);
+
+    ROS_INFO("waccr reset_distance %lf",reset_distance_);
+    ROS_INFO("waccr check_distance %lf",check_distance_);
+    ROS_INFO("waccr wait_time %lf",wait_time_);
+    ROS_INFO("costmap_2d::LETHAL_OBSTACLE = %d",costmap_2d::LETHAL_OBSTACLE);
     
     std::vector<std::string> clearable_layers_default, clearable_layers;
     clearable_layers_default.push_back( std::string("obstacles") );
@@ -198,7 +203,7 @@ void WaitAndClearCostmapRecovery::clearMap(boost::shared_ptr<costmap_2d::Costmap
     bool WaitAndClearCostmapRecovery::checkForObstacles(boost::shared_ptr<costmap_2d::CostmapLayer> costmap, double pose_x, double pose_y){
       boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(costmap->getMutex()));
 
-      double start_point_x = pose_x - check_distance_ / 2;
+      double start_point_x = pose_x;//- check_distance_ / 2;
       double start_point_y = pose_y - check_distance_ / 2;
       double end_point_x = start_point_x + check_distance_;
       double end_point_y = start_point_y + check_distance_;
@@ -215,11 +220,13 @@ void WaitAndClearCostmapRecovery::clearMap(boost::shared_ptr<costmap_2d::Costmap
           if(xrange && y>start_y && y<end_y)
             continue;
           int index = costmap->getIndex(x,y);
-          if(grid[index]!=costmap_2d::LETHAL_OBSTACLE){
+          if(grid[index]==costmap_2d::LETHAL_OBSTACLE){
             return true;
           }
         }
       }
+	ROS_INFO("end of cycle");
+	return false;
     }
 
   };

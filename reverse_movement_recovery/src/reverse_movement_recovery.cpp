@@ -25,8 +25,10 @@ namespace reverse_movement_recovery{
 
             ros::NodeHandle private_nh("~/" + name_);
             ROS_INFO("rmr name = %s",name_.c_str());
-            private_nh.param("rmr/distance", distance_, 0.2);
-            private_nh.param("rmr/escape_vel", escape_vel_, 0.2);
+            private_nh.param("distance", distance_, 0.2);
+            private_nh.param("escape_vel", escape_vel_, 0.2);
+            ROS_INFO("rmr distance %lf",distance_);
+            ROS_INFO("rmr escape_vel %lf",escape_vel_);
 
             vel_pub_ = private_nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
