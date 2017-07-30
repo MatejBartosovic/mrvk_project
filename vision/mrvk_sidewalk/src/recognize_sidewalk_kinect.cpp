@@ -48,6 +48,9 @@
 using namespace cv;
 
 cv::Mat kinectImage;
+sensor_msgs::Image depthKinectImage;
+ros::Time imageTime;
+ros::Time depthImageTime;
 bool gotImage = false;
 RecognizeSidewalkParams params;
 
@@ -89,7 +92,21 @@ void kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
     kinectImage = cv_bridge::toCvCopy(msg,"bgr8")->image;
     gotImage = true;
+    imageTime = ros::Time::now();
     sidewalk.sidewalkPublish();
+#ifdef DEBUG
+    //ROS_ERROR("Timestamp image: %f", imageTime.toSec());
+#endif
+
+}
+void kinectDepthImageCallback(const sensor_msgs::ImageConstPtr& msg)
+{
+    depthKinectImage = *msg;
+    depthImageTime = ros::Time::now();
+#ifdef DEBUG
+    //ROS_ERROR("Timestamp depth image: %f", depthImageTime.toSec());
+#endif
+
 }
 
 int main(int argc, char **argv) {
@@ -108,6 +125,7 @@ int main(int argc, char **argv) {
 
     //init subscribers
     ros::Subscriber sub = n.subscribe(params.image_topic, 1, kinectImageCallback);
+    ros::Subscriber subDepth = n.subscribe(params.depth_image_topic, 1, kinectDepthImageCallback);
 
     //init publishers
     sidewalk.pub_img = n.advertise<sensor_msgs::Image>("video_image_topic", 1);//output image publisher
