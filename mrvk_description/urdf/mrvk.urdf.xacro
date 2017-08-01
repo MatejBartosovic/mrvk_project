@@ -175,9 +175,9 @@
       </link>
 
       <joint name="kinect_to_veza" type="fixed">
-          <parent link="veza"/>
+          <parent link="base_stabilized"/>
           <child link="kinect"/>
-          <origin rpy=" 0 0 0" xyz="0 0 0.150"/>
+          <origin rpy=" 0 0 0" xyz="0.100 0 0.509"/>
       </joint>
 
       <link name="kinect_ir">
@@ -185,9 +185,9 @@
       </link>
 
       <joint name="kinect_ir_to_veza" type="fixed">
-          <parent link="veza"/>
+          <parent link="kinect"/>
           <child link="kinect_ir"/>
-          <origin rpy="0 0 -1.57" xyz="0.0 -0.070 0.158"/>
+          <origin rpy="1.57 0 1.57" xyz="0.0 -0.070 0"/>
       </joint>
 
     <link name="wheel_frame_l">
