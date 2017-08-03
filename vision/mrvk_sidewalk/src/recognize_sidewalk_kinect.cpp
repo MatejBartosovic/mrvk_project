@@ -103,6 +103,9 @@ void kinectDepthImageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
     depthKinectImage = *msg;
     depthImageTime = ros::Time::now();
+    msg->data;
+
+
 #ifdef DEBUG
     //ROS_ERROR("Timestamp depth image: %f", depthImageTime.toSec());
 #endif
