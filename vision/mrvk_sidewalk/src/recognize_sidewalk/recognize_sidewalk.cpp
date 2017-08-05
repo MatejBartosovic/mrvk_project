@@ -27,12 +27,16 @@
 #include <iostream>
 #include <fstream>
 
+#include <vector>
+#include <queue>
+
 //local libraries
 #include "../pavement_to_marker/pavement_to_marker.h"
 #include "../pavement_to_cloud/pavement_to_cloud.h"
 #include "recognize_sidewalk.h"
 #include "../misc_tools/misc_tools.h"
 #include "picture_segmentation.h"
+#include "SidewalkEdge.h"
 
 //messages
 #include "std_msgs/String.h"
@@ -48,14 +52,18 @@
 
 using namespace cv;
 
+
+
 sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams params)
 {
-
     //point cloud
     sensor_msgs::PointCloud pointCloud_msg;
     geometry_msgs::Point32 pavPoint;
     pointCloud_msg.header.stamp = ros::Time::now();
     pointCloud_msg.header.frame_id = "map";
+    //todo spravit okraje chodnika ako triedu, kde bude metoda na vypocet sklonu ciary a detekcie nevalidnych ciar
+    std::queue<std::vector<LineStructure> > leftEdge;
+    std::queue<std::vector<LineStructure> > rightEdge;
 
     Mat imageResult;		//Create Matrix to store processed image
 
@@ -102,7 +110,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     pavFragmentC.cm.left.start.x = pavFragmentC.cm.left.end.x;
     pavFragmentC.cm.right.start.x = pavFragmentC.cm.right.end.x;
     //putPavementFragmentIntoCloud(&pointCloud_msg, &pavFragmentC);
-
+//todo put pavement edge points into vector and save up to 10 frames of old edges
     int edge_cursor = 0;
     int edge_increment = 1;
     int sideOffset = (params.edge_side_offset_promile*imageResult.cols)/1000;
@@ -229,3 +237,5 @@ bool notPavement(int startPoint, int endPoint, int pavementCenter, int sideOffse
     }
     return notPavement;
 }
+
+//todo function which determines which edges are valid in consideration with old frames
