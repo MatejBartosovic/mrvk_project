@@ -51,7 +51,8 @@ set(LOCAL_INCLUDES 	src/recognize_sidewalk/recognize_sidewalk.cpp
 					src/recognize_sidewalk/picture_segmentation.cpp
 					src/RecognizeSidewalkParams.cpp
 					src/RecognizeSidewalkParams.h
-					src/cloud_processing.cpp)
+					src/cloud_processing.cpp
+					src/recognize_sidewalk/SidewalkEdge.cpp)
 
 add_executable(recognize_sidewalk_video src/recognize_sidewalk_video.cpp ${LOCAL_INCLUDES})
 target_link_libraries(recognize_sidewalk_video ${PCL_LIBRARIES} ${catkin_LIBRARIES})

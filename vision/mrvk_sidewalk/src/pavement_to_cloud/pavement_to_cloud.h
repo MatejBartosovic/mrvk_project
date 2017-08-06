@@ -1,3 +1,6 @@
+#ifndef PROJECT_PAVEMENTTOCLOUD_H
+#define PROJECT_PAVEMENTTOCLOUD_H
+
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
@@ -89,3 +92,5 @@ double m2cm(double m);
 
 lineEquation calibrationWidth();
 void calibrationDistance();
+
+#endif //PROJECT_PAVEMENTTOCLOUD_H

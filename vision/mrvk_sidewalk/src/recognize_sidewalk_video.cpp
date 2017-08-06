@@ -99,6 +99,7 @@ int main(int argc, char **argv) {
     cap.open(videoDirectory.c_str());
 
     //START edge detection variables
+    SidewalkEdges sidewalkEdges;
     Point lineStart;// = Point(100, 100);
     Point lineEnd;// = Point(300, 300);
     Point lineStartRight;// = Point(100, 100);
@@ -119,7 +120,7 @@ int main(int argc, char **argv) {
         }
         imageOrig = image.clone();
 
-        pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, params);
+        pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, params, &sidewalkEdges);
 
         //publish processed image
         header.stamp = ros::Time::now();

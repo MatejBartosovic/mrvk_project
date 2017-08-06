@@ -33,6 +33,7 @@
 #include "misc_tools/misc_tools.h"
 #include "recognize_sidewalk/recognize_sidewalk.h"
 #include "RecognizeSidewalkParams.h"
+#include "recognize_sidewalk/SidewalkEdge.h"
 
 #include "std_msgs/String.h"
 #include "sensor_msgs/Image.h"
@@ -93,7 +94,7 @@ private:
     ros::Time imageTime;
     ros::Time depthImageTime;
     RecognizeSidewalkParams params;
-
+    SidewalkEdges sidewalkEdges;
 
 public:
 
@@ -130,7 +131,7 @@ void Sidewalk::sidewalkPublish()
 
     imageOrig = kinectImage.clone();
 
-    pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, params);
+    pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, params, &sidewalkEdges);
 
     //publish processed image
     header.stamp = ros::Time::now();

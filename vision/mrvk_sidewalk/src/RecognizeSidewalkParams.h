@@ -19,7 +19,6 @@ public:
     int edge_start_offset = 50;
     int edge_side_offset_promile = 10;
     int detect_percent_of_image = 80;
-    int edge_history_num = 2;
 
     int getParametersFromServer(ros::NodeHandle n);
 };
