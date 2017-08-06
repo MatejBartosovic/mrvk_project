@@ -167,6 +167,8 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
 #ifdef DEBUG
     sidewalkEdges->left.drawAllEdges(imageOrig, &params);
     sidewalkEdges->right.drawAllEdges(imageOrig, &params);
+    sidewalkEdges->left.drawAllEdges(&imageResult, &params);
+    sidewalkEdges->right.drawAllEdges(&imageResult, &params);
 #endif
     *imageResultOut = imageResult;
 
