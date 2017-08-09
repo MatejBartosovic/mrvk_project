@@ -41,6 +41,8 @@
 #include "std_msgs/String.h"
 #include "sensor_msgs/Image.h"
 
+#include "../misc_tools/misc_tools.h"
+
 #define EDGE_MARKER_POINT_RADIUS 2
 #define EDGE_MARKER_POINT_WIDTH 4
 
@@ -52,6 +54,8 @@ using namespace cv;
 
 sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams params, SidewalkEdges *sidewalkEdges)
 {
+    //std::string imFile = get_directory("/Pictures/", "calibration", "", "jpg");
+    //imwrite( imFile.c_str(), *imageOrig);
     //point cloud
     sensor_msgs::PointCloud pointCloud_msg;
     geometry_msgs::Point32 pavPoint;
@@ -128,7 +132,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
 
         if (!isOpeningLeft(lineStart.x, lineEnd.x, params.sideOffest))
         {
-            //todo reeble offset
+            //todo reenable offset
             //lineEnd.x += sideOffset;
             //lineEnd.y += sideOffset;
             if (!notPavement(lineStart.x, lineEnd.x, pavementCenter, sideOffset))
@@ -164,11 +168,17 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
         pavFragmentC.pix.right.end = lineEndRight;
         //putPavementFragmentIntoCloud(&pointCloud_msg, &pavFragmentC);
     }
+    sidewalkEdges->left.setImgToDetect(&imageResult);
+    sidewalkEdges->right.setImgToDetect(&imageResult);
 #ifdef DEBUG
     sidewalkEdges->left.drawAllEdges(imageOrig, &params);
     sidewalkEdges->right.drawAllEdges(imageOrig, &params);
     sidewalkEdges->left.drawAllEdges(&imageResult, &params);
     sidewalkEdges->right.drawAllEdges(&imageResult, &params);
+    sidewalkEdges->left.validateEdge();
+    sidewalkEdges->right.validateEdge();
+    sidewalkEdges->left.drawDetectedPoints(imageOrig);
+    sidewalkEdges->right.drawDetectedPoints(imageOrig);
 #endif
     *imageResultOut = imageResult;
 

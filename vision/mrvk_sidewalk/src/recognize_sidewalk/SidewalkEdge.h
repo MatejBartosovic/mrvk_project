@@ -7,6 +7,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "opencv2/video/tracking.hpp"
 #include <sensor_msgs/Image.h>
 
 #include "../RecognizeSidewalkParams.h"
@@ -42,6 +43,10 @@ private:
     Edge edgeValid;//green
     Edge edgeFix;//yellow
     Edge edgeOld;
+    std::vector<cv::Point2f> oldPoints;
+    std::vector<cv::Point2f> newPoints;
+    cv::Mat oldImg;
+    cv::Mat newImg;
     //todo add line queue for line which replaces invalid lines - display with diferent color (yellow)
     //todo test contours for edge
     //todo optical flow will help us determine if we are turning and whether we are perpendicular to sidewalk
@@ -57,12 +62,17 @@ public:
     void validateEdge();
     void fixEdge();
     void computeLineEquation();
+    int computeOpticalFlow(cv::Mat *gray, cv::Mat *prevGray, std::vector<cv::Point2f> *points, std::vector<cv::Point2f> *prevPoints);
     void new_line();
     void clearEdge();
+    void setImgToDetect(cv::Mat *img);
     void drawEdgeRaw(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawEdgeValid(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawEdgeFix(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawAllEdges(cv::Mat *img, RecognizeSidewalkParams *params);
+    void drawDetectedPoints(cv::Mat *img);
+    void rawLinesToPoints();
+
     std::vector<LineStructure> *getEdgeRaw();
     std::vector<LineStructure> *getEdgeValid();
     std::vector<LineStructure> *getEdgeFix();
@@ -70,6 +80,7 @@ public:
 
 struct SidewalkEdges
 {
+    //todo turn to class
     SidewalkEdge left;
     SidewalkEdge right;
 };

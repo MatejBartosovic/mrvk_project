@@ -1,9 +1,9 @@
 #include "SidewalkEdge.h"
 #define COLOR_EDGE_RAW cv::Scalar(128, 0, 128) //purple
 #define COLOR_EDGE_VALID cv::Scalar(0, 255, 0) //green
-#define COLOR_EDGE_FIX cv::Scalar(0, 255, 255) //yellow
-#define COLOR_POINTS_OPTICAL_FLOW cv::Scalar(0, 255, 255) //orange
-#define COOLOR_POINTS_DETECTED cv::Scalar(0, 255, 255) //blue
+#define COLOR_EDGE_FIX cv::Scalar(255, 255, 0) //yellow
+#define COLOR_POINTS_OPTICAL_FLOW cv::Scalar(0, 140, 255) //orange
+#define COLOR_POINTS_DETECTED cv::Scalar(255, 0, 0) //blue
 
 Edge::Edge()
 {
@@ -61,7 +61,15 @@ SidewalkEdge::~SidewalkEdge()
 }
 void SidewalkEdge::validateEdge()
 {
+    computeOpticalFlow(&newImg, &oldImg, &oldPoints, &newPoints);
+    //for (int i = 0; i < getEdgeRaw(). )
+    /*if (!isOpeningLeft(lineStart.x, lineEnd.x, params.sideOffest))
+    {
+        if (!notPavement(lineStart.x, lineEnd.x, pavementCenter, sideOffset))
+        {
 
+        }
+    }*/
 }
 void SidewalkEdge::fixEdge()
 {
@@ -72,6 +80,29 @@ void SidewalkEdge::computeLineEquation()
     edgeFix.computeLineEquation();
     edgeValid.computeLineEquation();
     edgeRaw.computeLineEquation();
+}
+int SidewalkEdge::computeOpticalFlow(cv::Mat *gray, cv::Mat *prevGray, std::vector<cv::Point2f> *points, std::vector<cv::Point2f> *prevPoints)
+{
+    rawLinesToPoints();
+    cv::TermCriteria termcrit(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03);
+    cv::Size subPixWinSize(10, 10), winSize(31, 31);
+
+    const int MAX_COUNT = 500;
+
+    if (!points->empty()) {
+        std::vector<uchar> status;
+        std::vector<float> err;
+        if (prevGray->empty())
+            gray->copyTo(*prevGray);
+        cv::calcOpticalFlowPyrLK(*prevGray, *gray, *points, *prevPoints, status, err, winSize,
+                             3, termcrit, 0, 0.001);
+        std::cout << "prevPoints" << prevPoints->size() << std::endl;
+    }
+
+    std::swap(*prevPoints, *points);
+    //cv::swap(*prevGray, *gray);
+
+    return 0;
 }
 void SidewalkEdge::new_line()
 {
@@ -88,6 +119,18 @@ void SidewalkEdge::clearEdge()
     edgeRaw.getEdge()->clear();
     edgeValid.getEdge()->clear();
     edgeFix.getEdge()->clear();
+}
+void SidewalkEdge::setImgToDetect(cv::Mat *img)
+{
+    if (newImg.empty())
+    {
+        cv::cvtColor(*img, oldImg, cv::COLOR_BGR2GRAY);
+    }
+    else
+    {
+        oldImg = newImg.clone();
+    }
+    cv::cvtColor(*img, newImg, cv::COLOR_BGR2GRAY);
 }
 void SidewalkEdge::drawEdgeRaw(cv::Mat *img, RecognizeSidewalkParams *params)
 {
@@ -106,6 +149,35 @@ void SidewalkEdge::drawAllEdges(cv::Mat *img, RecognizeSidewalkParams *params)
     edgeRaw.drawEdge(img, COLOR_EDGE_RAW, params);
     edgeFix.drawEdge(img, COLOR_EDGE_FIX, params);
     edgeValid.drawEdge(img, COLOR_EDGE_VALID, params);
+}
+void SidewalkEdge::drawDetectedPoints(cv::Mat *img)
+{
+    //show points
+    if (!newPoints.empty())
+    {
+        size_t i, k;
+        for (i = 0; i < newPoints.size(); i++)
+        {
+            circle(*img, newPoints[i], 5, COLOR_POINTS_OPTICAL_FLOW, -1, 8);
+        }
+    }
+    if (!oldPoints.empty())
+    {
+        size_t i, k;
+        for (i = 0; i < oldPoints.size(); i++)
+        {
+            circle(*img, oldPoints[i], 5, COLOR_POINTS_DETECTED, -1, 8);
+        }
+    }
+}
+void SidewalkEdge::rawLinesToPoints()
+{
+    oldPoints.clear();
+    for (int i = 0; i < edgeRaw.getEdge()->size(); i++)
+    {
+        oldPoints.push_back(edgeRaw.getEdge()->at(i).start);
+    }
+    oldPoints.push_back(edgeRaw.getEdge()->at(edgeRaw.getEdge()->size() - 1).end);
 }
 
 std::vector<LineStructure> *SidewalkEdge::getEdgeRaw()
