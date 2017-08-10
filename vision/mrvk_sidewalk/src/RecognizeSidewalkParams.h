@@ -23,7 +23,7 @@ public:
     int edge_side_offset_promile = 10;
     int detect_percent_of_image = 80;
 
-    vector<cv::Point> calibrationPoints;
+    std::vector<cv::Point> calibrationPoints;
 
     int getParametersFromServer(ros::NodeHandle n);
     int getCalibParametersFromServer(ros::NodeHandle n);

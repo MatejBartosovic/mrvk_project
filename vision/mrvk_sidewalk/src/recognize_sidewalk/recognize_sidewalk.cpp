@@ -179,6 +179,10 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     sidewalkEdges->right.validateEdge();
     sidewalkEdges->left.drawDetectedPoints(imageOrig);
     sidewalkEdges->right.drawDetectedPoints(imageOrig);
+    /*for (int i = 0; i < params.calibrationPoints.size(); i++)
+    {
+        circle(*imageOrig, params.calibrationPoints[i], 5, cv::Scalar(255, 255, 255), -1, 8);
+    }*/
 #endif
     *imageResultOut = imageResult;
 

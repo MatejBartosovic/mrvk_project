@@ -27,11 +27,15 @@ int RecognizeSidewalkParams::getCalibParametersFromServer(ros::NodeHandle n)
     int readX = 0;
     int readY = 0;
     parameterName = "sidewalk_transform_calib/point_" + std::to_string(pointIter) + "_x";
+    cv::Point calibrationPoint;
     while (n.getParam(parameterName.c_str(), readX))
     {
+        parameterName = "sidewalk_transform_calib/point_" + std::to_string(pointIter) + "_y";
         n.getParam(parameterName.c_str(), readY);
-        calibrationPoints = cv::Point(readX, readY);
+        calibrationPoint = cv::Point(readX, readY);
+        calibrationPoints.push_back(calibrationPoint);
         pointIter++;
+        parameterName = "sidewalk_transform_calib/point_" + std::to_string(pointIter) + "_x";
     }
 
     return 0;
