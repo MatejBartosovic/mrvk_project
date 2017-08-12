@@ -11,3 +11,13 @@ public:
 };
 
 
+class cluster123
+{
+public:
+	cv::Vec3d point;
+	cv::Mat covar;
+	int mass;
+
+	cluster123();
+
+};

@@ -81,7 +81,8 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
 
     //frame segmentation
     //imageResult = picture_segmentation_frame(image);
-    imageResult = picture_segmentation_frame_HSV(*imageOrig);
+    //imageResult = picture_segmentation_frame_HSV(*imageOrig);
+    imageResult = picture_segmentation_frame_c1c2c3(*imageOrig);
 
     //START draw pavement boundaries
     pavementCenter = imageResult.cols/2;
