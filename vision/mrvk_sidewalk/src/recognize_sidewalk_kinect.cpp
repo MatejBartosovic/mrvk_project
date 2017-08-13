@@ -131,7 +131,7 @@ void Sidewalk::sidewalkPublish()
 
     imageOrig = kinectImage.clone();
 
-    pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, params, &sidewalkEdges);
+    pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges);
 
     //publish processed image
     header.stamp = ros::Time::now();

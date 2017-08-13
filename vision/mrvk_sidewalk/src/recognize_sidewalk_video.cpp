@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         }
         imageOrig = image.clone();
 
-        pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, params, &sidewalkEdges);
+        pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges);
 
         //publish processed image
         header.stamp = ros::Time::now();
@@ -140,7 +140,6 @@ int main(int argc, char **argv) {
         ros::spinOnce();
         loop_rate.sleep();
     }
-
 
     return 0;
 }
