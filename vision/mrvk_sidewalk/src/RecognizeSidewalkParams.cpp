@@ -16,6 +16,8 @@ int RecognizeSidewalkParams::getParametersFromServer(ros::NodeHandle n)
 
     n.getParam("sidewalk_params/edge_points_distribution/edge_points_dist", edge_points_dist);
     getCalibParametersFromServer(n);
+    getDisplayRecognized(n);
+    getGlitchFrame(n);
 
     return 0;
 }
@@ -39,4 +41,22 @@ int RecognizeSidewalkParams::getCalibParametersFromServer(ros::NodeHandle n)
     }
 
     return 0;
+}
+
+int RecognizeSidewalkParams::getDisplayRecognized(ros::NodeHandle n)
+{
+    n.getParam("sidewalk_params/display/edge/raw", displayRecognized.raw);
+    n.getParam("sidewalk_params/display/edge/valid", displayRecognized.valid);
+    n.getParam("sidewalk_params/display/edge/fix", displayRecognized.fix);
+    n.getParam("sidewalk_params/display/points/new", displayRecognized.newPts);
+    n.getParam("sidewalk_params/display/points/old", displayRecognized.oldPts);
+    n.getParam("sidewalk_params/display/points/old", displayRecognized.oldPts);
+    n.getParam("sidewalk_params/display/orig", displayRecognized.orig);
+    n.getParam("sidewalk_params/display/result", displayRecognized.result);
+}
+int RecognizeSidewalkParams::getGlitchFrame(ros::NodeHandle n)
+{
+    n.getParam("sidewalk_params/glitchFrame/areaBufferSize", glitchFrame.areaBufferSize);
+    n.getParam("sidewalk_params/glitchFrame/maxAreaDifference", glitchFrame.areaBufferSize);
+    n.getParam("sidewalk_params/glitchFrame/webSize", glitchFrame.areaBufferSize);
 }
