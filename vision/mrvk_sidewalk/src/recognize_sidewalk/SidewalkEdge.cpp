@@ -68,6 +68,7 @@ void SidewalkEdge::validateEdge(RecognizeSidewalkParams *params, int pavementCen
     int sideOffset = (params->edge_side_offset_promile*newImg.cols)/1000;
     *getEdgeValid() = *getEdgeRaw();
     getSidewalkArea(&newImg, params);
+    validPoints.clear();
     for (int i = 0; i < getEdgeRaw()->size(); i++)
     {
         getEdgeValid()->at(i).valid = false;
@@ -78,6 +79,7 @@ void SidewalkEdge::validateEdge(RecognizeSidewalkParams *params, int pavementCen
                 if (!notPavement(getEdgeRaw()->at(i).start.x, getEdgeRaw()->at(i).end.x, pavementCenter, sideOffset))
                 {
                     getEdgeValid()->at(i).valid = true;
+                    validPoints.push_back(getEdgeValid()->at(i).start);
                 }
             }
         }

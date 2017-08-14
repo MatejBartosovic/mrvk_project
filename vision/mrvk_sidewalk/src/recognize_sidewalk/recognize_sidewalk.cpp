@@ -50,8 +50,6 @@
 
 using namespace cv;
 
-
-
 sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams *params, SidewalkEdges *sidewalkEdges)
 {
     //std::string imFile = get_directory("/Pictures/", "calibration", "", "jpg");
@@ -146,7 +144,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     sidewalkEdges->right.setImgToDetect(&imageResult);
     sidewalkEdges->left.validateEdge(params, pavementCenter);
     sidewalkEdges->right.validateEdge(params, pavementCenter);
-#ifdef DEBUG
+
     if (params->displayRecognized.orig)
     {
         sidewalkEdges->left.drawAllEdges(imageOrig, params);
@@ -166,7 +164,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
         circle(*imageOrig, params->calibrationPoints[i], 5, cv::Scalar(255, 255, 255), -1, 8);
     }*/
 
-#endif
+
 
     *imageResultOut = imageResult;
 

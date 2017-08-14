@@ -63,6 +63,7 @@ private:
 
     //todo reenable offset - do it after all validation and fixation and put it into new vector
 public:
+    std::vector<cv::Point> validPoints;
     SidewalkEdge();
     ~SidewalkEdge();
     void validateEdge(RecognizeSidewalkParams *params, int pavementCenter);

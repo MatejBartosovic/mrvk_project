@@ -31,7 +31,7 @@ include_directories(
 )
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
-#add_definitions(-std=c++11)
+add_definitions(-std=c++11)
 #add_definitions(${PCL_DEFINITIONS})
 
 
