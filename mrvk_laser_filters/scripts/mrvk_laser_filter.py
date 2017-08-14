@@ -4,6 +4,7 @@ import os, sys, time, copy
 import math
 import numpy as np
 from threading import Thread
+from ring_buffer import RingBuffer
 
 import rospy
 import tf
@@ -17,18 +18,20 @@ class LaserFilter():
         self.laser_pub = rospy.Publisher('/scan_filtered', LaserScan, queue_size=10)
         
         # Isolated point filter
-        self.filter_isolated = rospy.get_param('~filter_isolated', True)
+        self.filter_isolated = rospy.get_param('~filter_isolated', False)
         self.min_accept_size = rospy.get_param('~min_accept_size', 3)
 
         # Transient points filter params
         self.filter_transient = rospy.get_param('~filter_transient', True)
         self.shift_tolerance = rospy.get_param('~shift_tolerance', 2)
+        self.num_prev_frames = rospy.get_param('~num_prev_frames', 1)
 
-        self.prev_data = None
+        self.prev_data = RingBuffer(self.num_prev_frames)
         if self.filter_isolated:
             rospy.loginfo("Isolated points filter enabled")
         if self.filter_transient:
-            rospy.loginfo("Transient points filter enabled")
+            rospy.loginfo("Transient points filter enabled, using {} prev frames"\
+                .format(self.num_prev_frames))
 
     def laser_cb(self, data):
         #print len(data.ranges)
@@ -92,28 +95,38 @@ class LaserFilter():
         # convert scan to numpy array
         new_data.ranges = np.array(new_data.ranges)
 
-        if self.prev_data is None:
-            self.prev_data = new_data
+        if not self.prev_data.data: # is None:
+            self.prev_data.append(new_data)
         new_data_clean = copy.deepcopy(new_data)
 
         # new_ranges = np.array(new_data.ranges)
         for i in range(0, new_data.ranges.shape[0]):
-            if self.is_invalid(self.prev_data.ranges[i]) and not self.is_invalid(new_data.ranges[i]):
-                # if pixel is the same as previous
-                new_data.ranges[i] = np.inf
-            # else:
-            #     # check pixels wihtin tolerance
-            #     for s in range(0, self.shift_tolerance):
+            is_valid_point = True
+            for prev in self.prev_data.get():
+                is_valid_point &= not (self.is_invalid(prev.ranges[i]) and not self.is_invalid(new_data.ranges[i]))
+                # if self.is_invalid(prev.ranges[i]) and not self.is_invalid(new_data.ranges[i]):
+                if not is_valid_point:
+                    # if pixel is the same as previous
+                    new_data.ranges[i] = np.inf
+                # else:
+                #     # check pixels wihtin tolerance
+                #     for s in range(0, self.shift_tolerance):
 
             #     pass
             # if (isnan(self.prev_data.ranges[i]) or isinf(self.prev_data.ranges[i]))
             #     and not 
 
-        self.prev_data = new_data_clean
+        self.prev_data.append(new_data_clean)
+        # self.print_buffer(self.prev_data)
         return new_data
 
     def is_invalid(self, val):
         return np.isinf(val) or np.isnan(val)
+
+    def print_buffer(self, buf):
+        for data in buf.get():
+            print [ "{:0.2f}".format(x) for x in data.ranges ]
+        print ""
 
 
 def main():	
