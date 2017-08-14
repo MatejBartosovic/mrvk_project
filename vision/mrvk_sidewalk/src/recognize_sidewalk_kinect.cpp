@@ -163,14 +163,18 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
     sensor_msgs::PointCloud2 final_cloud2;
     pcl::PointCloud<pcl::PointXYZRGB> cloud;
 
-    //for (int i=0;i<518400;i++){
-    int x,y;
-    x = 800; // sirka
-    y = 400; // vyska
-    long int data_point = (960-x) * 540 + (540-y);
-    ROS_ERROR_STREAM(data_point);
-    cloud.push_back(cloudProcessing.returnPoint(0,data_point));
-    //}
+    long int data_point;
+    for(int i = 0; i < sidewalkEdges.left.validPoints.size();i++){
+        data_point = (960-sidewalkEdges.left.validPoints[i].x) * 540 + (540-sidewalkEdges.left.validPoints[i].y);
+        cloud.push_back(cloudProcessing.returnPoint(0,data_point));
+
+    }
+
+    for(int i = 0; i < sidewalkEdges.right.validPoints.size();i++){
+        data_point = (960-sidewalkEdges.right.validPoints[i].x) * 540 + (540-sidewalkEdges.right.validPoints[i].y);
+        cloud.push_back(cloudProcessing.returnPoint(0,data_point));
+
+    }
 
     toROSMsg (cloud, final_cloud2);
     final_cloud2.header.frame_id = "world";

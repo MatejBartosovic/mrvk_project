@@ -23,7 +23,7 @@ sidewalk_params:
 
   glitchFrame:
     areaBufferSize: 6
-    maxAreaDifference: 100
+    maxAreaDifference: 50
     webSize: 30
 
   edge_points_distribution:
