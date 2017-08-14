@@ -1,13 +1,15 @@
 <launch>
-	<!-- <env name="ROSCONSOLE_CONFIG_FILE"
-       value="$(find mrvk_laser_filters)/launch/custom_rosconsole.conf"/> -->
+	<node pkg='mrvk_laser_filters' type='mrvk_laser_filter.py' name='mrvk_laser_filter' output="screen">
+		<!-- Isolated points filter -->
+		<param name="filter_isolated" value="true"/> <!-- enable/disable -->
+		<param name="min_accept_size" value="3"/> <!-- minimum accepted segment size -->
 
-	<node pkg='mrvk_laser_filters' type='mrvk_laser_filter.py' name='mrvk_laser_filter'>
-		<param name="filter_isolated" value="true"/>
-		<param name="min_accept_size" value="3"/>
-
-		<param name="filter_transient" value="true"/>
-		<!-- <param name="shift_tolerance" value="2"/> -->
+		<!-- Transient points filter -->
+		<param name="filter_transient" value="true"/> <!-- enable/disable -->
+		<param name="num_prev_frames" value="1"/> <!-- how many prev frames to compare the current frame to -->
+		<!-- NOT USED <param name="shift_tolerance" value="2"/> -->
 	</node>
 
+	<!-- <env name="ROSCONSOLE_CONFIG_FILE"
+       value="$(find mrvk_laser_filters)/launch/custom_rosconsole.conf"/> -->
 </launch>

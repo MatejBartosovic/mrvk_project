@@ -1,4 +1,5 @@
 #include "RecognizeSidewalkParams.h"
+#include <string>
 
 int RecognizeSidewalkParams::getParametersFromServer(ros::NodeHandle n)
 {
@@ -14,6 +15,28 @@ int RecognizeSidewalkParams::getParametersFromServer(ros::NodeHandle n)
     n.getParam("sidewalk_params/detect_percent_of_image", detect_percent_of_image);
 
     n.getParam("sidewalk_params/edge_points_distribution/edge_points_dist", edge_points_dist);
+    getCalibParametersFromServer(n);
+
+    return 0;
+}
+
+int RecognizeSidewalkParams::getCalibParametersFromServer(ros::NodeHandle n)
+{
+    std::string parameterName;
+    int pointIter = 0;
+    int readX = 0;
+    int readY = 0;
+    parameterName = "sidewalk_transform_calib/point_" + std::to_string(pointIter) + "_x";
+    cv::Point calibrationPoint;
+    while (n.getParam(parameterName.c_str(), readX))
+    {
+        parameterName = "sidewalk_transform_calib/point_" + std::to_string(pointIter) + "_y";
+        n.getParam(parameterName.c_str(), readY);
+        calibrationPoint = cv::Point(readX, readY);
+        calibrationPoints.push_back(calibrationPoint);
+        pointIter++;
+        parameterName = "sidewalk_transform_calib/point_" + std::to_string(pointIter) + "_x";
+    }
 
     return 0;
 }
