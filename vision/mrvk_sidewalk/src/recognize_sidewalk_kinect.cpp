@@ -158,6 +158,25 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
     kinectImage = cv_bridge::toCvCopy(msg,"bgr8")->image;
     imageTime = ros::Time::now();
     sidewalkPublish();
+
+    sensor_msgs::PointCloud2 final_cloud = cloudProcessing.getCloud();
+    sensor_msgs::PointCloud2 final_cloud2;
+    pcl::PointCloud<pcl::PointXYZRGB> cloud;
+
+    //for (int i=0;i<518400;i++){
+    int x,y;
+    x = 800; // sirka
+    y = 400; // vyska
+    long int data_point = (960-x) * 540 + (540-y);
+    ROS_ERROR_STREAM(data_point);
+    cloud.push_back(cloudProcessing.returnPoint(0,data_point));
+    //}
+
+    toROSMsg (cloud, final_cloud2);
+    final_cloud2.header.frame_id = "world";
+    final_cloud2.header.stamp = ros::Time::now();
+    pub_pav_pointCloud.publish(final_cloud2);
+
 #ifdef DEBUG
 
     //ROS_ERROR("Timestamp image: %f", imageTime.toSec());
@@ -167,21 +186,6 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
 
 void Sidewalk::kinectDepthImageCallback(const sensor_msgs::ImageConstPtr& depth_msg)
 {
-
-    sensor_msgs::PointCloud2 final_cloud = cloudProcessing.getCloud();
-    sensor_msgs::PointCloud2 final_cloud2;
-    pcl::PointCloud<pcl::PointXYZRGB> cloud;
-
-    for (int i=0;i<518400;i++){
-        cloud.push_back(cloudProcessing.returnPoint(0,i));
-    }
-
-    toROSMsg (cloud, final_cloud2);
-    final_cloud2.header.frame_id = "world";
-    final_cloud2.header.stamp = ros::Time::now();
-    pub_pav_pointCloud.publish(final_cloud2);
-
-
 
 #ifdef DEBUG
     //ROS_ERROR_STREAM(depth_msg->data.size());
