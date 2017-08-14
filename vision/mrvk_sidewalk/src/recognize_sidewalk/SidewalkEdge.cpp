@@ -1,5 +1,7 @@
 #include "SidewalkEdge.h"
 #include "../misc_tools/misc_tools.h"
+#include <unistd.h>
+
 #define COLOR_EDGE_RAW cv::Scalar(128, 0, 128) //purple
 #define COLOR_EDGE_VALID cv::Scalar(0, 255, 0) //green
 #define COLOR_EDGE_FIX cv::Scalar(255, 255, 0) //yellow
@@ -81,7 +83,7 @@ void SidewalkEdge::validateEdge(RecognizeSidewalkParams *params, int pavementCen
         }
         else
         {
-            //todo try to repair glitched frame
+            //todo try to repair glitched frame - leave for last
         }
     }
 
@@ -166,6 +168,10 @@ bool SidewalkEdge::glitchedFrame()
 }
 void SidewalkEdge::detectFrameGlitch(RecognizeSidewalkParams *params)
 {
+    /*if (glitchedFrameVal)
+    {
+        getchar();
+    }*/
     glitchedFrameVal = false;
     if (sidewalkArea.size() >= params->glitchFrame.areaBufferSize)
     {
