@@ -6,11 +6,13 @@ project(mrvk_sidewalk)
 
 find_package(catkin REQUIRED COMPONENTS
 		cv_bridge
-  		pcl_ros
+		pcl_ros
   		roscpp
   		rospy
 		image_transport
 		std_msgs
+		tf
+		tf_conversions
 )
 find_package(PCL REQUIRED QUIET COMPONENTS common sample_consensus io segmentation filters)
 
@@ -21,10 +23,6 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
-install(DIRECTORY ../mrvk_sidewalk/include/cloud_processing
-		DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-		PATTERN ".svn" EXCLUDE
-		)
 
 include_directories(
 		include/mrvk_sidewalk
@@ -32,16 +30,9 @@ include_directories(
 		${PCL_INCLUDE_DIRS}
 )
 
-
-link_directories(${PCL_LIBRARY_DIRS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
-add_definitions(-std=c++11)
-add_definitions(${PCL_DEFINITIONS})
-
-install(DIRECTORY ../ax_bx_calibration/include/${PROJECT_NAME}/
-		DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-		PATTERN ".svn" EXCLUDE
-		)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+#add_definitions(-std=c++11)
+#add_definitions(${PCL_DEFINITIONS})
 
 
 set(LOCAL_INCLUDES 	src/recognize_sidewalk/recognize_sidewalk.cpp
@@ -61,4 +52,3 @@ target_link_libraries(recognize_sidewalk_video ${PCL_LIBRARIES} ${catkin_LIBRARI
 add_executable(recognize_sidewalk_kinect src/recognize_sidewalk_kinect.cpp ${LOCAL_INCLUDES})
 target_link_libraries(recognize_sidewalk_kinect ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 #add_dependencies(recognize_sidewalk_kinect recognize_sidewalk_kinect_generate_messages_cpp)
-

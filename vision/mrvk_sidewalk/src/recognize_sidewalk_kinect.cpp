@@ -14,6 +14,7 @@
 
 //pointcloud - pavement
 #include <pcl_ros/point_cloud.h>
+#include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <sensor_msgs/PointCloud.h>
 
@@ -34,6 +35,7 @@
 #include "recognize_sidewalk/recognize_sidewalk.h"
 #include "RecognizeSidewalkParams.h"
 #include "recognize_sidewalk/SidewalkEdge.h"
+#include "../include/mrvk_sidewalk/cloud_processing.h"
 
 #include "std_msgs/String.h"
 #include "sensor_msgs/Image.h"
@@ -95,11 +97,13 @@ private:
     ros::Time depthImageTime;
     RecognizeSidewalkParams params;
     SidewalkEdges sidewalkEdges;
+    CloudProcessing cloudProcessing;
+
 
 public:
 
-    Sidewalk(){
-
+    Sidewalk():cloudProcessing(){
+        ROS_ERROR_STREAM("SIDEWALKINIT");
         //START get parameters
         params.getParametersFromServer(n);
         //END get parameters
@@ -112,11 +116,13 @@ public:
         pub_img = n.advertise<sensor_msgs::Image>("video_image_topic", 1);//output image publisher
         pub_img_orig = n.advertise<sensor_msgs::Image>("video_image_orig_topic", 1);//output image publisher
         octomap_pub = n.advertise<nav_msgs::OccupancyGrid>("pavement_map", 1);//map occupancy publisher
-        pub_pav_pointCloud = n.advertise<sensor_msgs::PointCloud> ("pav_pointCloud", 1);//publisher for pavement point cloud
+        pub_pav_pointCloud = n.advertise<sensor_msgs::PointCloud2> ("pav_pointCloud", 1);//publisher for pavement point cloud
 
         //point cloud header
         pointCloud_msg.header.stamp = ros::Time::now();
         pointCloud_msg.header.frame_id = "map";
+
+        cloudProcessing.createVectors(1920,1080);
 
     }
     ~Sidewalk(){
@@ -143,8 +149,8 @@ void Sidewalk::sidewalkPublish()
     pub_img_orig.publish(img_msg_orig);//publish original image
 
     //publish point cloud
-    pointCloud_msg.header.stamp = ros::Time::now();
-    pub_pav_pointCloud.publish(pointCloud_msg);
+    //pointCloud_msg.header.stamp = ros::Time::now();
+    //pub_pav_pointCloud.publish(pointCloud_msg);
 }
 
 void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -161,20 +167,21 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
 
 void Sidewalk::kinectDepthImageCallback(const sensor_msgs::ImageConstPtr& depth_msg)
 {
-    depthKinectImage = *depth_msg;
-    depthImageTime = ros::Time::now();
-    sensor_msgs::PointCloud2 cloud;
-    int skip = 2;
 
-    for (int x = 0; x < depth_msg->width; x+=skip) {
-        for (int y = 0; y < depth_msg->height; y+=skip) {
-            int offset = x + y * depth_msg->width;
+    sensor_msgs::PointCloud2 final_cloud = cloudProcessing.getCloud();
+    sensor_msgs::PointCloud2 final_cloud2;
+    pcl::PointCloud<pcl::PointXYZRGB> cloud;
 
-            //calculte the x, y, z camera position based on the depth information
-            sensor_msgs::PointCloud2 cloud_out;
-            //cloud.data.push_back(depthToPointCloudPos(x, y, depth_msg->data[offset]));
-        }
+    for (int i=0;i<518400;i++){
+        cloud.push_back(cloudProcessing.returnPoint(0,i));
     }
+
+    toROSMsg (cloud, final_cloud2);
+    final_cloud2.header.frame_id = "world";
+    final_cloud2.header.stamp = ros::Time::now();
+    pub_pav_pointCloud.publish(final_cloud2);
+
+
 
 #ifdef DEBUG
     ROS_ERROR_STREAM(depth_msg->data.size());
@@ -193,7 +200,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
-
-
-
