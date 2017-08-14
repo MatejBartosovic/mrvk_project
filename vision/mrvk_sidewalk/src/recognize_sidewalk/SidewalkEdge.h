@@ -1,0 +1,87 @@
+#ifndef PROJECT_SIDEWALKEDGE_H
+#define PROJECT_SIDEWALKEDGE_H
+
+//opencv
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include "opencv2/video/tracking.hpp"
+#include <sensor_msgs/Image.h>
+
+#include "../RecognizeSidewalkParams.h"
+#include "../pavement_to_cloud/pavement_to_cloud.h"
+
+#define EDGE_MARKER_TYPE 8
+#define EDGE_MARKER_SHIFT 0
+
+struct LineStructure{
+    cv::Point start;
+    cv::Point end;
+    cv::Point startOld;
+    cv::Point endOld;
+    lineEquation myLineEquation;
+    lineEquation myLineEquationOld;
+    bool valid = true;
+};
+class Edge{
+private:
+    std::vector<LineStructure> edge;
+public:
+    Edge();
+    ~Edge();
+    void computeLineEquation();
+    void new_line();
+    void drawEdge(cv::Mat *img, const cv::Scalar& color, RecognizeSidewalkParams *params);
+    std::vector<LineStructure> *getEdge();
+};
+
+class SidewalkEdge{
+private:
+    Edge edgeRaw;//purple
+    Edge edgeValid;//green
+    Edge edgeFix;//yellow
+    Edge edgeOld;
+    std::vector<cv::Point2f> oldPoints;
+    std::vector<cv::Point2f> newPoints;
+    cv::Mat oldImg;
+    cv::Mat newImg;
+    //todo add line queue for line which replaces invalid lines - display with diferent color (yellow)
+    //todo test contours for edge
+    //todo optical flow will help us determine if we are turning and whether we are perpendicular to sidewalk
+    //todo zda sa, ze ked je presvetleny obraz, tak segmentacia je dobra aspon pri robotovy, budeme teda pri rozpoznani hran toto brat do uvahy (budeme pocitat iba so spodkom obrazu).
+    //todo moja detekcia bodov okraja chodnika bude dodavat body do optickeho toku a ten bude uz dalej udrziavat chodnik. Zdetekujeme celkovy pohyb kamery, ten odfiltrujeme a zvyskovy pohyb bude sposobeny fluktuaciami v segmentacii obrazu.
+    //todo nebude buffer edge ako je teraz, ale staré detekované body posunuté optickým tokom na novom obraze a staré detekované body. Stare detekovane body budu zjednotenim bodov Valid a Fix (nakoniec Fix bude uz fuzia Valid a opravenych bodov)
+    //todo ak viacej framov za sebou daný úsek okraja nebude detekovaný správne, tak sa nezobrazí ani na Fix okraji.
+    //todo nastava problem ze zapis okraja po ciarach nie je vhodny pre spracovanie cez opticky tok
+    //todo spraviť kalibráciu optického toku (prahových hodnôt kedy brať detekovaný bod ako zlý) pre každý detekovaný riadok samostatne, z nejakej mediánovej hodnoty sa vytvorí pre každý konštanta prahu. (spraviť na to funkciu, čo to spraví automaticky).
+public:
+    SidewalkEdge();
+    ~SidewalkEdge();
+    void validateEdge();
+    void fixEdge();
+    void computeLineEquation();
+    int computeOpticalFlow(cv::Mat *gray, cv::Mat *prevGray, std::vector<cv::Point2f> *points, std::vector<cv::Point2f> *prevPoints);
+    void new_line();
+    void clearEdge();
+    void setImgToDetect(cv::Mat *img);
+    void drawEdgeRaw(cv::Mat *img, RecognizeSidewalkParams *params);
+    void drawEdgeValid(cv::Mat *img, RecognizeSidewalkParams *params);
+    void drawEdgeFix(cv::Mat *img, RecognizeSidewalkParams *params);
+    void drawAllEdges(cv::Mat *img, RecognizeSidewalkParams *params);
+    void drawDetectedPoints(cv::Mat *img);
+    void rawLinesToPoints();
+
+    std::vector<LineStructure> *getEdgeRaw();
+    std::vector<LineStructure> *getEdgeValid();
+    std::vector<LineStructure> *getEdgeFix();
+};
+
+struct SidewalkEdges
+{
+    //todo turn to class
+    SidewalkEdge left;
+    SidewalkEdge right;
+};
+#endif //PROJECT_SIDEWALKEDGE_H

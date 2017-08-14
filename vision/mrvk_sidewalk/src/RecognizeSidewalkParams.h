@@ -3,6 +3,9 @@
 
 //ros
 #include <ros/ros.h>
+#include <vector>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 class RecognizeSidewalkParams
 {
@@ -10,6 +13,7 @@ private:
 public:
     int ros_parameter = 0;
     std::string image_topic = "/my_kinect/hd/image_color";
+    std::string depth_image_topic = "/kinect2/qhd/image_depth_rect";
     int spinFreq = 20;
 
     int sideOffest = 1;
@@ -19,7 +23,10 @@ public:
     int edge_side_offset_promile = 10;
     int detect_percent_of_image = 80;
 
+    std::vector<cv::Point> calibrationPoints;
+
     int getParametersFromServer(ros::NodeHandle n);
+    int getCalibParametersFromServer(ros::NodeHandle n);
 };
 
 #endif //PROJECT_RECOGNIZESIDEWALKPARAMS_H
