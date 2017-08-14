@@ -40,8 +40,7 @@
 #include "../RecognizeSidewalkParams.h"
 #include "SidewalkEdge.h"
 
-sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams params, SidewalkEdges *sidewalkEdges);
-//todo pass params as pointer to function
+sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams *params, SidewalkEdges *sidewalkEdges);
 int getLeftPavementPoint(cv::Mat image, int line, int pavementCenter, int edge_side_offset_promile);
 int getRightPavementPoint(cv::Mat image, int line, int pavementCenter, int edge_side_offset_promile);
 int getPavementCenter(int leftPoint, int rightPoint, int pavementCenterLast);

@@ -1,4 +1,7 @@
 #include "SidewalkEdge.h"
+#include "../misc_tools/misc_tools.h"
+#include <unistd.h>
+
 #define COLOR_EDGE_RAW cv::Scalar(128, 0, 128) //purple
 #define COLOR_EDGE_VALID cv::Scalar(0, 255, 0) //green
 #define COLOR_EDGE_FIX cv::Scalar(255, 255, 0) //yellow
@@ -59,17 +62,31 @@ SidewalkEdge::~SidewalkEdge()
 {
 
 }
-void SidewalkEdge::validateEdge()
+void SidewalkEdge::validateEdge(RecognizeSidewalkParams *params, int pavementCenter)
 {
     computeOpticalFlow(&newImg, &oldImg, &oldPoints, &newPoints);
-    //for (int i = 0; i < getEdgeRaw(). )
-    /*if (!isOpeningLeft(lineStart.x, lineEnd.x, params.sideOffest))
+    int sideOffset = (params->edge_side_offset_promile*newImg.cols)/1000;
+    *getEdgeValid() = *getEdgeRaw();
+    getSidewalkArea(&newImg, params);
+    for (int i = 0; i < getEdgeRaw()->size(); i++)
     {
-        if (!notPavement(lineStart.x, lineEnd.x, pavementCenter, sideOffset))
+        getEdgeValid()->at(i).valid = false;
+        if (!glitchedFrame())
         {
-
+            if (!isOpening(newImg.cols, getEdgeRaw()->at(i).start.x, getEdgeRaw()->at(i).end.x, params->sideOffest))
+            {
+                if (!notPavement(getEdgeRaw()->at(i).start.x, getEdgeRaw()->at(i).end.x, pavementCenter, sideOffset))
+                {
+                    getEdgeValid()->at(i).valid = true;
+                }
+            }
         }
-    }*/
+        else
+        {
+            //todo try to repair glitched frame - leave for last
+        }
+    }
+
 }
 void SidewalkEdge::fixEdge()
 {
@@ -132,6 +149,63 @@ void SidewalkEdge::setImgToDetect(cv::Mat *img)
     }
     cv::cvtColor(*img, newImg, cv::COLOR_BGR2GRAY);
 }
+bool SidewalkEdge::isOpening(int imgCols, int startPoint, int endPoint, int sideOffset)
+{
+    bool opening = false;
+    if ((startPoint > (imgCols - sideOffset))&&(endPoint > (imgCols - sideOffset)))
+    {
+        opening = true;
+    }
+    if ((startPoint < sideOffset)&&(endPoint < sideOffset))
+    {
+        opening = true;
+    }
+    return opening;
+}
+bool SidewalkEdge::glitchedFrame()
+{
+    return glitchedFrameVal;
+}
+void SidewalkEdge::detectFrameGlitch(RecognizeSidewalkParams *params)
+{
+    /*if (glitchedFrameVal)
+    {
+        getchar();
+    }*/
+    glitchedFrameVal = false;
+    if (sidewalkArea.size() >= params->glitchFrame.areaBufferSize)
+    {
+        if (fabs(intMedian(sidewalkArea) - sidewalkAreaFrame) > params->glitchFrame.maxAreaDifference)
+        {
+            glitchedFrameVal = true;
+        }
+    }
+}
+void SidewalkEdge::getSidewalkArea(cv::Mat *img, RecognizeSidewalkParams *params)
+{
+    sidewalkAreaFrame = 0;
+    for (int x = 0; x < img->cols; x += params->glitchFrame.webSize)
+    {
+        for (int y = 0; y < img->rows; y += params->glitchFrame.webSize)
+        {
+            if (img->at<cv::Vec3b>(x, y)[0] != 0)
+            {
+                sidewalkAreaFrame++;
+            }
+        }
+    }
+    detectFrameGlitch(params);
+    if (!glitchedFrame())
+    {
+        sidewalkArea.push_back(sidewalkAreaFrame);
+    }
+    if (params->glitchFrame.areaBufferSize < sidewalkArea.size())
+    {
+        sidewalkArea.erase(sidewalkArea.begin());
+    }
+}
+
+
 void SidewalkEdge::drawEdgeRaw(cv::Mat *img, RecognizeSidewalkParams *params)
 {
     edgeRaw.drawEdge(img, COLOR_EDGE_RAW, params);
@@ -146,14 +220,23 @@ void SidewalkEdge::drawEdgeFix(cv::Mat *img, RecognizeSidewalkParams *params)
 }
 void SidewalkEdge::drawAllEdges(cv::Mat *img, RecognizeSidewalkParams *params)
 {
-    edgeRaw.drawEdge(img, COLOR_EDGE_RAW, params);
-    edgeFix.drawEdge(img, COLOR_EDGE_FIX, params);
-    edgeValid.drawEdge(img, COLOR_EDGE_VALID, params);
+    if (params->displayRecognized.raw)
+    {
+        edgeRaw.drawEdge(img, COLOR_EDGE_RAW, params);
+    }
+    if (params->displayRecognized.valid)
+    {
+        edgeFix.drawEdge(img, COLOR_EDGE_FIX, params);
+    }
+    if (params->displayRecognized.valid)
+    {
+        edgeValid.drawEdge(img, COLOR_EDGE_VALID, params);
+    }
 }
-void SidewalkEdge::drawDetectedPoints(cv::Mat *img)
+void SidewalkEdge::drawDetectedPoints(cv::Mat *img, RecognizeSidewalkParams *params)
 {
     //show points
-    if (!newPoints.empty())
+    if (!newPoints.empty()&&params->displayRecognized.newPts)
     {
         size_t i, k;
         for (i = 0; i < newPoints.size(); i++)
@@ -161,7 +244,7 @@ void SidewalkEdge::drawDetectedPoints(cv::Mat *img)
             circle(*img, newPoints[i], 5, COLOR_POINTS_OPTICAL_FLOW, -1, 8);
         }
     }
-    if (!oldPoints.empty())
+    if (!oldPoints.empty()&&params->displayRecognized.oldPts)
     {
         size_t i, k;
         for (i = 0; i < oldPoints.size(); i++)
@@ -193,3 +276,19 @@ std::vector<LineStructure> *SidewalkEdge::getEdgeFix()
     return edgeFix.getEdge();
 }
 
+//filters lines which are incorrect because detected point was detected in pavement center
+bool notPavement(int startPoint, int endPoint, int pavementCenter, int sideOffset)
+{
+    bool notPavement = false;
+    if ((startPoint >= pavementCenter - sideOffset-10)&&(startPoint <= pavementCenter + sideOffset+10))
+    {
+        notPavement = true;
+    }
+    if ((endPoint >= pavementCenter - sideOffset-10)&&(endPoint <= pavementCenter + sideOffset+10))
+    {
+        notPavement = true;
+    }
+    return notPavement;
+}
+
+//todo zhustit siet detekovanych bodov (pri ciarach bliziacich sa vodorovnym sa stratia ciary kvoli nedostatky bodov) ak sa dorobi detekcia vodorovnych ciar, tak sa da pocet detekovanych bodov do povodneho stavu

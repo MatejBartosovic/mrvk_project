@@ -47,6 +47,10 @@ private:
     std::vector<cv::Point2f> newPoints;
     cv::Mat oldImg;
     cv::Mat newImg;
+    std::vector<int> sidewalkArea;
+    int sidewalkAreaFrame;
+    bool glitchedFrameVal = false;
+    //TODO function which determines which edges are valid in consideration with old frames
     //todo add line queue for line which replaces invalid lines - display with diferent color (yellow)
     //todo test contours for edge
     //todo optical flow will help us determine if we are turning and whether we are perpendicular to sidewalk
@@ -56,21 +60,28 @@ private:
     //todo ak viacej framov za sebou daný úsek okraja nebude detekovaný správne, tak sa nezobrazí ani na Fix okraji.
     //todo nastava problem ze zapis okraja po ciarach nie je vhodny pre spracovanie cez opticky tok
     //todo spraviť kalibráciu optického toku (prahových hodnôt kedy brať detekovaný bod ako zlý) pre každý detekovaný riadok samostatne, z nejakej mediánovej hodnoty sa vytvorí pre každý konštanta prahu. (spraviť na to funkciu, čo to spraví automaticky).
+
+    //todo reenable offset - do it after all validation and fixation and put it into new vector
 public:
     SidewalkEdge();
     ~SidewalkEdge();
-    void validateEdge();
+    void validateEdge(RecognizeSidewalkParams *params, int pavementCenter);
     void fixEdge();
     void computeLineEquation();
     int computeOpticalFlow(cv::Mat *gray, cv::Mat *prevGray, std::vector<cv::Point2f> *points, std::vector<cv::Point2f> *prevPoints);
     void new_line();
     void clearEdge();
     void setImgToDetect(cv::Mat *img);
+    bool isOpening(int imgCols, int startPoint, int endPoint, int sideOffset);
+    void getSidewalkArea(cv::Mat *img, RecognizeSidewalkParams *params);
+    bool glitchedFrame();
+    void detectFrameGlitch(RecognizeSidewalkParams *params);
+
     void drawEdgeRaw(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawEdgeValid(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawEdgeFix(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawAllEdges(cv::Mat *img, RecognizeSidewalkParams *params);
-    void drawDetectedPoints(cv::Mat *img);
+    void drawDetectedPoints(cv::Mat *img, RecognizeSidewalkParams *params);
     void rawLinesToPoints();
 
     std::vector<LineStructure> *getEdgeRaw();
@@ -84,4 +95,7 @@ struct SidewalkEdges
     SidewalkEdge left;
     SidewalkEdge right;
 };
+
+bool notPavement(int startPoint, int endPoint, int pavementCenter, int sideOffset);
+
 #endif //PROJECT_SIDEWALKEDGE_H

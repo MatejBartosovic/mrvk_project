@@ -9,8 +9,9 @@ Panels:
         - /Map1
         - /Global plan1
         - /Routes1
+        - /Marker1
       Splitter Ratio: 0.5
-    Tree Height: 719
+    Tree Height: 435
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -59,6 +60,7 @@ Visualization Manager:
       Name: Map
       Topic: /map
       Unreliable: false
+      Use Timestamp: false
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -128,7 +130,20 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        gps:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         imu:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        kinect:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        kinect_ir:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -205,17 +220,19 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         uchopenie_pravo:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         veza:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+        vo:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         wheel_frame_l:
           Alpha: 1
           Show Axes: false
@@ -277,7 +294,13 @@ Visualization Manager:
           Value: true
         camera_r:
           Value: true
+        gps:
+          Value: true
         imu:
+          Value: true
+        kinect:
+          Value: true
+        kinect_ir:
           Value: true
         laser:
           Value: true
@@ -288,8 +311,6 @@ Visualization Manager:
         link_3_4:
           Value: true
         link_3_4x:
-          Value: true
-        local_map:
           Value: true
         map:
           Value: true
@@ -319,6 +340,8 @@ Visualization Manager:
           Value: true
         veza:
           Value: true
+        vo:
+          Value: true
         wheel_frame_l:
           Value: true
         wheel_frame_l_rotation:
@@ -342,8 +365,6 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
-          local_map:
-            {}
           odom:
             base_link:
               base_stabilized:
@@ -375,12 +396,17 @@ Visualization Manager:
                 imu:
                   {}
                 laser:
-                  veza:
-                    camera_l:
+                  {}
+                veza:
+                  camera_l:
+                    {}
+                  camera_r:
+                    camera:
                       {}
-                    camera_r:
-                      camera:
-                        {}
+                  kinect:
+                    {}
+                  kinect_ir:
+                    {}
                 wheel_frame_l:
                   wheel_frame_l_rotation:
                     {}
@@ -395,6 +421,9 @@ Visualization Manager:
                     {}
                   wheel_pz:
                     {}
+              gps:
+                vo:
+                  {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -412,6 +441,7 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0
+      Pose Color: 255; 85; 255
       Pose Style: None
       Radius: 0.0299999993
       Shaft Diameter: 0.100000001
@@ -434,11 +464,12 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0
+      Pose Color: 255; 85; 255
       Pose Style: None
       Radius: 0.0299999993
       Shaft Diameter: 0.100000001
       Shaft Length: 0.100000001
-      Topic: /shortest_path
+      Topic: /move_base/osm/shortest_path
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -457,6 +488,7 @@ Visualization Manager:
       Name: Global map
       Topic: /move_base/global_costmap/costmap
       Unreliable: false
+      Use Timestamp: false
       Value: true
     - Alpha: 0.699999988
       Class: rviz/Map
@@ -466,6 +498,7 @@ Visualization Manager:
       Name: Local map
       Topic: /move_base/local_costmap/costmap
       Unreliable: false
+      Use Timestamp: false
       Value: true
     - Alpha: 1
       Axes Length: 1
@@ -497,12 +530,21 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0
+      Pose Color: 255; 85; 255
       Pose Style: None
       Radius: 0.0299999993
       Shaft Diameter: 0.100000001
       Shaft Length: 0.100000001
-      Topic: /route_network
+      Topic: /move_base/osm/route_network
       Unreliable: false
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /move_base/osm/position_marker
+      Name: Marker
+      Namespaces:
+        work_space: true
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -528,21 +570,21 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1986.70117
+      Distance: 144.231216
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -302.173676
-        Y: 16.1674156
-        Z: 83.4140625
+        X: -78.7842789
+        Y: 6.76180792
+        Z: -97.2738342
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.890397668
+      Pitch: 0.885397673
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
       Yaw: 6.18858242
@@ -550,10 +592,10 @@ Visualization Manager:
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1000
+  Height: 716
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000016a0000035efc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007301000000280000035e000000dd00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000035efc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007301000000280000035e000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004bf0000003efc0100000002fb0000000800540069006d00650100000000000004bf0000030000fffffffb0000000800540069006d006501000000000000045000000000000000000000023a0000035e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000016a00000242fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000002800000242000000dd00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f00000242fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000002800000242000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004bf0000003efc0100000002fb0000000800540069006d00650100000000000004bf0000030000fffffffb0000000800540069006d006501000000000000045000000000000000000000023a0000024200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -563,5 +605,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1215
-  X: 65
-  Y: 24
+  X: 75
+  Y: 34

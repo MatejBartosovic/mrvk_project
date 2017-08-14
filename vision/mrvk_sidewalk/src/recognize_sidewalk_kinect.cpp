@@ -137,7 +137,7 @@ void Sidewalk::sidewalkPublish()
 
     imageOrig = kinectImage.clone();
 
-    pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, params, &sidewalkEdges);
+    pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges);
 
     //publish processed image
     header.stamp = ros::Time::now();
@@ -184,9 +184,9 @@ void Sidewalk::kinectDepthImageCallback(const sensor_msgs::ImageConstPtr& depth_
 
 
 #ifdef DEBUG
-    ROS_ERROR_STREAM(depth_msg->data.size());
-    ROS_ERROR_STREAM(depth_msg->width);
-    ROS_ERROR_STREAM(depth_msg->height);
+    //ROS_ERROR_STREAM(depth_msg->data.size());
+    //ROS_ERROR_STREAM(depth_msg->width);
+    //ROS_ERROR_STREAM(depth_msg->height);
     //ROS_ERROR("Timestamp depth image: %f", depthImageTime.toSec());
 #endif
 }

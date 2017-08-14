@@ -7,6 +7,22 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+struct GlitchFrame{
+    int areaBufferSize = 6;
+    int maxAreaDifference = 100;
+    int webSize = 30;
+};
+
+struct DisplayRecognized{
+    bool raw = true;
+    bool valid = true;
+    bool fix = true;
+    bool newPts = true;
+    bool oldPts = true;
+    bool orig = true;
+    bool result = true;
+};
+
 class RecognizeSidewalkParams
 {
 private:
@@ -24,9 +40,13 @@ public:
     int detect_percent_of_image = 80;
 
     std::vector<cv::Point> calibrationPoints;
+    DisplayRecognized displayRecognized;
+    GlitchFrame glitchFrame;
 
     int getParametersFromServer(ros::NodeHandle n);
     int getCalibParametersFromServer(ros::NodeHandle n);
+    int getDisplayRecognized(ros::NodeHandle n);
+    int getGlitchFrame(ros::NodeHandle n);
 };
 
 #endif //PROJECT_RECOGNIZESIDEWALKPARAMS_H
