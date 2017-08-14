@@ -1,6 +1,7 @@
 <?xml version='1.0'?>
 
 <launch>
+    <include file="$(find mrvk_description)/launch/load_description.launch"/>
     <rosparam command="load" file="$(find mrvk_sidewalk)/config/sidewalk_config.yaml" />
 
     <node pkg="mrvk_sidewalk" name="recognize_sidewalk_kinect" type="recognize_sidewalk_kinect"/>

@@ -13,423 +13,422 @@
        xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
        xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
        name="mrvk" >
-  
-  <xacro:macro name="mrvk_base" params="parent *origin end_point">
-    
-    <!--joint name="footprint_to_base" type="fixed">
-      <xacro:insert_block name="origin" />
-      <parent link="${parent}"/>
-      <child link="base_link"/>
-    </joint-->
 
-    <link name="base_link"/>
+    <xacro:macro name="mrvk_base" params="parent *origin end_point">
 
-   <joint name="base_to_stabilizer" type="fixed">
-      <origin xyz="0 0 0"/>
-      <parent link="base_link"/>
-      <child link="base_stabilized"/>
-    </joint>
-<!--todo narazniky -->
-    <link name="base_stabilized">
-      <visual>
-	<geometry>
-        <box size="0.47 .315 .168"/>
-	</geometry>
-	<origin xyz="0 0 0"/>
-	<material name="Blue"/>
-      </visual>
-      <inertial>
-	<mass value="10"/>
-	<inertia_zaklad/>
-      </inertial>
-      <collision>
-	<geometry>
-	<box size="0.5 .31 .30"/>
-	</geometry>
-	<origin xyz="0 0 0.08"/>
-     </collision>
-   </link>
- 
-  <joint name="stabilizer_to_imu" type="fixed">
-    <origin xyz="-0.1 0.1 -0.01"/>
-    <parent link="base_stabilized"/>
-    <child link="imu"/>
-  </joint>
+        <joint name="footprint_to_base" type="fixed">
+          <xacro:insert_block name="origin" />
+          <parent link="${parent}"/>
+          <child link="base_link"/>
+        </joint>
 
-  <link name = "imu"/>
+        <link name="base_link"/>
 
-  <link name="laser">
-    <visual>
-      <geometry>
-	  <cylinder length="0.03" radius="0.025"/>
-      </geometry>
-      <material name="Black"/>
-    </visual>
-      <inertial>
-	<mass value="0.1"/>
-	<xacro:inertia_zaklad/>
-      </inertial>
-    </link>
+        <joint name="base_to_stabilizer" type="fixed">
+            <origin xyz="0 0 0"/>
+            <parent link="base_link"/>
+            <child link="base_stabilized"/>
+        </joint>
+        <!--todo narazniky -->
+        <link name="base_stabilized">
+            <visual>
+                <geometry>
+                    <box size="0.47 .315 .168"/>
+                </geometry>
+                <origin xyz="0 0 0"/>
+                <material name="Blue"/>
+            </visual>
+            <inertial>
+                <mass value="10"/>
+                <inertia_zaklad/>
+            </inertial>
+            <collision>
+                <geometry>
+                    <box size="0.5 .31 .30"/>
+                </geometry>
+                <origin xyz="0 0 0.08"/>
+            </collision>
+        </link>
 
-    <joint name="base_to_scan" type="fixed">
-    <parent link="base_stabilized"/>
-    <child link="laser"/>
-    <origin xyz="0.181 0 0.099"/>
-    </joint>
+        <joint name="stabilizer_to_imu" type="fixed">
+            <origin xyz="-0.1 0.1 -0.01"/>
+            <parent link="base_stabilized"/>
+            <child link="imu"/>
+        </joint>
 
-    <link name="veza">
-    <visual>
-      <geometry>
-	<cylinder length="0.045" radius="0.0665"/>
-      </geometry>
-      <material name="White"/>
-    </visual>
-    <inertial>
-	<mass value="0.3"/>
-	<inertia_zaklad/>
-      </inertial>
-    </link>
+        <link name = "imu"/>
 
-    <joint name="scan_to_veza" type="revolute"><!--todo premenovat na base_to_veza-->
-      <parent link="base_stabilized"/>
-	<child link="veza"/>
-	  <origin xyz="0.14 0 0.136"/>
-	  <axis xyz="0 0 1"/>
-	  <limit effort="30.0" lower="-2.09439" upper="${M_PI}" velocity="5"/>
-  </joint>
+        <link name="laser">
+            <visual>
+                <geometry>
+                    <cylinder length="0.03" radius="0.025"/>
+                </geometry>
+                <material name="Black"/>
+            </visual>
+            <inertial>
+                <mass value="0.1"/>
+                <xacro:inertia_zaklad/>
+            </inertial>
+        </link>
 
-  <link name="camera_l">
-      <visual>
-	<geometry>
-	  <box size="0.07 .03 .08"/>
-	</geometry> 
-      <material name="Black"/>
-      </visual>
-      <inertial>
-	<mass value="0.1"/>
-	<inertia_zaklad/>
-	
-      </inertial>
-    </link>
+        <joint name="base_to_scan" type="fixed">
+            <parent link="base_stabilized"/>
+            <child link="laser"/>
+            <origin xyz="0.181 0 0.099"/>
+        </joint>
 
-    <joint name="veza_to_camera_l" type="fixed">
-      <parent link="veza"/>
-      <child link="camera_l"/>
-      <origin xyz="0 0.05 0.0575"/>
-    </joint>
+        <link name="veza">
+            <visual>
+                <geometry>
+                    <cylinder length="0.045" radius="0.0665"/>
+                </geometry>
+                <material name="White"/>
+            </visual>
+            <inertial>
+                <mass value="0.3"/>
+                <inertia_zaklad/>
+            </inertial>
+        </link>
 
-    <link name="camera_r">
-      <visual>
-	<geometry>
-	  <box size="0.07 .03 .08"/>
-	</geometry>
-	<material name="Black"/>
-      </visual>
-      <inertial>
-	<mass value="0.1"/>
-	<inertia_zaklad/>
-	
-      </inertial>
-    </link>
+        <joint name="scan_to_veza" type="revolute"><!--todo premenovat na base_to_veza-->
+            <parent link="base_stabilized"/>
+            <child link="veza"/>
+            <origin xyz="0.14 0 0.136"/>
+            <axis xyz="0 0 1"/>
+            <limit effort="30.0" lower="-2.09439" upper="${M_PI}" velocity="5"/>
+        </joint>
 
-    <joint name="veza_to_camera_r" type="fixed">
-      <parent link="veza"/>
-      <child link="camera_r"/>
-      <origin xyz="0 -0.05 0.0575"/>
-    </joint>
+        <link name="camera_l">
+            <visual>
+                <geometry>
+                    <box size="0.07 .03 .08"/>
+                </geometry>
+                <material name="Black"/>
+            </visual>
+            <inertial>
+                <mass value="0.1"/>
+                <inertia_zaklad/>
 
-    <link name="camera">
-      <visual>
-	<geometry>
-	  <box size="0.075 .06 .06"/>
-	</geometry>
-      <material name="Black"/>
-      </visual>
-      <inertial>
-	<mass value="0.4"/>
-	<inertia_zaklad/>
-	
-      </inertial>
-    </link>
+            </inertial>
+        </link>
 
-    <joint name="camera_r_to_camera" type="revolute">
-      <limit effort="30.0" lower="-0.523598" upper="${M_PI/2}" velocity="5"/>
-      <parent link="camera_r"/>
-      <child link="camera"/>
-      <origin rpy=" ${M_PI/2} 0 0" xyz="0 0.05 0.01"/>
-      <axis xyz="0 0 1"/>
-    </joint>
+        <joint name="veza_to_camera_l" type="fixed">
+            <parent link="veza"/>
+            <child link="camera_l"/>
+            <origin xyz="0 0.05 0.0575"/>
+        </joint>
 
-      <link name="kinect">
-          <visual>
-              <geometry>
-                  <box size=" .065 0.25 .075"/>
-              </geometry>
-              <material name="kinect"/>
-          </visual>
-          <inertial>
-              <mass value="1.5"/>
-              <inertia_zaklad/>
+        <link name="camera_r">
+            <visual>
+                <geometry>
+                    <box size="0.07 .03 .08"/>
+                </geometry>
+                <material name="Black"/>
+            </visual>
+            <inertial>
+                <mass value="0.1"/>
+                <inertia_zaklad/>
 
-          </inertial>
-      </link>
+            </inertial>
+        </link>
 
-      <joint name="kinect_to_veza" type="fixed">
-          <parent link="base_stabilized"/>
-          <child link="kinect"/>
-          <origin rpy=" 0 0 0" xyz="0.100 0 0.509"/>
-      </joint>
+        <joint name="veza_to_camera_r" type="fixed">
+            <parent link="veza"/>
+            <child link="camera_r"/>
+            <origin xyz="0 -0.05 0.0575"/>
+        </joint>
 
-      <link name="kinect_ir">
+        <link name="camera">
+            <visual>
+                <geometry>
+                    <box size="0.075 .06 .06"/>
+                </geometry>
+                <material name="Black"/>
+            </visual>
+            <inertial>
+                <mass value="0.4"/>
+                <inertia_zaklad/>
 
-      </link>
+            </inertial>
+        </link>
 
-      <joint name="kinect_ir_to_veza" type="fixed">
-          <parent link="kinect"/>
-          <child link="kinect_ir"/>
-          <origin rpy="1.57 0 1.57" xyz="0.0 -0.070 0"/>
-      </joint>
+        <joint name="camera_r_to_camera" type="revolute">
+            <limit effort="30.0" lower="-0.523598" upper="${M_PI/2}" velocity="5"/>
+            <parent link="camera_r"/>
+            <child link="camera"/>
+            <origin rpy=" ${M_PI/2} 0 0" xyz="0 0.05 0.01"/>
+            <axis xyz="0 0 1"/>
+        </joint>
 
-    <link name="wheel_frame_l">
-      <visual>
-      <geometry>
-	<box size="0.4 .025 .1"/>
-      </geometry>
-	<material name="White"/>
-      </visual>
-      <inertial>
-	<mass value="1.3"/>
-	<inertia_zaklad/>
-      </inertial>
-    </link>
-    
-    <joint name="wheel_joint_left" type="continuous">
-	<!--limit rychlosti v impulzoch za 10ms-->
-      <limit effort="30.0" velocity="${1000*ODOMETRY_CONSTANT}"/>
-      <parent link="wheel_frame_l"/>
-      <child link="wheel_frame_l_rotation"/>
-      <origin rpy="${-M_PI/2} 0 0"/>
-      <axis xyz="0 0 1"/>
-    </joint>
-    
-    <link name="wheel_frame_l_rotation">
-    </link>
-    
+        <link name="kinect">
+            <visual>
+                <geometry>
+                    <box size=" .065 0.25 .075"/>
+                </geometry>
+                <material name="kinect"/>
+            </visual>
+            <inertial>
+                <mass value="1.5"/>
+                <inertia_zaklad/>
 
-    <joint name="base_link_to_wheel_frame_l" type="fixed">
-      <parent link="base_stabilized"/>
-	<child link="wheel_frame_l"/>
-	<origin xyz="0 +0.1775 -0.05"/>
-	<axis xyz="0 1 0"/>
-    </joint>
+            </inertial>
+        </link>
 
-    <link name="wheel_frame_r">
-      <visual>
-	<geometry>
-	  <box size="0.4 .025 .1"/>
-	</geometry>
-	<material name="White"/>
-      </visual>
-      <inertial>
-	<mass value="1.3"/>
-	<inertia_zaklad/>
-      </inertial>
-    </link>
-    
-    <joint name="wheel_joint_right" type="continuous">
-	<!--limit rychlosti v impulzoch za 10ms-->
-      <limit effort="30.0" velocity="${1000*ODOMETRY_CONSTANT}"/>
-      <parent link="wheel_frame_r"/>
-      <child link="wheel_frame_r_rotation"/>
-      <origin rpy="${M_PI/2} 0 0"/>
-      <axis xyz="0 0 -1"/>
-    </joint>
-    
-    <link name="wheel_frame_r_rotation">
-    </link>
-    
+        <joint name="kinect_to_veza" type="fixed">
+            <parent link="base_stabilized"/>
+            <child link="kinect"/>
+            <origin rpy=" 0 0.44 0" xyz="0.100 0 0.509"/>
+        </joint>
 
-    <joint name="base_link_to_wheel_frame_r" type="fixed">
-      <parent link="base_stabilized"/>
-      <child link="wheel_frame_r"/>
-      <origin xyz="0 -0.1775 -0.05"/>
-      <axis xyz="0 1 0"/>
-    </joint>
+        <link name="kinect_ir">
 
-    <link name="wheel_lp">
-      <visual>
-	<geometry>
-	  <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
-	</geometry>
-      <material name="Black"/>
-      </visual>
-      <inertial>
-	<mass value="0.5"/>
-	<inertia_zaklad/> 
-      </inertial>
-      <collision>
-	  <geometry>
-	    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
-	  </geometry>
-      </collision>
-    </link>
+        </link>
 
-    <joint name="wheel_frame_l_to_wheel_lp" type="continuous">
-       <parent link="wheel_frame_l"/>
-       <child link="wheel_lp"/>
-       <origin rpy=" ${M_PI/2} 0 0" xyz="0.145 0.05 -0.01"/>
-       <axis xyz="0 0 1"/>
-       <mimic joint= "wheel_joint_left" multiplier="-1" />
-    </joint>
+        <joint name="kinect_ir_to_veza" type="fixed">
+            <parent link="kinect"/>
+            <child link="kinect_ir"/>
+            <origin rpy="1.57 0 1.57" xyz="0.0 0 0"/>
+        </joint>
 
-    <link name="wheel_lz">
-      <visual>
-      <geometry>
-	<cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
-      </geometry>
-	<material name="Black"/>
-      </visual>
-      <inertial>
-	<mass value="0.5"/>
-	<inertia_zaklad/> 
-      </inertial>
-      <collision>
-	  <geometry>
-	    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
-	  </geometry>
-      </collision>
-    </link>
+        <link name="wheel_frame_l">
+            <visual>
+                <geometry>
+                    <box size="0.4 .025 .1"/>
+                </geometry>
+                <material name="White"/>
+            </visual>
+            <inertial>
+                <mass value="1.3"/>
+                <inertia_zaklad/>
+            </inertial>
+        </link>
 
-    <joint name="wheel_frame_l_to_wheel_lz" type="continuous">
-      <parent link="wheel_frame_l"/>
-      <child link="wheel_lz"/>
-      <origin rpy=" ${M_PI/2} 0 0" xyz="-0.145 0.05 -0.01"/>
-      <axis xyz="0 0 1"/>
-      <mimic joint= "wheel_joint_left" multiplier="-1" />
-    </joint>
+        <joint name="wheel_joint_left" type="continuous">
+            <!--limit rychlosti v impulzoch za 10ms-->
+            <limit effort="30.0" velocity="${1000*ODOMETRY_CONSTANT}"/>
+            <parent link="wheel_frame_l"/>
+            <child link="wheel_frame_l_rotation"/>
+            <origin rpy="${-M_PI/2} 0 0"/>
+            <axis xyz="0 0 1"/>
+        </joint>
 
-    <link name="wheel_pp">
-      <visual>
-	<geometry>
-	  <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
-	</geometry>
-	<material name="Black"/>
-      </visual>
-      <inertial>
-	<mass value="0.5"/>
-	<inertia_zaklad/>
-      </inertial>
-      <collision>
-	  <geometry>
-	    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
-	  </geometry>
-      </collision>
-    </link>
+        <link name="wheel_frame_l_rotation">
+        </link>
 
-    <joint name="wheel_frame_r_to_wheel_pp" type="continuous">
-      <parent link="wheel_frame_r"/>
-      <child link="wheel_pp"/>
-      <origin rpy=" ${M_PI/2} 0 0" xyz="0.145 -0.05 -0.01"/>
-      <axis xyz="0 0 1"/>
-      <mimic joint= "wheel_joint_right" multiplier="-1" />
-    </joint>
 
-    <link name="wheel_pz">
-      <visual>
-      <geometry>
-	<cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
-      </geometry>
-      <material name="Black"/>
-      </visual>
-      <inertial>
-	<mass value="0.5"/>
-	<inertia_zaklad/>
-	
-    </inertial>
-      <collision>
-	  <geometry>
-	    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
-	  </geometry>
-      </collision>
-    </link>
+        <joint name="base_link_to_wheel_frame_l" type="fixed">
+            <parent link="base_stabilized"/>
+            <child link="wheel_frame_l"/>
+            <origin xyz="0 +0.1775 -0.05"/>
+            <axis xyz="0 1 0"/>
+        </joint>
 
-    <joint name="wheel_frame_r_to_wheel_pz" type="continuous">
-      <parent link="wheel_frame_r"/>
-      <child link="wheel_pz"/>
-      <origin rpy=" ${M_PI/2} 0 0" xyz="-0.145 -0.05 -0.01"/>
-      <axis xyz="0 0 1"/>
-      <mimic joint= "wheel_joint_right" multiplier="-1" />
-    </joint>
-    
-    <joint name="end_point_connetion" type="fixed">
-      <parent link="base_stabilized"/>
-      <child link="${end_point}"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <axis xyz="0 0 1"/>
-    </joint>
-    
-    <link name="${end_point}"/> 
-    
-    <joint name="base_to_gps" type="fixed">
-      <parent link="base_link"/>
-      <child link="gps"/>
-      <origin rpy="0 0 0" xyz="0 0 2"/>
-    </joint>
+        <link name="wheel_frame_r">
+            <visual>
+                <geometry>
+                    <box size="0.4 .025 .1"/>
+                </geometry>
+                <material name="White"/>
+            </visual>
+            <inertial>
+                <mass value="1.3"/>
+                <inertia_zaklad/>
+            </inertial>
+        </link>
 
-    <link name="gps"/>
+        <joint name="wheel_joint_right" type="continuous">
+            <!--limit rychlosti v impulzoch za 10ms-->
+            <limit effort="30.0" velocity="${1000*ODOMETRY_CONSTANT}"/>
+            <parent link="wheel_frame_r"/>
+            <child link="wheel_frame_r_rotation"/>
+            <origin rpy="${M_PI/2} 0 0"/>
+            <axis xyz="0 0 -1"/>
+        </joint>
 
-<joint name="gps_to_vo" type="fixed">
-      <parent link="gps"/>
-      <child link="vo"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-    </joint>
+        <link name="wheel_frame_r_rotation">
+        </link>
 
-    <link name="vo"/>
 
-      
-  <transmission name="mrvk_left_transmission">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="wheel_joint_left">
-      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="mrvk_motor_left">
-			<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-      <mechanicalReduction>${1/ODOMETRY_CONSTANT}</mechanicalReduction>
-    </actuator>
-  </transmission>
-  <transmission name="mrvk_right_transmission">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="wheel_joint_right">
-      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="mrvk_motor_right">
-			<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-      <mechanicalReduction>${1/ODOMETRY_CONSTANT}</mechanicalReduction>
-    </actuator>
-  </transmission>
-<!--${1/ODOMETRY_CONSTANT/WHEEL_RADIUS}-->
-  
-  <transmission name="camera_horizontal_transmission">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="scan_to_veza">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="camera_horizontal_motor">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission>
-  <transmission name="camera_vertical_transmission">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="camera_r_to_camera">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="camera_vertical_motor">
-      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission>
+        <joint name="base_link_to_wheel_frame_r" type="fixed">
+            <parent link="base_stabilized"/>
+            <child link="wheel_frame_r"/>
+            <origin xyz="0 -0.1775 -0.05"/>
+            <axis xyz="0 1 0"/>
+        </joint>
+
+        <link name="wheel_lp">
+            <visual>
+                <geometry>
+                    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
+                </geometry>
+                <material name="Black"/>
+            </visual>
+            <inertial>
+                <mass value="0.5"/>
+                <inertia_zaklad/>
+            </inertial>
+            <collision>
+                <geometry>
+                    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="wheel_frame_l_to_wheel_lp" type="continuous">
+            <parent link="wheel_frame_l"/>
+            <child link="wheel_lp"/>
+            <origin rpy=" ${M_PI/2} 0 0" xyz="0.145 0.05 -0.01"/>
+            <axis xyz="0 0 1"/>
+            <mimic joint= "wheel_joint_left" multiplier="-1" />
+        </joint>
+
+        <link name="wheel_lz">
+            <visual>
+                <geometry>
+                    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
+                </geometry>
+                <material name="Black"/>
+            </visual>
+            <inertial>
+                <mass value="0.5"/>
+                <inertia_zaklad/>
+            </inertial>
+            <collision>
+                <geometry>
+                    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="wheel_frame_l_to_wheel_lz" type="continuous">
+            <parent link="wheel_frame_l"/>
+            <child link="wheel_lz"/>
+            <origin rpy=" ${M_PI/2} 0 0" xyz="-0.145 0.05 -0.01"/>
+            <axis xyz="0 0 1"/>
+            <mimic joint= "wheel_joint_left" multiplier="-1" />
+        </joint>
+
+        <link name="wheel_pp">
+            <visual>
+                <geometry>
+                    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
+                </geometry>
+                <material name="Black"/>
+            </visual>
+            <inertial>
+                <mass value="0.5"/>
+                <inertia_zaklad/>
+            </inertial>
+            <collision>
+                <geometry>
+                    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="wheel_frame_r_to_wheel_pp" type="continuous">
+            <parent link="wheel_frame_r"/>
+            <child link="wheel_pp"/>
+            <origin rpy=" ${M_PI/2} 0 0" xyz="0.145 -0.05 -0.01"/>
+            <axis xyz="0 0 1"/>
+            <mimic joint= "wheel_joint_right" multiplier="-1" />
+        </joint>
+
+        <link name="wheel_pz">
+            <visual>
+                <geometry>
+                    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
+                </geometry>
+                <material name="Black"/>
+            </visual>
+            <inertial>
+                <mass value="0.5"/>
+                <inertia_zaklad/>
+
+            </inertial>
+            <collision>
+                <geometry>
+                    <cylinder radius="${WHEEL_RADIUS}" length="0.065"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="wheel_frame_r_to_wheel_pz" type="continuous">
+            <parent link="wheel_frame_r"/>
+            <child link="wheel_pz"/>
+            <origin rpy=" ${M_PI/2} 0 0" xyz="-0.145 -0.05 -0.01"/>
+            <axis xyz="0 0 1"/>
+            <mimic joint= "wheel_joint_right" multiplier="-1" />
+        </joint>
+
+        <joint name="end_point_connetion" type="fixed">
+            <parent link="base_stabilized"/>
+            <child link="${end_point}"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <axis xyz="0 0 1"/>
+        </joint>
+
+        <link name="${end_point}"/>
+
+        <joint name="base_to_gps" type="fixed">
+            <parent link="base_link"/>
+            <child link="gps"/>
+            <origin rpy="0 0 0" xyz="0 0 2"/>
+        </joint>
+
+        <link name="gps"/>
+
+        <joint name="gps_to_vo" type="fixed">
+            <parent link="gps"/>
+            <child link="vo"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+        </joint>
+
+        <link name="vo"/>
+
+
+        <transmission name="mrvk_left_transmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="wheel_joint_left">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="mrvk_motor_left">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+                <mechanicalReduction>${1/ODOMETRY_CONSTANT}</mechanicalReduction>
+            </actuator>
+        </transmission>
+        <transmission name="mrvk_right_transmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="wheel_joint_right">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="mrvk_motor_right">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+                <mechanicalReduction>${1/ODOMETRY_CONSTANT}</mechanicalReduction>
+            </actuator>
+        </transmission>
+        <!--${1/ODOMETRY_CONSTANT/WHEEL_RADIUS}-->
+
+        <transmission name="camera_horizontal_transmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="scan_to_veza">
+                <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="camera_horizontal_motor">
+                <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+        </transmission>
+        <transmission name="camera_vertical_transmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="camera_r_to_camera">
+                <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="camera_vertical_motor">
+                <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+        </transmission>
     </xacro:macro>
 
 </robot>
-

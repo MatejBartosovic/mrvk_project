@@ -12,6 +12,15 @@
 using namespace cv;
 using namespace std;
 
+// HSV segmentation
+// ok values  0 175 1 82 36 255 - TODO: update adaptation
+int iLowH = 75;
+int iHighH = 130;
+int iLowS = 0;
+int iHighS = 162;
+int iLowV = 36;
+int iHighV = 255;
+
 cv::Mat picture_segmentation_frame(cv::Mat frame)
 {
     cv::Mat segmented;
@@ -54,14 +63,7 @@ cv::Mat picture_segmentation_frame_HSV(cv::Mat frame)
 	cvtColor(frame,imageHSV,CV_BGR2HSV);
 	//cv::blur(image,imageThresh,cv::Size(60, 60));//blurr image
 		
-	// HSV segmentation
-	// ok values  0 175 1 82 36 255 - TODO: update adaptation
-	int iLowH = 75;
-	int iHighH = 130;
-	int iLowS = 0;
-	int iHighS = 162;
-	int iLowV = 36;
-	int iHighV = 255;
+
 
 	inRange(imageHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imageThresh); //Threshold the image	
 		
@@ -107,3 +109,39 @@ cv::Mat picture_segmentation_frame_HSV(cv::Mat frame)
 
     return imageContFiltered;
 }
+
+
+cv::Vec3b computeAdaptationKernels(Mat imageHSV)
+{
+	int regionX = imageHSV.cols/2;
+	int regionY = (imageHSV.rows/4)*3;
+
+	int k = 0, i = 0, j = 0;
+	int minKern=500, indexKern=0;
+	cv::Vec3i kernelAvg[3];
+	for (k=-1;k<=1;k++)
+	{
+		for (i=-1;i<=1;i++)
+		{
+			for (j=-1;j<=1;j++)
+			{
+				kernelAvg[k+1]+=imageHSV.at<cv::Vec3b>((70*k)+regionX+(i*3),+regionY+(j*3));
+			}
+
+		}
+	kernelAvg[k+1]/=9;
+	if (minKern>kernelAvg[k+1][0])
+	{
+		minKern=kernelAvg[k+1][0];
+		indexKern = k+1;
+	}
+	}
+	// Check validity
+	if(abs(((iLowH+iHighH)/2-kernelAvg[indexKern][0]))>30)
+		kernelAvg[indexKern][0]=(iLowH+iHighH)/2;
+
+	cv::Vec3b rangeSamplePoint= kernelAvg[indexKern];
+	cout << "kernel avg: "<< rangeSamplePoint << endl;
+	return rangeSamplePoint;
+}
+

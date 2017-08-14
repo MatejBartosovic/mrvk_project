@@ -27,6 +27,9 @@
 #include <iostream>
 #include <fstream>
 
+#include <vector>
+#include <queue>
+
 //local libraries
 #include "../pavement_to_marker/pavement_to_marker.h"
 #include "../pavement_to_cloud/pavement_to_cloud.h"
@@ -38,9 +41,6 @@
 #include "std_msgs/String.h"
 #include "sensor_msgs/Image.h"
 
-#define EDGE_MARKER_TYPE 8
-#define EDGE_MARKER_SHIFT 0
-
 #define EDGE_MARKER_POINT_RADIUS 2
 #define EDGE_MARKER_POINT_WIDTH 4
 
@@ -48,14 +48,18 @@
 
 using namespace cv;
 
-sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams params)
-{
 
+
+sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams params, SidewalkEdges *sidewalkEdges)
+{
     //point cloud
     sensor_msgs::PointCloud pointCloud_msg;
     geometry_msgs::Point32 pavPoint;
     pointCloud_msg.header.stamp = ros::Time::now();
     pointCloud_msg.header.frame_id = "map";
+    //todo spravit okraje chodnika ako triedu, kde bude metoda na vypocet sklonu ciary a detekcie nevalidnych ciar
+    std::queue<std::vector<LineStructure> > leftEdge;
+    std::queue<std::vector<LineStructure> > rightEdge;
 
     Mat imageResult;		//Create Matrix to store processed image
 
@@ -67,6 +71,8 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     int leftPoint = 0;
     int rightPoint = 0;
     int pavementCenter = 0;
+    sidewalkEdges->left.clearEdge();
+    sidewalkEdges->right.clearEdge();
     //END edge detection variables
 
     //frame segmentation
@@ -102,7 +108,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     pavFragmentC.cm.left.start.x = pavFragmentC.cm.left.end.x;
     pavFragmentC.cm.right.start.x = pavFragmentC.cm.right.end.x;
     //putPavementFragmentIntoCloud(&pointCloud_msg, &pavFragmentC);
-
+//todo put pavement edge points into vector and save up to 10 frames of old edges
     int edge_cursor = 0;
     int edge_increment = 1;
     int sideOffset = (params.edge_side_offset_promile*imageResult.cols)/1000;
@@ -116,27 +122,36 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
         edge_cursor = edge_cursor + pow(edge_increment*params.edge_points_dist, -0.5)*200;
         lineStart = lineEnd;
         lineEnd = Point(getLeftPavementPoint(imageResult, -params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor, pavementCenter, params.edge_side_offset_promile), -params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor);
+        sidewalkEdges->left.new_line();
+        sidewalkEdges->left.getEdgeRaw()->at(sidewalkEdges->left.getEdgeRaw()->size() - 1).start = lineStart;
+        sidewalkEdges->left.getEdgeRaw()->at(sidewalkEdges->left.getEdgeRaw()->size() - 1).end = lineEnd;
+
         if (!isOpeningLeft(lineStart.x, lineEnd.x, params.sideOffest))
         {
-            lineEnd.x += sideOffset;
-            lineEnd.y += sideOffset;
+            //todo reeble offset
+            //lineEnd.x += sideOffset;
+            //lineEnd.y += sideOffset;
             if (!notPavement(lineStart.x, lineEnd.x, pavementCenter, sideOffset))
             {
-                line(imageResult, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
-                line(*imageOrig, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+                //line(imageResult, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+                //line(*imageOrig, lineStart, lineEnd, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
             }
         }
         cv::circle(*imageOrig, lineStart, EDGE_MARKER_POINT_RADIUS, Scalar(0, 0, 255), EDGE_MARKER_POINT_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
         lineStartRight = lineEndRight;
         lineEndRight = Point(getRightPavementPoint(imageResult, -params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor, pavementCenter, params.edge_side_offset_promile), -params.edge_start_offset + imageOrig->rows - params.edge_points_dist - edge_cursor);
+        sidewalkEdges->right.new_line();
+        sidewalkEdges->right.getEdgeRaw()->at(sidewalkEdges->right.getEdgeRaw()->size() - 1).start = lineStartRight;
+        sidewalkEdges->right.getEdgeRaw()->at(sidewalkEdges->right.getEdgeRaw()->size() - 1).end = lineEndRight;
         if (!isOpeningRight(imageResult.cols, lineStartRight.x, lineEndRight.x, params.sideOffest))
         {
-            lineEndRight.x -= sideOffset;
-            lineEndRight.y += sideOffset;
+            //todo reeble offset
+            //lineEndRight.x -= sideOffset;
+            //lineEndRight.y += sideOffset;
             if (!notPavement(lineStart.x, lineEnd.x, pavementCenter, sideOffset))
             {
-                line(imageResult, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
-                line(*imageOrig, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+                //line(imageResult, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
+                //line(*imageOrig, lineStartRight, lineEndRight, Scalar(0, 255, 0), params.edge_marker_width, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
             }
         }
         cv::circle(*imageOrig, lineStartRight, EDGE_MARKER_POINT_RADIUS, Scalar(0, 0, 255), EDGE_MARKER_POINT_WIDTH, EDGE_MARKER_TYPE, EDGE_MARKER_SHIFT);
@@ -149,7 +164,12 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
         pavFragmentC.pix.right.end = lineEndRight;
         //putPavementFragmentIntoCloud(&pointCloud_msg, &pavFragmentC);
     }
-
+#ifdef DEBUG
+    sidewalkEdges->left.drawAllEdges(imageOrig, &params);
+    sidewalkEdges->right.drawAllEdges(imageOrig, &params);
+    sidewalkEdges->left.drawAllEdges(&imageResult, &params);
+    sidewalkEdges->right.drawAllEdges(&imageResult, &params);
+#endif
     *imageResultOut = imageResult;
 
     return pointCloud_msg;
@@ -229,3 +249,5 @@ bool notPavement(int startPoint, int endPoint, int pavementCenter, int sideOffse
     }
     return notPavement;
 }
+
+//todo function which determines which edges are valid in consideration with old frames

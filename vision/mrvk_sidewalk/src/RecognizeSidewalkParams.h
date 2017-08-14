@@ -10,6 +10,7 @@ private:
 public:
     int ros_parameter = 0;
     std::string image_topic = "/my_kinect/hd/image_color";
+    std::string depth_image_topic = "/kinect2/qhd/image_depth_rect";
     int spinFreq = 20;
 
     int sideOffest = 1;

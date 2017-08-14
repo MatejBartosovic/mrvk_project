@@ -1,3 +1,6 @@
+#ifndef PROJECT_RECOGNIZESIDEWALK_H
+#define PROJECT_RECOGNIZESIDEWALK_H
+
 //ros
 #include <ros/ros.h>
 
@@ -35,11 +38,15 @@
 #include "sensor_msgs/Image.h"
 
 #include "../RecognizeSidewalkParams.h"
+#include "../recognize_sidewalk/SidewalkEdge.h"
 
-sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams params);
+sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams params, SidewalkEdges *sidewalkEdges);
+//todo pass params as pointer to function
 int getLeftPavementPoint(cv::Mat image, int line, int pavementCenter, int edge_side_offset_promile);
 int getRightPavementPoint(cv::Mat image, int line, int pavementCenter, int edge_side_offset_promile);
 int getPavementCenter(int leftPoint, int rightPoint, int pavementCenterLast);
 bool isOpeningLeft(int startPoint, int endPoint, int sideOffset);
 bool isOpeningRight(int imgCols, int startPoint, int endPoint, int sideOffset);
 bool notPavement(int startPoint, int endPoint, int pavementCenter, int sideOffset);
+
+#endif //PROJECT_RECOGNIZESIDEWALK_H
