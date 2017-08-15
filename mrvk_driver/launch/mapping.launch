@@ -16,7 +16,9 @@
 	</include>
 
 	<!--run hokuyo node-->
-	<node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" />
+	<include file="$(find mrvk_laser_filters)/launch/hokuyo_filter.launch"/>
+
+	<!--run adis node-->
 	<include file="$(find adis16350)/launch/adis_driver.launch" if="$(arg use_imu)"/>
 
 	<!--run robot pose ekf node-->
@@ -33,7 +35,7 @@
 
 	<!--run gmapping node-->
 	<node name="gmapping" pkg="gmapping" type="slam_gmapping" if="$(arg use_gmapping)">
-
+	  <remap from="/scan" to="/scan_filtered"/>
 	  <param name="base_frame" value="base_link"/> 
 	  <param name="map_frame" value="map"/>
 	  <param name="odom_frame" value="odom"/>
