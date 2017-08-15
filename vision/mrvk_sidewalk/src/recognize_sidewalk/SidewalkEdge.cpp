@@ -68,18 +68,21 @@ void SidewalkEdge::validateEdge(RecognizeSidewalkParams *params, int pavementCen
     int sideOffset = (params->edge_side_offset_promile*newImg.cols)/1000;
     *getEdgeValid() = *getEdgeRaw();
     getSidewalkArea(&newImg, params);
+    slopeValidate(params);
+
     validPoints.clear();
     for (int i = 0; i < getEdgeRaw()->size(); i++)
     {
         getEdgeValid()->at(i).valid = false;
-        if (!glitchedFrame())
+        if (!glitchedFrame()&&!glitchedFrameSlope())
         {
             if (!isOpening(newImg.cols, getEdgeRaw()->at(i).start.x, getEdgeRaw()->at(i).end.x, params->sideOffest))
             {
                 if (!notPavement(getEdgeRaw()->at(i).start.x, getEdgeRaw()->at(i).end.x, pavementCenter, sideOffset))
                 {
                     getEdgeValid()->at(i).valid = true;
-                    validPoints.push_back(getEdgeValid()->at(i).start);
+                    //validPoints.push_back(getEdgeValid()->at(i).start);
+                    fillLineWithPoints(&validPoints, getEdgeValid()->at(i).myLineEquation, getEdgeValid()->at(i).start, getEdgeValid()->at(i).end);
                 }
             }
         }
@@ -89,6 +92,92 @@ void SidewalkEdge::validateEdge(RecognizeSidewalkParams *params, int pavementCen
         }
     }
 
+}
+void SidewalkEdge::fillLineWithPoints(std::vector<cv::Point> *outFilledPointsEdge, lineEquation lineEquationC, cv::Point lineCmStart, cv::Point lineCmEnd)
+{
+    //point cloud
+    cv::Point pavPoint;
+    pavPoint.x = lineCmStart.x;
+    pavPoint.y = lineCmStart.y;
+    pointCm pointCm1;
+    pointCm1.x = lineCmStart.x;
+    pointCm1.y = lineCmStart.y;
+    pointCm1.z = DEFAULT_PAV_Z;
+
+    double lineDirection = 1.0;
+    if (lineCmStart.x > lineCmEnd.x)
+    {
+        lineDirection = -1.0;
+    }
+
+    while ( (fabs(pointCm1.y - lineCmEnd.y) > m2cm(PAV_LINE_RESOLUTION))||(fabs(pointCm1.x - lineCmEnd.x) > m2cm(PAV_LINE_RESOLUTION)) )
+    {
+        if (lineCmEnd.x == lineCmStart.x)
+        {
+            pointCm1.x = lineCmEnd.x;
+            pointCm1.y = pointCm1.y - m2cm(PAV_LINE_RESOLUTION);
+        }
+        else
+        {
+            if ((B_KVADR*B_KVADR - 4.0*A_KVADR*C_KVADR) == 0)
+            {
+                pointCm1.x = -B_KVADR/2/A_KVADR;
+                pointCm1.y = pointCm1.x*lineEquationC.slope + lineEquationC.yIntercept;
+                pavPoint.x = cm2m(pointCm1.x);
+                pavPoint.y = cm2m(pointCm1.y);
+                outFilledPointsEdge->push_back(pavPoint);
+                if (outFilledPointsEdge->size() > MAX_NUM_POINTS_POINTCLOUD)
+                {
+                    ROS_ERROR("Point count overload!");
+                    break;
+                }
+            }
+            else if ((B_KVADR*B_KVADR - 4.0*A_KVADR*C_KVADR) > 0)
+            {
+                pointCm1.x = (-B_KVADR + lineDirection*sqrt(B_KVADR*B_KVADR - 4.0*A_KVADR*C_KVADR))/2/A_KVADR;
+
+                pointCm1.y = pointCm1.x*lineEquationC.slope + lineEquationC.yIntercept;
+                pavPoint.x = cm2m(pointCm1.x);
+                pavPoint.y = cm2m(pointCm1.y);
+                outFilledPointsEdge->push_back(pavPoint);
+                if (outFilledPointsEdge->size() > MAX_NUM_POINTS_POINTCLOUD)
+                {
+                    ROS_ERROR("Point count overload!");
+                    break;
+                }
+            }
+            else
+            {
+                ROS_ERROR("Couldn't put line point to cloud!");
+                break;
+            }
+        }
+    }
+}
+void SidewalkEdge::computeSlopeMedian(RecognizeSidewalkParams *params)
+{
+    int maxNumMedianSlope = 10;
+
+    std::vector<double> slopeVector;
+    for (int i = 0; i < getEdgeValid()->size(); i++)
+    {
+        slopeVector.push_back(getEdgeValid()->at(i).myLineEquation.slope);
+    }
+    medianSlopeFrame = doubleMedian(slopeVector);
+}
+void SidewalkEdge::slopeValidate(RecognizeSidewalkParams *params)
+{
+    int maxSlopeDeviation = 10;
+    computeSlopeMedian(params);
+    if (fabs(doubleMedian(medianSlope) - medianSlopeFrame) < doubleMedian(medianSlope)/maxSlopeDeviation)
+    {
+        medianSlope.push_back(medianSlopeFrame);
+    }
+    if (medianSlope.size() > 10)
+    {
+        medianSlope.erase(medianSlope.begin());
+    }
+    //TODO magic
 }
 void SidewalkEdge::fixEdge()
 {
@@ -168,6 +257,10 @@ bool SidewalkEdge::glitchedFrame()
 {
     return glitchedFrameVal;
 }
+bool SidewalkEdge::glitchedFrameSlope()
+{
+    return glitchedFrameSlopeVal;
+}
 void SidewalkEdge::detectFrameGlitch(RecognizeSidewalkParams *params)
 {
     /*if (glitchedFrameVal)
@@ -206,7 +299,6 @@ void SidewalkEdge::getSidewalkArea(cv::Mat *img, RecognizeSidewalkParams *params
         sidewalkArea.erase(sidewalkArea.begin());
     }
 }
-
 
 void SidewalkEdge::drawEdgeRaw(cv::Mat *img, RecognizeSidewalkParams *params)
 {
@@ -293,4 +385,4 @@ bool notPavement(int startPoint, int endPoint, int pavementCenter, int sideOffse
     return notPavement;
 }
 
-//todo zhustit siet detekovanych bodov (pri ciarach bliziacich sa vodorovnym sa stratia ciary kvoli nedostatky bodov) ak sa dorobi detekcia vodorovnych ciar, tak sa da pocet detekovanych bodov do povodneho stavu
+//TODO zhustit siet detekovanych bodov (pri ciarach bliziacich sa vodorovnym sa stratia ciary kvoli nedostatky bodov) ak sa dorobi detekcia vodorovnych ciar, tak sa da pocet detekovanych bodov do povodneho stavu

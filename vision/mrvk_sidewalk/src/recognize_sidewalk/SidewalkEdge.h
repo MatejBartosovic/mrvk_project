@@ -48,8 +48,11 @@ private:
     cv::Mat oldImg;
     cv::Mat newImg;
     std::vector<int> sidewalkArea;
+    std::vector<double> medianSlope;
+    double medianSlopeFrame = 0;
     int sidewalkAreaFrame;
     bool glitchedFrameVal = false;
+    bool glitchedFrameSlopeVal = false;
     //TODO function which determines which edges are valid in consideration with old frames
     //todo add line queue for line which replaces invalid lines - display with diferent color (yellow)
     //todo test contours for edge
@@ -60,6 +63,11 @@ private:
     //todo ak viacej framov za sebou daný úsek okraja nebude detekovaný správne, tak sa nezobrazí ani na Fix okraji.
     //todo nastava problem ze zapis okraja po ciarach nie je vhodny pre spracovanie cez opticky tok
     //todo spraviť kalibráciu optického toku (prahových hodnôt kedy brať detekovaný bod ako zlý) pre každý detekovaný riadok samostatne, z nejakej mediánovej hodnoty sa vytvorí pre každý konštanta prahu. (spraviť na to funkciu, čo to spraví automaticky).
+    //todo Do vysledneho vektora bodov, by mali ist uz iba novo detekovane body, aby sme nezakreslovali stare body viac krat
+
+    //TODO dolezite - z rovnic priamok spravime median a potom tie ciary, ktore budu vybiehat z medianu nahradime ciarou s rovnicou priamky median
+    //TODO dolezite - zahadzovat framy, ktore maju median rovnic priamok iny ako predosle framy
+
 
     //todo reenable offset - do it after all validation and fixation and put it into new vector
 public:
@@ -67,6 +75,8 @@ public:
     SidewalkEdge();
     ~SidewalkEdge();
     void validateEdge(RecognizeSidewalkParams *params, int pavementCenter);
+    void fillLineWithPoints(std::vector<cv::Point> *outFilledPointsEdge, lineEquation lineEquationC, cv::Point lineCmStart, cv::Point lineCmEnd);
+    void rawLinesToPoints();
     void fixEdge();
     void computeLineEquation();
     int computeOpticalFlow(cv::Mat *gray, cv::Mat *prevGray, std::vector<cv::Point2f> *points, std::vector<cv::Point2f> *prevPoints);
@@ -76,14 +86,16 @@ public:
     bool isOpening(int imgCols, int startPoint, int endPoint, int sideOffset);
     void getSidewalkArea(cv::Mat *img, RecognizeSidewalkParams *params);
     bool glitchedFrame();
+    bool glitchedFrameSlope();
     void detectFrameGlitch(RecognizeSidewalkParams *params);
+    void computeSlopeMedian(RecognizeSidewalkParams *params);
+    void slopeValidate(RecognizeSidewalkParams *params);
 
     void drawEdgeRaw(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawEdgeValid(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawEdgeFix(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawAllEdges(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawDetectedPoints(cv::Mat *img, RecognizeSidewalkParams *params);
-    void rawLinesToPoints();
 
     std::vector<LineStructure> *getEdgeRaw();
     std::vector<LineStructure> *getEdgeValid();
