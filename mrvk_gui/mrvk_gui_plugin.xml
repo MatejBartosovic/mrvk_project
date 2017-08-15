@@ -1,0 +1,19 @@
+<library path="lib/libmrvk_gui">
+    <class name="mrvk_gui/MrvkGuiPlugin" type="mrvk_gui::MrvkGuiPlugin" base_class_type="rqt_gui_cpp::Plugin">
+        <description>
+            An C++ GUI Mrvk plugin.
+        </description>
+        <qtgui>
+            <group>
+                <label>Robot</label>
+                <icon type="theme">folder</icon>
+            </group>
+            <group>
+                <label>Mrvk</label>
+                <icon type="theme">folder</icon>
+            </group>
+            <icon type="file">pictures/Mrvk.jpg</icon>
+            <statustip>Great user interface to provide real value.</statustip>
+        </qtgui>
+    </class>
+</library>
