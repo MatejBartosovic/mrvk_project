@@ -9,10 +9,10 @@
 #include <ui_MainWidget.h>
 
 namespace mrvk_gui{
-    class MrvkGuiPlugin : public rqt_gui_cpp::Plugin
+    class MrvkGui : public rqt_gui_cpp::Plugin
         {
             Q_OBJECT
-            public:MrvkGuiPlugin();
+            public:MrvkGui();
             virtual void initPlugin(qt_gui_cpp::PluginContext& context);
             virtual void shutdownPlugin();
             virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings, qt_gui_cpp::Settings& instance_settings) const;

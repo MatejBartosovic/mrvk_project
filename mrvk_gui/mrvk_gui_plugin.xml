@@ -1,5 +1,5 @@
 <library path="lib/libmrvk_gui">
-    <class name="mrvk_gui/MrvkGuiPlugin" type="mrvk_gui::MrvkGuiPlugin" base_class_type="rqt_gui_cpp::Plugin">
+    <class name="mrvk_gui/MrvkGui" type="mrvk_gui::MrvkGui" base_class_type="rqt_gui_cpp::Plugin">
         <description>
             An C++ GUI Mrvk plugin.
         </description>
