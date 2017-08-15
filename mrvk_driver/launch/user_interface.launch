@@ -8,6 +8,6 @@
 	<node name="joy_node" pkg="joy" type="joy_node">
 		<param name="dev" type="string" value="$(arg joy)"/>
 	</node>
-	<node name="rviz" pkg="rviz" type="rviz"/>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_2dnav)/rviz/navigation_osm.rviz"/>
 	
 </launch>
