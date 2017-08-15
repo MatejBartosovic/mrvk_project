@@ -110,12 +110,12 @@ public:
 
         //init subscribers
         sub = n.subscribe(params.image_topic, 1, &Sidewalk::kinectImageCallback,this);
-        subDepth = n.subscribe(params.depth_image_topic, 1, &Sidewalk::kinectDepthImageCallback,this);
+//        subDepth = n.subscribe(params.depth_image_topic, 1, &Sidewalk::kinectDepthImageCallback,this);
 
         //init publishers
         pub_img = n.advertise<sensor_msgs::Image>("video_image_topic", 1);//output image publisher
         pub_img_orig = n.advertise<sensor_msgs::Image>("video_image_orig_topic", 1);//output image publisher
-        octomap_pub = n.advertise<nav_msgs::OccupancyGrid>("pavement_map", 1);//map occupancy publisher
+ //       octomap_pub = n.advertise<nav_msgs::OccupancyGrid>("pavement_map", 1);//map occupancy publisher
         pub_pav_pointCloud = n.advertise<sensor_msgs::PointCloud2> ("pav_pointCloud", 1);//publisher for pavement point cloud
 
         //point cloud header
@@ -148,9 +148,6 @@ void Sidewalk::sidewalkPublish()
     img_bridge.toImageMsg(img_msg_orig);
     pub_img_orig.publish(img_msg_orig);//publish original image
 
-    //publish point cloud
-    //pointCloud_msg.header.stamp = ros::Time::now();
-    //pub_pav_pointCloud.publish(pointCloud_msg);
 }
 
 void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
