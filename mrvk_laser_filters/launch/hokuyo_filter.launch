@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find mrvk_laser_filters)/launch/laser_filter.launch"/>
+  <node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node"/>
+</launch>

@@ -95,8 +95,8 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
     odom.child_frame_id = child_frame_id;
 
-    odom.pose.pose.position.x = easting - easting_init;
-    odom.pose.pose.position.y = northing - northing_init;
+    odom.pose.pose.position.y = easting - easting_init;
+    odom.pose.pose.position.x = northing - northing_init;
     odom.pose.pose.position.z = 0;
     
     odom.pose.pose.orientation.x = 0;
