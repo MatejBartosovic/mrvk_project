@@ -8,7 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
-find_package(Qt4 COMPONENTS QtCore QtGUi REQUIRED)
+#find_package(Qt4 COMPONENTS QtCore QtGUi REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 
 set(${PROJECT_NAME}_cpp_HDRS
         include/mrvk_gui/MrvkGuiPlugin.h
@@ -21,8 +22,10 @@ set(${PROJECT_NAME}_cpp_UIS
         uis/MainWidget.ui
         )
 
-qt4_wrap_cpp(${PROJECT_NAME}_cpp_MOCS ${${PROJECT_NAME}_cpp_HDRS})
-qt4_wrap_ui(${PROJECT_NAME}_cpp_UIS_H ${${PROJECT_NAME}_cpp_UIS})
+#qt4_wrap_cpp(${PROJECT_NAME}_cpp_MOCS ${${PROJECT_NAME}_cpp_HDRS})
+#qt4_wrap_ui(${PROJECT_NAME}_cpp_UIS_H ${${PROJECT_NAME}_cpp_UIS})
+qt5_wrap_cpp(${PROJECT_NAME}_cpp_MOCS ${${PROJECT_NAME}_cpp_HDRS})
+qt5_wrap_ui(${PROJECT_NAME}_cpp_UIS_H ${${PROJECT_NAME}_cpp_UIS})
 
 catkin_package(
    INCLUDE_DIRS include
@@ -36,7 +39,7 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   include
 )
-include(${QT_USE_FILE})
+#include(${QT_USE_FILE})
 
 add_library(${PROJECT_NAME}
         ${${PROJECT_NAME}_cpp_HDRS}
@@ -49,6 +52,7 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
-        ${QT_QTCORE_LIBRARY}
-        ${QT_QTGUI_LIBRARY}
+        #${QT_QTCORE_LIBRARY}
+        #${QT_QTGUI_LIBRARY}
+        Qt5::Widgets
         )
