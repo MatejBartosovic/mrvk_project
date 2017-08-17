@@ -41,6 +41,8 @@
 #include <tf/transform_listener.h>
 #include <ros/ros.h>
 #include <costmap_2d/costmap_layer.h>
+#include <std_srvs/Trigger.h>
+
 
 namespace wait_and_clear_costmap_recovery{
   /**
@@ -77,6 +79,9 @@ namespace wait_and_clear_costmap_recovery{
       void clearMap(boost::shared_ptr<costmap_2d::CostmapLayer> costmap, double pose_x, double pose_y);
       bool checkForObstacle(costmap_2d::Costmap2DROS* costmap);
       bool checkForObstacles(boost::shared_ptr<costmap_2d::CostmapLayer> costmap, double pose_x, double pose_y);
+      bool runBehavior(std_srvs::Trigger::Request  &req, std_srvs::Trigger::Response &res);
+
+      ros::ServiceServer runBehaviorService;
       costmap_2d::Costmap2DROS* global_costmap_, *local_costmap_;
       std::string name_;
       tf::TransformListener* tf_;
