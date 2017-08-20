@@ -45,4 +45,4 @@ include_directories(
 
 add_executable(kv01_actionserver_point src/kv01_actionserver_point.cpp)
 target_link_libraries(kv01_actionserver_point ${catkin_LIBRARIES} ${kv01_actionserver_LIBRARIES} ${kv01_driver_LIBRARIES})
-add_dependencies(kv01_actionserver_point kv01_driver_generate_messages_cpp)
+add_dependencies(kv01_actionserver_point ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
