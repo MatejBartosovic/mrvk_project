@@ -22,6 +22,8 @@ int iLowS = 0;
 int iHighS = 162;
 int iLowV = 36;
 int iHighV = 255;
+cluster123 clust_sample_main;
+bool first_time = true;
 
 
 cv::Mat picture_segmentation_frame(cv::Mat frame)
@@ -301,7 +303,7 @@ cluster123 extractRegion123(cv::Mat unregioned_image, cv::Mat mask_image)
 	//cv::Point3d sum_pix;
 	int pixel_cnt = 0;
 	//double c1,c2,c3;
-	int i,j;
+	int i,j,k,l;
 
 
 	for (i=2*(unregioned_image.rows)/3; i < (unregioned_image.rows);i++)
@@ -326,10 +328,125 @@ cluster123 extractRegion123(cv::Mat unregioned_image, cv::Mat mask_image)
 	}
 	clust.point = sum_pix/pixel_cnt;
 	clust.mass = pixel_cnt;
+	cv::Mat meanMatClust = (Mat::zeros(3, 3, CV_64F));
+	cv::Mat meanMatPixel = (Mat::zeros(3, 3, CV_64F));
+	//cv::Mat meanMatPixel = (Mat::zeros(3, 3, CV_64F));
+
+	for (i=0;i<3;i++)
+	{
+		for (j=0;j<3;j++)
+		{
+			meanMatClust.at<double>(i,j)=clust.point[i]*clust.point[j];
+		}
+	}
+
+	//std::cout << "Mean vector: \n" << clust.point <<" \n";
+	//std::cout << "Mean matrix: \n" << meanMatClust <<" \n";
+
+
+	for (i=2*(unregioned_image.rows)/3; i < (unregioned_image.rows);i++)
+		{
+			for (j=unregioned_image.cols/3; j < 2*(unregioned_image.cols)/3;j++)
+			{
+				if (!((mask_image.at<cv::Vec3b>(i,j)[0]==1)&&
+						(mask_image.at<cv::Vec3b>(i,j)[1]==1) &&
+						(mask_image.at<cv::Vec3b>(i,j)[2]==1 )))
+				{
+					for (k=0;k<3;k++)
+					{
+						for (l=0;l<3;l++)
+						{
+							meanMatPixel.at<double>(k,l) = unregioned_image.at<Vec3d>(i,j)[k] * unregioned_image.at<Vec3d>(i,j)[l];
+
+							//std::cout << "Unregioned image at i,j: \n" << unregioned_image.at<Vec3d>(i,j) <<" \n";
+
+						}
+					}
+					//std::cout << "Mean matrix pixel: \n" << meanMatPixel <<" \n";
+					clust.covar += meanMatPixel - meanMatClust ;
+					//std::cout << "Mean matrix clust: \n" << clust.covar <<" \n";
+
+				}
+					//fill region
+				//unregioned_image.at<cv::Vec3b>(i,j)=cv::Point3_<unsigned char>(0,0,0);
+			}
+		}
+	clust.covar/=clust.mass;
+	//std::cout << "Covariance matrix is: \n" << clust.covar <<" mass is>:"<< clust.mass << " \n";
 	//std::cout << "extractRegion Cluster point is: "<< clust.point << " mass: " << clust.mass  << std::endl;
 	return clust;
 }
 
+double calcClusterDistance123(cluster123 clustLearnt, cluster123 clustTraining)
+{
+	//std::cout << "Learnt mean vector:\n " << clustLearnt.point <<"\n";
+	//std::cout << "Training mean vector:\n " << clustTraining.point <<"\n";
+
+	//std::cout << "Learnt mass:\n " << clustLearnt.mass <<"\n";
+	//std::cout << "Training mass:\n " << clustTraining.mass <<"\n";
+
+	//std::cout << "Learnt covariance:\n " << clustLearnt.covar <<"\n";
+	//std::cout << "Training covariance:\n " << clustTraining.covar <<"\n";
+
+
+	cv::Mat matInvCovar = clustLearnt.covar.clone();
+	matInvCovar +=  clustTraining.covar;
+
+	cv::Vec3d meanDifferen = clustLearnt.point;
+	meanDifferen -= clustTraining.point;
+
+	Vec3d outDiff;
+	double outputValue;
+
+	//std::cout << "Covar L+T :\n " << matInvCovar<<"\n";
+
+
+	cv::invert(matInvCovar , matInvCovar );
+	//std::cout << "Inverted covar L+T :\n " << matInvCovar<<"\n";
+	//std::cout << "MeanDifference :\n " << meanDifferen <<"\n";
+	int i,j;
+
+	for (i=0;i<3;i++)
+	{
+		for (j=0;j<3;j++)
+		{
+			outDiff[i] += meanDifferen[j]*matInvCovar.at<double>(j,i);
+			//cout << "Sucin meanDiff a invCovar \n" << outDiff<< "\n";
+
+		}
+	}
+
+	for (i=0;i<3;i++)
+		{
+			outputValue += outDiff[i]*meanDifferen[i];
+		}
+	cout << "Calculated cluster difference is: " << outputValue << "\n";
+	return outputValue ;
+}
+
+double calcPointDistance123(cluster123 clustLearnt, cluster123 clustTraining)
+{
+	return ((clustTraining.point[0]-clustLearnt.point[0])+
+			(clustTraining.point[1]-clustLearnt.point[1])+
+			(clustTraining.point[1]-clustLearnt.point[2])
+	)/3.0;
+}
+
+
+cluster123 updateModel123(cluster123 clustLearnt, cluster123 clustTraining)
+{
+	//std::cout << "Mass L, mass T: " << clustLearnt.mass << " " << clustTraining.mass << "\n";
+	//std::cout << "Mean L, Mean T: \n" << clustLearnt.point << "\n" << clustTraining.point << "\n";
+	cluster123 clustUpdated;
+	clustUpdated.point = ((clustLearnt.mass*clustLearnt.point )+ (clustTraining.mass*clustTraining.point))/(clustLearnt.mass +clustTraining.mass);
+	clustUpdated.mass = (clustLearnt.mass + clustTraining.mass)/2;
+	clustUpdated.covar = ((clustLearnt.mass*clustLearnt.covar) + (clustTraining.mass*clustTraining.covar))/(clustLearnt.mass + clustTraining.mass);
+	std::cout << "Updated point: " << clustUpdated.point << "\n";
+	std::cout << "Updated mass: " << clustUpdated.mass<< "\n";
+	std::cout << "Updated covar: " << clustUpdated.covar << "\n";
+
+	return clustUpdated;
+}
 
 
 
@@ -352,8 +469,28 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 	//std::cout<<regionX<<" x "<<regionY<<" Data: "<< imHSV.at<cv::Vec3b>(regionX,regionY)<<endl;
 
 	//region selection
-	clust_sample= extractRegion123 (image123,frame);
+	//region selection
+	if (first_time)
+		{
+		first_time = false;
+		clust_sample_main= extractRegion123 (image123,frame);
+		clust_sample = clust_sample_main;
+		}
+	else
+	{
+		clust_sample= extractRegion123 (image123,frame);
+	}
 
+	double clusterDistance = calcClusterDistance123(clust_sample_main,clust_sample);
+	double clusterPointDistance = calcPointDistance123(clust_sample_main,clust_sample);
+
+	if (std::abs(clusterPointDistance)> 0.015)
+	{
+		//clust_sample = clust_sample_main;
+		std::cout << "                      ---------- ZLY MODEL ------------\n";
+	}
+	else clust_sample_main = clust_sample; // - Nahrad jemnym updatom nie replacom
+	
 	double iLowC1 = setRange123(clust_sample.point[0],-rangeH123rangeC1,true);
 	double iHighC1 = setRange123(clust_sample.point[0],+rangeH123rangeC1,true);
 	double iLowC2 = setRange123(clust_sample.point[1],-rangeH123rangeC2,false);
