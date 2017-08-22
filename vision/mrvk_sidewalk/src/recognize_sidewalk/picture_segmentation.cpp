@@ -523,7 +523,7 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size, dilate_size)) );
 	
 	//morphological closing (fill small holes in the foreground)
-	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size*3, dilate_size*3)) );
+	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size*5, dilate_size*5)) );
 	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
 	
 	//contours
@@ -547,7 +547,7 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 
 	/// Draw contours*/
 	  Mat imageContFiltered = Mat::zeros( imageCont.size(), CV_8UC3 );
-	for( int i = 0; i< contours.size(); i++ )
+	/*for( int i = 0; i< contours.size(); i++ )
 	{
 		if (radius[i]>180)
 		{
@@ -556,6 +556,19 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 			 floodFill(imageContFiltered, center[i], Scalar(255)); // unsafe function - please detect hranice chodnika podla krajnych kontur, nie color fill
 		}
 	}
+	*/
+	  for (i=0; i< imageThresh.rows;i++)
+	  		{
+	  			for (j=0;j< imageThresh.cols;j++)
+	  			{
+	  				if (imageThresh.at<uchar>(i,j) > 1  )
+	  				{
+	  					imageContFiltered.at<cv::Vec3b>(i,j,0)=255;
+	  					//im_contFin.at<uchar>(i,j,1)=255;
+	  					//im_contFin.at<uchar>(i,j,2)=255;
+	  				}
+	  			}
+	  		}
 		
 
     return imageContFiltered;
