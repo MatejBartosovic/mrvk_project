@@ -3,13 +3,11 @@
 //
 
 #include "mrvk_gui/MrvkGuiPlugin.h"
-
 #include <pluginlib/class_list_macros.h>
-#include <QStringList>
 
 namespace mrvk_gui {
 
-    MrvkGui::MrvkGui() : rqt_gui_cpp::Plugin(), widget_(0)
+    MrvkGui::MrvkGui() : rqt_gui_cpp::Plugin(), mainWidget(0)
     {
 
     }
@@ -19,10 +17,16 @@ namespace mrvk_gui {
         // access standalone command line arguments
         QStringList argv = context.argv();
 
+        //setup mainWidget
+        mainWidget = new QWidget();
+        mainUi.setupUi(mainWidget);
 
-        widget_ = new QWidget();
-        ui.setupUi(widget_);
-        context.addWidget(widget_);
+        //setup diagnosticsWidget
+        diagnosticsWidget.setupUi(mainUi.tabWidget->widget(0));
+
+        //add to cintext
+        context.addWidget(mainWidget);
+
     }
 
     void MrvkGui::shutdownPlugin()

@@ -12,7 +12,7 @@
                 <label>Mrvk</label>
                 <icon type="theme">folder</icon>
             </group>
-            <icon type="file">pictures/Mrvk.jpg</icon>
+            <icon type="file">Resources/Mrvk.jpg</icon>
             <statustip>Great user interface to provide real value.</statustip>
         </qtgui>
     </class>
