@@ -8,6 +8,8 @@
 cv::Mat picture_segmentation_frame(cv::Mat frame);
 cv::Mat picture_segmentation_frame_HSV(cv::Mat frame);
 cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame);
+cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid);
+
 
 cv::Vec3b computeAdaptationKernels(cv::Mat imageHSV);
 cv::Mat maskExposure(cv::Mat unmasked_image);
