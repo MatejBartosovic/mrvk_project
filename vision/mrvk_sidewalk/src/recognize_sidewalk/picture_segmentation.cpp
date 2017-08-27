@@ -22,6 +22,8 @@ int iLowS = 0;
 int iHighS = 162;
 int iLowV = 36;
 int iHighV = 255;
+cluster123 clust_sample_main;
+bool first_time = true;
 
 
 cv::Mat picture_segmentation_frame(cv::Mat frame)
@@ -301,7 +303,7 @@ cluster123 extractRegion123(cv::Mat unregioned_image, cv::Mat mask_image)
 	//cv::Point3d sum_pix;
 	int pixel_cnt = 0;
 	//double c1,c2,c3;
-	int i,j;
+	int i,j,k,l;
 
 
 	for (i=2*(unregioned_image.rows)/3; i < (unregioned_image.rows);i++)
@@ -326,10 +328,128 @@ cluster123 extractRegion123(cv::Mat unregioned_image, cv::Mat mask_image)
 	}
 	clust.point = sum_pix/pixel_cnt;
 	clust.mass = pixel_cnt;
+	cv::Mat meanMatClust = (Mat::zeros(3, 3, CV_64F));
+	cv::Mat meanMatPixel = (Mat::zeros(3, 3, CV_64F));
+	//cv::Mat meanMatPixel = (Mat::zeros(3, 3, CV_64F));
+
+	for (i=0;i<3;i++)
+	{
+		for (j=0;j<3;j++)
+		{
+			meanMatClust.at<double>(i,j)=clust.point[i]*clust.point[j];
+		}
+	}
+
+	//std::cout << "Mean vector: \n" << clust.point <<" \n";
+	//std::cout << "Mean matrix: \n" << meanMatClust <<" \n";
+
+
+	for (i=2*(unregioned_image.rows)/3; i < (unregioned_image.rows);i++)
+		{
+			for (j=unregioned_image.cols/3; j < 2*(unregioned_image.cols)/3;j++)
+			{
+				if (!((mask_image.at<cv::Vec3b>(i,j)[0]==1)&&
+						(mask_image.at<cv::Vec3b>(i,j)[1]==1) &&
+						(mask_image.at<cv::Vec3b>(i,j)[2]==1 )))
+				{
+					for (k=0;k<3;k++)
+					{
+						for (l=0;l<3;l++)
+						{
+							meanMatPixel.at<double>(k,l) = unregioned_image.at<Vec3d>(i,j)[k] * unregioned_image.at<Vec3d>(i,j)[l];
+
+							//std::cout << "Unregioned image at i,j: \n" << unregioned_image.at<Vec3d>(i,j) <<" \n";
+
+						}
+					}
+					//std::cout << "Mean matrix pixel: \n" << meanMatPixel <<" \n";
+					clust.covar += meanMatPixel - meanMatClust ;
+					//std::cout << "Mean matrix clust: \n" << clust.covar <<" \n";
+
+				}
+					//fill region
+				//unregioned_image.at<cv::Vec3b>(i,j)=cv::Point3_<unsigned char>(0,0,0);
+			}
+		}
+	clust.covar/=clust.mass;
+	clust.covar.at<double>(0,0) += 0.01 ;
+	clust.covar.at<double>(1,1) += 0.01 ;
+	clust.covar.at<double>(2,2) += 0.01 ;
+	//std::cout << "Covariance matrix is: \n" << clust.covar <<" mass is>:"<< clust.mass << " \n";
 	//std::cout << "extractRegion Cluster point is: "<< clust.point << " mass: " << clust.mass  << std::endl;
 	return clust;
 }
 
+double calcClusterDistance123(cluster123 clustLearnt, cluster123 clustTraining)
+{
+	//std::cout << "Learnt mean vector:\n " << clustLearnt.point <<"\n";
+	//std::cout << "Training mean vector:\n " << clustTraining.point <<"\n";
+
+	//std::cout << "Learnt mass:\n " << clustLearnt.mass <<"\n";
+	//std::cout << "Training mass:\n " << clustTraining.mass <<"\n";
+
+	//std::cout << "Learnt covariance:\n " << clustLearnt.covar <<"\n";
+	//std::cout << "Training covariance:\n " << clustTraining.covar <<"\n";
+
+
+	cv::Mat matInvCovar = clustLearnt.covar.clone();
+	matInvCovar +=  clustTraining.covar;
+
+	cv::Vec3d meanDifferen = clustLearnt.point;
+	meanDifferen -= clustTraining.point;
+
+	Vec3d outDiff;
+	double outputValue;
+
+	//std::cout << "Covar L+T :\n " << matInvCovar<<"\n";
+
+
+	cv::invert(matInvCovar , matInvCovar );
+	//std::cout << "Inverted covar L+T :\n " << matInvCovar<<"\n";
+	//std::cout << "MeanDifference :\n " << meanDifferen <<"\n";
+	int i,j;
+
+	for (i=0;i<3;i++)
+	{
+		for (j=0;j<3;j++)
+		{
+			outDiff[i] += meanDifferen[j]*matInvCovar.at<double>(j,i);
+			//cout << "Sucin meanDiff a invCovar \n" << outDiff<< "\n";
+
+		}
+	}
+
+	for (i=0;i<3;i++)
+		{
+			outputValue += outDiff[i]*meanDifferen[i];
+		}
+	cout << "Calculated cluster difference is: " << outputValue << "\n";
+	return outputValue ;
+}
+
+double calcPointDistance123(cluster123 clustLearnt, cluster123 clustTraining)
+{
+	return ((clustTraining.point[0]-clustLearnt.point[0])+
+			(clustTraining.point[1]-clustLearnt.point[1])+
+			(clustTraining.point[1]-clustLearnt.point[2])
+	)/3.0;
+}
+
+
+cluster123 updateModel123(cluster123 clustLearnt, cluster123 clustTraining)
+{
+	//std::cout << "Mass L, mass T: " << clustLearnt.mass << " " << clustTraining.mass << "\n";
+	//std::cout << "Mean L, Mean T: \n" << clustLearnt.point << "\n" << clustTraining.point << "\n";
+	cluster123 clustUpdated;
+	clustUpdated.point = ((clustLearnt.mass*clustLearnt.point )+ (clustTraining.mass*clustTraining.point))/(clustLearnt.mass +clustTraining.mass);
+	clustUpdated.mass = (clustLearnt.mass + clustTraining.mass)/2;
+	clustUpdated.covar = ((clustLearnt.mass*clustLearnt.covar) + (clustTraining.mass*clustTraining.covar))/(clustLearnt.mass + clustTraining.mass);
+	//std::cout << "Updated point: " << clustUpdated.point << "\n";
+	//std::cout << "Updated mass: " << clustUpdated.mass<< "\n";
+	//std::cout << "Updated covar: " << clustUpdated.covar << "\n";
+
+	return clustUpdated;
+}
 
 
 
@@ -352,8 +472,28 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 	//std::cout<<regionX<<" x "<<regionY<<" Data: "<< imHSV.at<cv::Vec3b>(regionX,regionY)<<endl;
 
 	//region selection
-	clust_sample= extractRegion123 (image123,frame);
+	//region selection
+	if (first_time)
+		{
+		first_time = false;
+		clust_sample_main= extractRegion123 (image123,frame);
+		clust_sample = clust_sample_main;
+		}
+	else
+	{
+		clust_sample= extractRegion123 (image123,frame);
+	}
 
+	double clusterDistance = calcClusterDistance123(clust_sample_main,clust_sample);
+	double clusterPointDistance = calcPointDistance123(clust_sample_main,clust_sample);
+
+	if (std::abs(clusterPointDistance)> 0.015)
+	{
+		//clust_sample = clust_sample_main;
+		std::cout << "                      ---------- ZLY MODEL ------------\n";
+	}
+	else clust_sample_main = clust_sample; // - Nahrad jemnym updatom nie replacom
+	
 	double iLowC1 = setRange123(clust_sample.point[0],-rangeH123rangeC1,true);
 	double iHighC1 = setRange123(clust_sample.point[0],+rangeH123rangeC1,true);
 	double iLowC2 = setRange123(clust_sample.point[1],-rangeH123rangeC2,false);
@@ -365,12 +505,28 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 	//cout<< "ilowH, iHighH, iLowS,iHighS:"<<iLowC1<<" "<<iHighC1<<" "<< iLowC2<<" "<<iHighC2<<" "<< iLowC3 <<" "<< iHighC3<<endl;
 	inRange(image123, Scalar(iLowC1, iLowC2, iLowC3), Scalar(iHighC1, iHighC2, iHighC3), imageThresh); //Threshold the image
 		
+	// Add Adams sidewalk lines
+	cv::Point3_<unsigned char> maskedPix = cv::Vec3b(1,1,1);
+	int i,j;
+	for (i=0; i< frame.rows;i++)
+		{
+			for (j=0;j< frame.cols;j++)
+			{
+				if (frame.at<cv::Vec3b>(i,j) == (cv::Vec3b)maskedPix  )
+				{
+					imageThresh.at<uchar>(i,j,0)=100;
+				}
+			}
+		}
+
+
+
 	//morphological opening (remove small objects from the foreground)
 	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
 	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size, dilate_size)) );
 	
 	//morphological closing (fill small holes in the foreground)
-	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size*3, dilate_size*3)) );
+	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size*5, dilate_size*5)) );
 	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
 	
 	//contours
@@ -394,7 +550,7 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 
 	/// Draw contours*/
 	  Mat imageContFiltered = Mat::zeros( imageCont.size(), CV_8UC3 );
-	for( int i = 0; i< contours.size(); i++ )
+	/*for( int i = 0; i< contours.size(); i++ )
 	{
 		if (radius[i]>180)
 		{
@@ -403,8 +559,149 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 			 floodFill(imageContFiltered, center[i], Scalar(255)); // unsafe function - please detect hranice chodnika podla krajnych kontur, nie color fill
 		}
 	}
+	*/
+	  for (i=0; i< imageThresh.rows;i++)
+	  		{
+	  			for (j=0;j< imageThresh.cols;j++)
+	  			{
+	  				if (imageThresh.at<uchar>(i,j) > 1  )
+	  				{
+	  					imageContFiltered.at<cv::Vec3b>(i,j,0)=255;
+	  					//im_contFin.at<uchar>(i,j,1)=255;
+	  					//im_contFin.at<uchar>(i,j,2)=255;
+	  				}
+	  			}
+	  		}
 		
 
     return imageContFiltered;
 }
 
+
+cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid)
+{
+	cv::Mat imageHSV;		//Create Matrix to store processed image
+	cv::Mat imageCont;
+	cv::Mat imageThresh;
+	Mat image123 = convertc123(frame);
+
+	cluster123 clust_sample;
+	cv::cvtColor(frame,imageHSV,CV_BGR2HSV);
+	//cv::blur(image,imageThresh,cv::Size(60, 60));//blurr image
+	frame = maskExposure123(imageHSV,frame);	
+	
+
+	double rangeH123rangeC1 = 0.05; // 0.08 -> more tolerant
+	double rangeH123rangeC2 = 0.05; // 0.08 -> more tolerant
+	double rangeH123rangeC3 = 0.15;
+	//std::cout<<regionX<<" x "<<regionY<<" Data: "<< imHSV.at<cv::Vec3b>(regionX,regionY)<<endl;
+
+	//region selection
+	//region selection
+	if (first_time)
+		{
+		first_time = false;
+		clust_sample_main= extractRegion123 (image123,frame);
+		clust_sample = clust_sample_main;
+		}
+	else
+	{
+		clust_sample= extractRegion123 (image123,frame);
+	}
+
+	double clusterDistance = calcClusterDistance123(clust_sample_main,clust_sample);
+	double clusterPointDistance = calcPointDistance123(clust_sample_main,clust_sample);
+
+	if (std::abs(clusterDistance)< 0.015)
+	{	updateModel123(clust_sample_main,clust_sample);
+	 	*valid = 0;
+
+	} else
+	{
+		clust_sample = clust_sample_main;
+		*valid = -1;
+		std::cout << "                      ---------- ZLY MODEL ------------\n";
+	}
+	
+	double iLowC1 = setRange123(clust_sample.point[0],-rangeH123rangeC1,true);
+	double iHighC1 = setRange123(clust_sample.point[0],+rangeH123rangeC1,true);
+	double iLowC2 = setRange123(clust_sample.point[1],-rangeH123rangeC2,false);
+	double iHighC2 = setRange123(clust_sample.point[1],+rangeH123rangeC2,false);
+	double iLowC3 = setRange123(clust_sample.point[2],-rangeH123rangeC3,false);
+	double iHighC3 = setRange123(clust_sample.point[2],+rangeH123rangeC3,false);
+	
+
+	//cout<< "ilowH, iHighH, iLowS,iHighS:"<<iLowC1<<" "<<iHighC1<<" "<< iLowC2<<" "<<iHighC2<<" "<< iLowC3 <<" "<< iHighC3<<endl;
+	inRange(image123, Scalar(iLowC1, iLowC2, iLowC3), Scalar(iHighC1, iHighC2, iHighC3), imageThresh); //Threshold the image
+		
+	// Add Adams sidewalk lines
+	cv::Point3_<unsigned char> maskedPix = cv::Vec3b(1,1,1);
+	int i,j;
+	for (i=0; i< frame.rows;i++)
+		{
+			for (j=0;j< frame.cols;j++)
+			{
+				if (frame.at<cv::Vec3b>(i,j) == (cv::Vec3b)maskedPix  )
+				{
+					imageThresh.at<uchar>(i,j,0)=100;
+				}
+			}
+		}
+
+
+
+	//morphological opening (remove small objects from the foreground)
+	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
+	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size, dilate_size)) );
+	
+	//morphological closing (fill small holes in the foreground)
+	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size*5, dilate_size*5)) );
+	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
+	
+	//contours
+ 	vector<vector<Point> > contours;
+  	vector<Vec4i> hierarchy;
+  	RNG rng(12345);
+  	imageCont=imageThresh.clone();
+	findContours( imageCont, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+		
+		
+	// Approximate contours to polygons + get bounding circles
+    vector<vector<Point> > contours_poly( contours.size() );
+	vector<Point2f> center( contours.size() );
+	vector<float> radius( contours.size() );  
+    
+	for( int i = 0; i < contours.size(); i++ )
+    { 
+        approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
+        minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
+    }
+
+	/// Draw contours*/
+	  Mat imageContFiltered = Mat::zeros( imageCont.size(), CV_8UC3 );
+	/*for( int i = 0; i< contours.size(); i++ )
+	{
+		if (radius[i]>180)
+		{
+			Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+			drawContours( imageContFiltered, contours, i, color, 2, 8, hierarchy, 0, Point() );
+			 floodFill(imageContFiltered, center[i], Scalar(255)); // unsafe function - please detect hranice chodnika podla krajnych kontur, nie color fill
+		}
+	}
+	*/
+	  for (i=0; i< imageThresh.rows;i++)
+	  		{
+	  			for (j=0;j< imageThresh.cols;j++)
+	  			{
+	  				if (imageThresh.at<uchar>(i,j) > 1  )
+	  				{
+	  					imageContFiltered.at<cv::Vec3b>(i,j,0)=255;
+	  					//im_contFin.at<uchar>(i,j,1)=255;
+	  					//im_contFin.at<uchar>(i,j,2)=255;
+	  				}
+	  			}
+	  		}
+		
+
+    return imageContFiltered;
+}

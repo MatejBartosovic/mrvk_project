@@ -75,11 +75,13 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     sidewalkEdges->left.clearEdge();
     sidewalkEdges->right.clearEdge();
     //END edge detection variables
-
+	
+	short isValid = 0; // 0 valid OK, -1 invalid
     //frame segmentation
     //imageResult = picture_segmentation_frame(image);
     //imageResult = picture_segmentation_frame_HSV(*imageOrig);
-    imageResult = picture_segmentation_frame_c1c2c3(*imageOrig);
+    //imageResult = picture_segmentation_frame_c1c2c3(*imageOrig);
+	imageResult = picture_segmentation_frame_c1c2c3_check(*imageOrig, &isValid);
 
     //START draw pavement boundaries
     pavementCenter = imageResult.cols/2;
