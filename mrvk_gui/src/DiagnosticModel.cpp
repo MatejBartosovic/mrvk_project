@@ -89,7 +89,7 @@ bool DiagnosticModel::removeRows(int position, int rows, const QModelIndex &pare
     bool success = true;
 
     beginRemoveRows(parent, position, position + rows - 1);
-    success = parentItem->removeChildren(position, rows);
+    success = parentItem->removeAndDeleteChildren(position, rows);
     endRemoveRows();
 
     return success;
@@ -181,5 +181,27 @@ bool DiagnosticModel::insertRows(int position, int rows, const QModelIndex &pare
     endInsertRows();
 
     return success;
+}
+
+DiagnosticItem* DiagnosticModel::createNewItemsFromMsg(diagnostic_msgs::DiagnosticStatus &msg){
+    //insertRow(rootItem->child(msg.level)->childCount(),createIndex(rootItem->child(msg.level),0,rootItem->child(msg.level)));
+}
+
+void DiagnosticModel::registerNewMsg(diagnostic_msgs::DiagnosticStatus msg){
+    ROS_ERROR("registering new item");
+    createNewItemsFromMsg(msg);
+}
+
+void DiagnosticModel::fillWithMsg(diagnostic_msgs::DiagnosticStatus &msg, DiagnosticItem* item){
+    if(item->childNumber() != msg.values.size()){
+        item->deleteAllChildren();
+        item->insertChildren(0,msg.values.size(),2);
+    }
+    for(int i = 0 ; i < msg.values.size(); i++){
+        item->child(i)->setData(0,QVariant(msg.values[i].key.c_str()));
+        item->child(i)->setData(1,QVariant(msg.values[i].value.c_str()));
+
+    }
+    //insertRo
 }
 

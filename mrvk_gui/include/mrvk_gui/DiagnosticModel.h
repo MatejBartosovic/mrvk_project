@@ -49,6 +49,9 @@ public:
     bool removeRows(int position, int rows,
                     const QModelIndex &parent = QModelIndex()) override;
 
+    DiagnosticItem* createNewItemsFromMsg(diagnostic_msgs::DiagnosticStatus &msg);
+    void registerNewMsg(diagnostic_msgs::DiagnosticStatus msg);
+    void fillWithMsg(diagnostic_msgs::DiagnosticStatus &msg, DiagnosticItem* item);
 private:
     //void setupModelData(const QStringList &lines, DiagnosticModel *parent);
     DiagnosticItem *getItem(const QModelIndex &index) const;

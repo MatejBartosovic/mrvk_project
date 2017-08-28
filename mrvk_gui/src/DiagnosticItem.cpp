@@ -10,6 +10,10 @@ DiagnosticItem::DiagnosticItem(const QList<QVariant> data, DiagnosticItem *paren
     itemData = data;
 }
 
+void DiagnosticItem::setParent(DiagnosticItem *parent){
+    parentItem = parent;
+}
+
 DiagnosticItem::~DiagnosticItem()
 {
     qDeleteAll(childItems);
@@ -76,7 +80,7 @@ bool DiagnosticItem::insertChildren(int position, int count, int columns)
     return true;
 }
 
-bool DiagnosticItem::removeChildren(int position, int count)
+bool DiagnosticItem::removeAndDeleteChildren(int position, int count)
 {
     if (position < 0 || position + count > childItems.size())
         return false;
@@ -85,6 +89,14 @@ bool DiagnosticItem::removeChildren(int position, int count)
         delete childItems.takeAt(position);
 
     return true;
+}
+
+DiagnosticItem* DiagnosticItem::getAndRemoveChildren(int position)
+{
+    if (position < 0 || position > childItems.size())
+        return nullptr;
+
+    return childItems.takeAt(position);;
 }
 
 bool DiagnosticItem::insertColumns(int position, int columns)
@@ -99,4 +111,13 @@ bool DiagnosticItem::insertColumns(int position, int columns)
             child->insertColumns(position, columns);
 
     return true;
+}
+
+void DiagnosticItem::deleteAllChildren(){
+    qDeleteAll(childItems);
+}
+
+void DiagnosticItem::insertChildren(DiagnosticItem* children){
+    childItems.push_back(children);
+    return;
 }

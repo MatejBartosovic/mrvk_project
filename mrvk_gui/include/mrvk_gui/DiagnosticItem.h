@@ -16,16 +16,21 @@ public:
     ~DiagnosticItem();
 
     DiagnosticItem *child(int number);
+    void setParent(DiagnosticItem *parent);
     int childCount() const;
     int columnCount() const;
     QVariant data(int column) const;
     bool insertChildren(int position, int count, int columns);
+    void insertChildren(DiagnosticItem* children);
     bool insertColumns(int position, int columns);
     DiagnosticItem *parent();
-    bool removeChildren(int position, int count);
+    bool removeAndDeleteChildren(int position, int count);
+    DiagnosticItem* getAndRemoveChildren(int position);
     bool removeColumns(int position, int columns);
     int childNumber() const;
     bool setData(int column, const QVariant &value);
+
+    void deleteAllChildren();
 private:
     QList<DiagnosticItem*> childItems;
     QList<QVariant> itemData;
