@@ -16,16 +16,24 @@
 
     <xacro:macro name="mrvk_base" params="parent *origin end_point">
 
-        <joint name="footprint_to_base" type="fixed">
-          <xacro:insert_block name="origin" />
-          <parent link="${parent}"/>
-          <child link="base_link"/>
-        </joint>
+        <!--<joint name="footprint_to_base" type="fixed">-->
+          <!--<xacro:insert_block name="origin" />-->
+          <!--<parent link="${parent}"/>-->
+          <!--<child link="base_link"/>-->
+        <!--</joint>-->
 
         <link name="base_link"/>
 
+        <!--<joint name="fbase_to_stabilizer" type="continuous">-->
+            <!--<limit effort="30.0"  velocity="5"/>-->
+            <!--<origin xyz="0 0 0.174"/>-->
+            <!--<parent link="base_link"/>-->
+            <!--<child link="base_stabilized"/>-->
+            <!--<axis xyz="0 0 1"/>-->
+        <!--</joint>-->
+
         <joint name="base_to_stabilizer" type="fixed">
-            <origin xyz="0 0 0"/>
+            <origin xyz="0 0 0.174"/>
             <parent link="base_link"/>
             <child link="base_stabilized"/>
         </joint>
@@ -159,7 +167,6 @@
             <origin rpy=" ${M_PI/2} 0 0" xyz="0 0.05 0.01"/>
             <axis xyz="0 0 1"/>
         </joint>
-
 
         <link name="kinect">
             <visual>

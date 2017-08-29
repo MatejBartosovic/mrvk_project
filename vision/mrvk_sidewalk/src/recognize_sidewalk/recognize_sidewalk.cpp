@@ -50,7 +50,7 @@
 
 using namespace cv;
 
-sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams *params, SidewalkEdges *sidewalkEdges)
+short recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams *params, SidewalkEdges *sidewalkEdges)
 {
     //std::string imFile = get_directory("/Pictures/", "calibration", "", "jpg");
     //imwrite( imFile.c_str(), *imageOrig);
@@ -170,7 +170,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
 
     *imageResultOut = imageResult;
 
-    return pointCloud_msg;
+    return isValid;
 }
 
 int getLeftPavementPoint(cv::Mat image, int line, int pavementCenter, int edge_side_offset_promile)
