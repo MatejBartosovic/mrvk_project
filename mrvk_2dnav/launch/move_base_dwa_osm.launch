@@ -8,9 +8,9 @@
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
     <param name="controller_frequency" value="10"/>
     <param name="base_global_planner" value="osm_planner/Planner"/>
-    <rosparam file="$(find mrvk_2dnav)/config/dwa/costmap_common.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find mrvk_2dnav)/config/dwa/costmap_common.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find mrvk_2dnav)/config/dwa/local_costmap.yaml" command="load" />
+    <rosparam file="$(find mrvk_2dnav)/config/osm/costmap_common.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find mrvk_2dnav)/config/osm/costmap_common.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find mrvk_2dnav)/config/osm/local_costmap.yaml" command="load" />
     <rosparam file="$(find mrvk_2dnav)/config/osm/global_costmap.yaml" command="load"/>
     <param name="global_costmap/filepath" value="$(arg filepath)"/>
     <rosparam file="$(find mrvk_2dnav)/config/dwa/base_local_planner.yaml" command="load" />
@@ -18,5 +18,6 @@
     <!--remap from="cmd_vel" to="/mrvk/diff_drive_controller/cmd_vel"/-->
   </node>
 
+ <node name="osm_helper" pkg="osm_planner" type="osm_helper" ns="move_base"/>
 
 </launch>

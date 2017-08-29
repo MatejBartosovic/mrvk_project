@@ -27,7 +27,7 @@ void DiagnosticsWidget::setupUi(QWidget *widget) {
 }
 
 void DiagnosticsWidget::diagnosticMsgCallback(const diagnostic_msgs::DiagnosticArray &msg){
-    ROS_ERROR("new msg");
+   // ROS_ERROR("new msg");
     int dataRows = 0;
     for(int i = 0; i<msg.status.size(); i++) {
         QList<QStandardItem*> row;
@@ -43,7 +43,9 @@ void DiagnosticsWidget::diagnosticMsgCallback(const diagnostic_msgs::DiagnosticA
                 QModelIndex childIndex = rootIndex.child(j,0);
                 if(!childIndex.isValid()){
                     ROS_WARN("pridavam riadky mozno to spadne");
-                    model.insertRow(j,rootIndex);
+                    if(!model.insertRows(j,1,rootIndex)){
+                        ROS_ERROR("insert failed");
+                    }
                 }
                 childIndex = rootIndex.child(j,0);
                 if(childIndex.isValid()){
@@ -51,7 +53,7 @@ void DiagnosticsWidget::diagnosticMsgCallback(const diagnostic_msgs::DiagnosticA
                     model.setData(childIndex.sibling(childIndex.row(),1),msg.status[i].values[j].value.c_str());
                 }
                 else{
-                    ROS_ERROR("Hmmm toto by sa nikdy nemalo stat");
+                    ROS_ERROR("Hmmm toto by sa nikdy nemalo stat pri spracovani '%s' index data '%s'",msg.status[i].name.c_str(),model.data(rootIndex).toString().toStdString().c_str());
                 }
                 dataRows = j;
             }
@@ -90,15 +92,17 @@ QModelIndex DiagnosticsWidget::checkIfItemExist(const diagnostic_msgs::Diagnosti
         if(i == msg.level){
             continue;
         }
-        for(int j = 0 ; j < model.item(i,0)->rowCount(); j++)
-        if(msg.name == model.data(model.item(i,0)->child(j,0)->index()).toString().toStdString()){
-            ROS_WARN("presuvam spravu mozno to spadne");
-            model.item(i,0)->child(j,0)->clone();
-            QList<QStandardItem*> row;
-            row << model.item(i,0)->child(j,0)->clone() << model.item(i,0)->child(j,1)->clone();
-            model.item(i,0)->removeRow(j);
-            model.item(msg.level,0)->appendRow(row);
-            return model.item(msg.level,0)->child(model.item(msg.level,0)->rowCount()-1,0)->index();
+        for(int j = 0 ; j < model.item(i,0)->rowCount(); j++){
+            if(msg.name == model.data(model.item(i,0)->child(j,0)->index()).toString().toStdString()){
+                ROS_WARN("presuvam spravu mozno to spadne");
+                model.item(i,0)->child(j,0)->clone();
+                QList<QStandardItem*> row;
+                row << model.item(i,0)->child(j,0)->clone() << model.item(i,0)->child(j,1)->clone();
+                model.item(i,0)->removeRow(j);
+                //model.item(msg.level,0)->appendRow(row);
+                //return model.item(msg.level,0)->child(model.item(msg.level,0)->rowCount()-1,0)->index();
+                return  QModelIndex();
+            }
         }
     }
     return QModelIndex();

@@ -1,0 +1,18 @@
+recovery_behaviors:  [{name: conservative_reset, type: clear_costmap_recovery/ClearCostmapRecovery},{name: reverse_movement_recovery1, type: reverse_movement_recovery/ReverseMovementRecovery}, {name: aggressive_reset, type: clear_costmap_recovery/ClearCostmapRecovery}, {name: reverse_movement_recovery2, type: reverse_movement_recovery/ReverseMovementRecovery},{name: wait_and_clear_costmap_recovery, type: wait_and_clear_costmap_recovery/WaitAndClearCostmapRecovery}]
+conservative_reset:
+  reset_distance: 3.0
+  layer_names:  ["obstacle_layer","inflation_layer"]
+reverse_movement_recovery1:
+  distance: 0.3
+  escape_vel: 0.2
+aggressive_reset:
+  reset_distance: 6.0
+reverse_movement_recovery2:
+  distance: 0.6
+  escape_vel: 0.2
+wait_and_clear_costmap_recovery:
+  reset_distance: 6.0
+  check_distance: 0.8
+  wait_time: 2
+#  layer_names:  ["obstacle_layer","inflation_layer"]
+  layer_names:  ["obstacle_layer"]

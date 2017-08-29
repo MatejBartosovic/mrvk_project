@@ -71,8 +71,8 @@ namespace Mrvk{
 			//}
 			//else{
 			//start_read_blog++;
-			pos[0] = 0;
-			pos[1] = 0;
+			//pos[0] = 0;
+			//pos[1] = 0;
 			//}
 			
 			pos[3] = comunication_interface.getCameraPositionX();

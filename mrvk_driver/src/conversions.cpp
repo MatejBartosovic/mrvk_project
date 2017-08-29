@@ -178,7 +178,7 @@ double Conversions::getVelRightWheel(){
 
 double Conversions::getPosLeftWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	uint16_t dif = (uint16_t)(posWheels[0] - posWheelsLast[0]);
+	int dif = (uint16_t)(posWheels[0] - posWheelsLast[0]);
 	if (dif > 32767){
 		dif = (uint16_t)(posWheelsLast[0] - posWheels[0]);
 	}
@@ -190,7 +190,7 @@ double Conversions::getPosLeftWheel(){
 
 double Conversions::getPosRightWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	uint16_t dif = (uint16_t)(posWheels[1] - posWheelsLast[1]);
+	int dif = (uint16_t)(posWheels[1] - posWheelsLast[1]);
 	if (dif > 32767){
 		dif = (uint16_t)(posWheelsLast[1] - posWheels[1]);
 	}
