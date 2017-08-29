@@ -63,16 +63,17 @@ namespace Mrvk{
             pos[1] += vel[1] * getPeriod().toSec();*/
 			double lavy = -comunication_interface.getPosLeftWheel();
 			double pravy = comunication_interface.getPosRightWheel();
-			static int start_read_blog = 0;
-			if(start_read_blog > 10){
+			//ROS_ERROR("l = %lf  r = %lf",lavy,pravy);
+			//static int start_read_blog = 0;
+			//if(start_read_blog > 10){
 			pos[0] += lavy;
 			pos[1] += pravy;
-			}
-			else{
-			start_read_blog++;
+			//}
+			//else{
+			//start_read_blog++;
 			pos[0] = 0;
 			pos[1] = 0;
-			}					
+			//}
 			
 			pos[3] = comunication_interface.getCameraPositionX();
 			pos[4] = comunication_interface.getCameraPositionZ();
