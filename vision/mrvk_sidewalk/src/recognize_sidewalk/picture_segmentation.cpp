@@ -8,7 +8,7 @@
 #include "segment_class.hpp"
 #define dilate_size 10
 #define erode_size 10
-#define OVEREXPOSED 250
+#define OVEREXPOSED 245
 #define UNDEREXPOSED 30
 
 using namespace cv;
@@ -22,7 +22,8 @@ int iLowS = 0;
 int iHighS = 162;
 int iLowV = 36;
 int iHighV = 255;
-cluster123 clust_sample_main;
+cluster123 clust_sample_main, clust_sample_buffer;
+int bufferCnt;
 bool first_time = true;
 
 
@@ -591,8 +592,8 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid)
 	frame = maskExposure123(imageHSV,frame);	
 	
 
-	double rangeH123rangeC1 = 0.05; // 0.08 -> more tolerant
-	double rangeH123rangeC2 = 0.05; // 0.08 -> more tolerant
+	double rangeH123rangeC1 = 0.07; // 0.08 -> more tolerant
+	double rangeH123rangeC2 = 0.07; // 0.08 -> more tolerant
 	double rangeH123rangeC3 = 0.15;
 	//std::cout<<regionX<<" x "<<regionY<<" Data: "<< imHSV.at<cv::Vec3b>(regionX,regionY)<<endl;
 
@@ -603,16 +604,31 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid)
 		first_time = false;
 		clust_sample_main= extractRegion123 (image123,frame);
 		clust_sample = clust_sample_main;
+		clust_sample_buffer = clust_sample;
 		}
 	else
 	{
 		clust_sample= extractRegion123 (image123,frame);
 	}
 
+	double bufferDistance = calcClusterDistance123(clust_sample_buffer, clust_sample);
+	
+	if (abs(bufferDistance)<0.03)
+	{
+		bufferCnt++;
+		std::cout<< "cnt++ je: " << bufferCnt<<"\n";
+		if (bufferCnt>=5)
+		{
+			clust_sample_main = clust_sample_buffer;
+			bufferCnt = 0;
+		}
+	} else bufferCnt=0;
+	clust_sample_buffer = clust_sample;
+	
 	double clusterDistance = calcClusterDistance123(clust_sample_main,clust_sample);
 	double clusterPointDistance = calcPointDistance123(clust_sample_main,clust_sample);
 
-	if (std::abs(clusterDistance)< 0.015)
+	if (std::abs(clusterDistance)< 0.05)
 	{	updateModel123(clust_sample_main,clust_sample);
 	 	*valid = 0;
 
