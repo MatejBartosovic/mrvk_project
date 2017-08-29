@@ -1,11 +1,7 @@
 #include <mrvk_driver/conversions.h>
-#include <ros/ros.h>
 
-Conversions::Conversions(){
-
-	cameraPositionX = 0;
-	cameraPositionZ = 0;
-
+Conversions::Conversions() : cameraPositionX(0),cameraPositionZ(0), inicialized(2,false),
+							 posWheelsLast(2,0),posWheels(2,0), posActuators(2,0),posActuatorsLast(2,0) {
 }
 
 void Conversions::convertMsg(uint8_t *data, uint8_t device){
@@ -142,6 +138,12 @@ void Conversions::answerMCB(uint8_t *data, uint8_t device){
 		posActuators[motorIndex] = char2BToInt16(data[6], data[7]);
 		posWheels[motorIndex] = char2BToInt16(data[8], data[9]);
 
+		if(!inicialized[motorIndex]){
+			posWheelsLast[motorIndex] = posWheels[motorIndex];
+			posActuatorsLast[motorIndex] = posActuators[motorIndex];
+			inicialized[motorIndex] = true;
+		}
+
 		statusMCB[motorIndex].gear_position = data[10];
 
 		statusMCB[motorIndex].gear_current = ((float)data[11])*MCBIGM;
@@ -176,7 +178,7 @@ double Conversions::getVelRightWheel(){
 
 double Conversions::getPosLeftWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	int dif = (uint16_t)(posWheels[0] - posWheelsLast[0]);
+	uint16_t dif = (uint16_t)(posWheels[0] - posWheelsLast[0]);
 	if (dif > 32767){
 		dif = (uint16_t)(posWheelsLast[0] - posWheels[0]);
 	}
@@ -188,7 +190,7 @@ double Conversions::getPosLeftWheel(){
 
 double Conversions::getPosRightWheel(){
 	boost::unique_lock<boost::mutex> lock(data_mutex);
-	int dif = (uint16_t)(posWheels[1] - posWheelsLast[1]);
+	uint16_t dif = (uint16_t)(posWheels[1] - posWheelsLast[1]);
 	if (dif > 32767){
 		dif = (uint16_t)(posWheelsLast[1] - posWheels[1]);
 	}
