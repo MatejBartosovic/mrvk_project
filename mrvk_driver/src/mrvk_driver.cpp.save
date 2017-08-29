@@ -63,16 +63,10 @@ namespace Mrvk{
             pos[1] += vel[1] * getPeriod().toSec();*/
 			double lavy = -comunication_interface.getPosLeftWheel();
 			double pravy = comunication_interface.getPosRightWheel();
-			static int start_read_blog = 0;
-			if(start_read_blog > 10){
 			pos[0] += lavy;
 			pos[1] += pravy;
-			}
-			else{
-			start_read_blog++;
-			pos[0] = 0;
-			pos[1] = 0;
-			}					
+			ROS_ERROR_STREAM(lavy);
+			ROS_ERROR_STREAM(pravy);					
 			
 			pos[3] = comunication_interface.getCameraPositionX();
 			pos[4] = comunication_interface.getCameraPositionZ();
@@ -161,8 +155,8 @@ int main (int argc, char **argv){
 
 	Mrvk::Driver driver(ports,baud,stopBits,parity,byteSize);
 	driver.init();
-	
-	controller_manager::ControllerManager cm(&driver);
+	 = 0;	
+	ntroller_manager::ControllerManager cm(&driver);
 		
 	ros::AsyncSpinner spinner(4);
 	spinner.start();
@@ -171,6 +165,7 @@ int main (int argc, char **argv){
 
 	while (n.ok())
 	{
+		)
 		a.sleep();
 		driver.read();
 		cm.update(ros::Time::now(), driver.getPeriod());

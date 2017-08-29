@@ -34,46 +34,17 @@ bool CommunicationInterface::init(){
 		return true;
 
 	try{
-		BOOST_FOREACH(std::string port,ports){
-			my_serials.push_back(new serial::Serial(port, baud, serial::Timeout::simpleTimeout(50)));
+		for(int i=0;i<ports.size();i++){
+			serialInterface.addBoard(std::shared_ptr<serial::Serial>(new serial::Serial(ports[i], baud, serial::Timeout::simpleTimeout(50))),ports[i]);
 		}
 	}catch (std::exception& e){
 		ROS_ERROR("port sa neotvoril");
 		active = false;
 		return false;
 	}
-
-	std::vector<int> fds;
-	BOOST_FOREACH(serial::Serial* serial,my_serials){
-
-		if (serial->isOpen())
-			ROS_INFO("port otvoreny");
-		else{
-			ROS_ERROR("port sa neotvoril");
-			active = false;
-			return false;
-		}
-
-		try{
-			setupPort(stopBits, parity, byteSize);
-			serial->flush();
-
-		}catch (std::exception& e){
-			ROS_ERROR("nenastavili sa parametre portu");
-			active = false;
-			return false;
-		}
-		fds.push_back(serial->getFd());
-	}
-	fd_max = -1;
-	BOOST_FOREACH(int fd,fds){
-		if(fd>fd_max)
-			fd_max = fd;
-	}
-	active = true;
+	active = serialInterface.init(stopBits, parity, byteSize);
 	ROS_INFO("init done");
-
-		return true;
+	return active;
 }
 
 bool CommunicationInterface::isActive(){
@@ -82,9 +53,7 @@ bool CommunicationInterface::isActive(){
 
 void CommunicationInterface::close(){
 	if (active){
-		BOOST_FOREACH(serial::Serial* serial,my_serials){
-			serial->close();
-		}
+		serialInterface.close();
 		active = false;
 	}
 }
@@ -109,9 +78,9 @@ int CommunicationInterface::waitToRead(){
 	int setFlags = 0;
     new_data_status = 0;        //reset received data status
 
-	while(sucesfull_readings != my_serials.size()){
+	while(sucesfull_readings != serialInterface.boards.size()){
 		setFds(&read_set,&setFlags);
-		readable_fds = select(fd_max+1,&read_set,NULL,NULL,&timeout);
+		readable_fds = select(serialInterface.fd_max+1,&read_set,NULL,NULL,&timeout);
 		if (readable_fds == -1){
 			ROS_ERROR("select failed");
 			if(timeout.tv_usec == 0){
@@ -130,7 +99,8 @@ int CommunicationInterface::waitToRead(){
 			}
 		}
 		if(timeout.tv_usec == 0){
-            ROS_ERROR("Receive TIMEOUT flags = '%d'",setFlags);  //if flag is set device roesponded (1 mb, 2 mcbl, 4 mcbr )
+            //ROS_ERROR("Receive TIMEOUT flags = '%d'",setFlags);  //if flag is set device roesponded (1 mb, 2 mcbl, 4 mcbr )
+			receiveFlagsToHumanReadable(setFlags);
 			break;
         }
 	}
@@ -355,8 +325,8 @@ int CommunicationInterface::write(int id,uint8_t *dataWrite, int lengthWrite){
 	if(active){
 		int count;
 		try{
-			count = my_serials[id]->write(dataWrite, lengthWrite);
-			my_serials[id]->flush();
+			count = serialInterface.boards[id]->board->write(dataWrite, lengthWrite);
+			serialInterface.boards[id]->board->flush();
 			}catch (std::exception& e){
 				ROS_ERROR("chyba pri zapise na port");
 				active = false;
@@ -379,7 +349,7 @@ bool CommunicationInterface::read(int id){
 
 		int count = -1;
 		try{
-			count = my_serials[id]->read(dataRead, read_lengths[id]);
+			count = serialInterface.boards[id]->board->read(dataRead, read_lengths[id]);
 		}catch (std::exception& e){
 			ROS_ERROR("chyba pri citani z portu");
 			active = false;
@@ -423,15 +393,15 @@ bool CommunicationInterface::read(int id){
 void CommunicationInterface::setFds(fd_set *set,int* flag){
 
 	FD_ZERO(set);
-	for(int i=0;i<my_serials.size();i++){
+	for(int i=0;i<serialInterface.boards.size();i++){
 		if(!(*flag & (1<<i)))
-			FD_SET(my_serials[i]->getFd(),set);
+			FD_SET(serialInterface.boards[i]->board->getFd(),set);
 	}
 }
 int CommunicationInterface::getReadableFd(fd_set *set,int* flag){
 	for(int i=0;i<3;i++){
-		if(FD_ISSET(my_serials[i]->getFd(),set)){
-			FD_CLR(my_serials[i]->getFd(),set);
+		if(FD_ISSET(serialInterface.boards[i]->board->getFd(),set)){
+			FD_CLR(serialInterface.boards[i]->board->getFd(),set);
 			*flag |= 1 << i;
 			return i;
 		}
@@ -439,53 +409,13 @@ int CommunicationInterface::getReadableFd(fd_set *set,int* flag){
 	return -1;
 }
 
-void CommunicationInterface::setupPort(int sb,int p,int bs){
-
-	/*nastavenie defaultnych parametrov*/
-	//sb - stop bits
-	//p  - parity
-	//bs - byte size
-
-	serial::stopbits_t stopBits;
-	serial::parity_t parity;
-	serial::bytesize_t byteSize;
-
-
-	/*konvertovanie parametrov aby sa dali nastavit v serial class*/
-	switch (sb)
-	    {
-		case 1: stopBits = serial::stopbits_one;
-			break;
-		case 2: stopBits = serial::stopbits_two;
-			break;
-		default: stopBits = serial::stopbits_one_point_five;
-			 break;
-		}
-	switch (p)
-	    {
-		case 0: parity = serial::parity_none;
-			break;
-		case 1: parity = serial::parity_odd;
-			break;
-		case 2: parity = serial::parity_even;
-			 break;
-	}
-	switch (bs)
-	    {
-		case 5: byteSize = serial::fivebits;
-			break;
-		case 6: byteSize = serial::sixbits;
-			break;
-		case 7: byteSize = serial::sevenbits;
-			 break;
-		case 8: byteSize = serial::eightbits;
-			 break;
-	}
-	/*samotne setnutie parametrov*/
-	BOOST_FOREACH(serial::Serial* serial,my_serials){
-		serial->setStopbits(stopBits);
-		serial->setParity(parity);
-		serial->setBytesize(byteSize);
+void CommunicationInterface::receiveFlagsToHumanReadable(int flags){
+	//1 mb 2 mcbl 4 mcbr (1 +2 +4 =7)
+	if(flags != serialInterface.flagsSum)
+		ROS_WARN("Receive timout flags: %d",flags);
+	for(int i;i<serialInterface.size();i++){
+		if(!(flags&(serialInterface.boards[i]->flag)))
+			ROS_WARN("%s TIMEOUT",serialInterface.boards[i]->name.c_str());
 	}
 }
 
