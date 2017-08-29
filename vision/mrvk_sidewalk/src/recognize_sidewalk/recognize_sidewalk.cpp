@@ -50,7 +50,7 @@
 
 using namespace cv;
 
-sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams *params, SidewalkEdges *sidewalkEdges)
+short recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams *params, SidewalkEdges *sidewalkEdges)
 {
     //std::string imFile = get_directory("/Pictures/", "calibration", "", "jpg");
     //imwrite( imFile.c_str(), *imageOrig);
@@ -75,11 +75,13 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
     sidewalkEdges->left.clearEdge();
     sidewalkEdges->right.clearEdge();
     //END edge detection variables
-
+	
+	short isValid = 0; // 0 valid OK, -1 invalid
     //frame segmentation
     //imageResult = picture_segmentation_frame(image);
     //imageResult = picture_segmentation_frame_HSV(*imageOrig);
-    imageResult = picture_segmentation_frame_c1c2c3(*imageOrig);
+    //imageResult = picture_segmentation_frame_c1c2c3(*imageOrig);
+	imageResult = picture_segmentation_frame_c1c2c3_check(*imageOrig, &isValid);
 
     //START draw pavement boundaries
     pavementCenter = imageResult.cols/2;
@@ -168,7 +170,7 @@ sensor_msgs::PointCloud recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *im
 
     *imageResultOut = imageResult;
 
-    return pointCloud_msg;
+    return isValid;
 }
 
 int getLeftPavementPoint(cv::Mat image, int line, int pavementCenter, int edge_side_offset_promile)
