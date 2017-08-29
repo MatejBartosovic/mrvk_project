@@ -365,6 +365,22 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 	//cout<< "ilowH, iHighH, iLowS,iHighS:"<<iLowC1<<" "<<iHighC1<<" "<< iLowC2<<" "<<iHighC2<<" "<< iLowC3 <<" "<< iHighC3<<endl;
 	inRange(image123, Scalar(iLowC1, iLowC2, iLowC3), Scalar(iHighC1, iHighC2, iHighC3), imageThresh); //Threshold the image
 		
+	// Add Adams sidewalk lines
+	cv::Point3_<unsigned char> maskedPix = cv::Vec3b(1,1,1);
+	int i,j;
+	for (i=0; i< frame.rows;i++)
+		{
+			for (j=0;j< frame.cols;j++)
+			{
+				if (frame.at<cv::Vec3b>(i,j) == (cv::Vec3b)maskedPix  )
+				{
+					imageThresh.at<uchar>(i,j,0)=100;
+				}
+			}
+		}
+
+
+
 	//morphological opening (remove small objects from the foreground)
 	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
 	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size, dilate_size)) );
