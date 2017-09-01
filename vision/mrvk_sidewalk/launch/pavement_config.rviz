@@ -31,7 +31,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Image
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -223,10 +223,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        world:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -280,55 +276,52 @@ Visualization Manager:
           Value: true
         wheel_pz:
           Value: true
-        world:
-          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        world:
-          base_link:
-            base_stabilized:
-              base_end_point:
+        base_link:
+          base_stabilized:
+            base_end_point:
+              {}
+            imu:
+              {}
+            kinect:
+              kinect_ir:
                 {}
-              imu:
+            laser:
+              {}
+            veza:
+              camera_l:
                 {}
-              kinect:
-                kinect_ir:
+              camera_r:
+                camera:
                   {}
-              laser:
+            wheel_frame_l:
+              wheel_frame_l_rotation:
                 {}
-              veza:
-                camera_l:
-                  {}
-                camera_r:
-                  camera:
-                    {}
-              wheel_frame_l:
-                wheel_frame_l_rotation:
-                  {}
-                wheel_lp:
-                  {}
-                wheel_lz:
-                  {}
-              wheel_frame_r:
-                wheel_frame_r_rotation:
-                  {}
-                wheel_pp:
-                  {}
-                wheel_pz:
-                  {}
-            gps:
-              vo:
+              wheel_lp:
                 {}
+              wheel_lz:
+                {}
+            wheel_frame_r:
+              wheel_frame_r_rotation:
+                {}
+              wheel_pp:
+                {}
+              wheel_pz:
+                {}
+          gps:
+            vo:
+              {}
       Update Interval: 0
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: world
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -363,10 +356,10 @@ Visualization Manager:
       Focal Shape Size: 0.0500000007
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.45519805
+      Pitch: -0.0848019868
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.58315229
+      Yaw: 4.29315329
     Saved: ~
 Window Geometry:
   Displays:

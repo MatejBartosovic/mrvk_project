@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
     int num_of_edge_points = (EDGE_PAV_VERTICAL_END - EDGE_PAV_VERTICAL_START - EDGE_MARKER_VERTICAL_POINT_DIST)/EDGE_MARKER_VERTICAL_POINT_DIST;
     int leftPoint = 0;
     int rightPoint = 0;
-
+    short valid_data;
     //END edge detection variables
 
     while (ros::ok())
@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         }
         imageOrig = image.clone();
 
-        pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges);
+        valid_data = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges);
 
         //publish processed image
         header.stamp = ros::Time::now();

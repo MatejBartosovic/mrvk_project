@@ -26,7 +26,7 @@ void CloudProcessing::createVectors(int width, int height) {
 
     toROSMsg (cloud, ros_cloud);
     std::string kinFrame("kinect_ir");
-    std::string baseLinkFrame("base_link"); ///Sojka zmenil z world na base_link
+    std::string baseLinkFrame("base_link");
 #ifdef DEBUG
     ROS_ERROR_STREAM(kinFrame);
     ROS_ERROR_STREAM(baseLinkFrame);
