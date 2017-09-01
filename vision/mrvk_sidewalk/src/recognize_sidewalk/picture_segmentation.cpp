@@ -10,6 +10,7 @@
 #define erode_size 10
 #define OVEREXPOSED 245
 #define UNDEREXPOSED 30
+#include "SidewalkEdge.h"
 
 using namespace cv;
 using namespace std;
@@ -296,6 +297,33 @@ cv::Mat maskExposure123(cv::Mat unmasked_image, cv::Mat unmasked_imageRGB)
 	return masked_image;
 }
 
+bool improveShadows(cv::Mat iputImgHSV,cv::Mat inputImgRGB)
+{
+	//volat az po maskovani
+	int i,j;
+	for (i=0;i<inputImgRGB.rows;i++)
+	{
+		for (j=0;j<inputImgRGB.cols;j++)
+		{
+			if ((iputImgHSV.at<cv::Vec3b>(i,j)[2] < UNDEREXPOSED+30)&&(inputImgRGB.at<cv::Vec3b>(i,j)[0]!=1)&&(inputImgRGB.at<cv::Vec3b>(i,j)[1]!=1))
+			{
+				inputImgRGB.at<cv::Vec3b>(i,j)[0]+=60;
+				inputImgRGB.at<cv::Vec3b>(i,j)[1]+=60;
+				inputImgRGB.at<cv::Vec3b>(i,j)[2]+=60;
+
+			} else if ((iputImgHSV.at<cv::Vec3b>(i,j)[2] > OVEREXPOSED-30)&&(inputImgRGB.at<cv::Vec3b>(i,j)[0]!=1)&&(inputImgRGB.at<cv::Vec3b>(i,j)[1]!=1))
+			{
+				inputImgRGB.at<cv::Vec3b>(i,j)[0]-=40;
+				inputImgRGB.at<cv::Vec3b>(i,j)[1]-=40;
+				inputImgRGB.at<cv::Vec3b>(i,j)[2]-=40;
+			}
+		}
+	}
+
+
+	return 0;
+}
+
 cluster123 extractRegion123(cv::Mat unregioned_image, cv::Mat mask_image)
 {
 	cluster123 clust;
@@ -579,7 +607,7 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 }
 
 
-cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid)
+cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  SidewalkEdges *sidewalkEdges)
 {
 	cv::Mat imageHSV;		//Create Matrix to store processed image
 	cv::Mat imageCont;
@@ -590,7 +618,7 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid)
 	cv::cvtColor(frame,imageHSV,CV_BGR2HSV);
 	//cv::blur(image,imageThresh,cv::Size(60, 60));//blurr image
 	frame = maskExposure123(imageHSV,frame);	
-	
+	improveShadows(imageHSV,frame);	
 
 	double rangeH123rangeC1 = 0.07; // 0.08 -> more tolerant
 	double rangeH123rangeC2 = 0.07; // 0.08 -> more tolerant
@@ -628,7 +656,7 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid)
 	double clusterDistance = calcClusterDistance123(clust_sample_main,clust_sample);
 	double clusterPointDistance = calcPointDistance123(clust_sample_main,clust_sample);
 
-	if (std::abs(clusterDistance)< 0.05)
+	if ((std::abs(clusterDistance)< 0.05)&& !((sidewalkEdges->right.invalidFrame)||(sidewalkEdges->left.invalidFrame)))
 	{	updateModel123(clust_sample_main,clust_sample);
 	 	*valid = 0;
 
