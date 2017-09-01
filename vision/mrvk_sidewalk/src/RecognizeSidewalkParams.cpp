@@ -59,4 +59,6 @@ int RecognizeSidewalkParams::getGlitchFrame(ros::NodeHandle n)
     n.getParam("sidewalk_params/glitchFrame/areaBufferSize", glitchFrame.areaBufferSize);
     n.getParam("sidewalk_params/glitchFrame/maxAreaDifference", glitchFrame.areaBufferSize);
     n.getParam("sidewalk_params/glitchFrame/webSize", glitchFrame.areaBufferSize);
+    n.getParam("sidewalk_params/glitchFrame/max_slope_deviation", glitchFrame.max_slope_deviation);
+    n.getParam("sidewalk_params/glitchFrame/slope_perpendicular_spread", glitchFrame.slope_perpendicular_spread);
 }

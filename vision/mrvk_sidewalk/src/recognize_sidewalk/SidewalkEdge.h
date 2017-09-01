@@ -67,10 +67,12 @@ private:
 
     //TODO dolezite - z rovnic priamok spravime median a potom tie ciary, ktore budu vybiehat z medianu nahradime ciarou s rovnicou priamky median
     //TODO dolezite - zahadzovat framy, ktore maju median rovnic priamok iny ako predosle framy
-
+    //TODO median slope prerobit na median uhol pretoze slope je exp funkcia a to je zle
 
     //todo reenable offset - do it after all validation and fixation and put it into new vector
 public:
+    bool invalidFrame = false;
+    bool perpendicularSidewalk = false;
     std::vector<cv::Point> validPoints;
     SidewalkEdge();
     ~SidewalkEdge();
@@ -88,8 +90,9 @@ public:
     bool glitchedFrame();
     bool glitchedFrameSlope();
     void detectFrameGlitch(RecognizeSidewalkParams *params);
-    void computeSlopeMedian(RecognizeSidewalkParams *params);
+    int computeSlopeMedian(RecognizeSidewalkParams *params);
     void slopeValidate(RecognizeSidewalkParams *params);
+    bool isSidewalkPerpendicular(RecognizeSidewalkParams *params);
 
     void drawEdgeRaw(cv::Mat *img, RecognizeSidewalkParams *params);
     void drawEdgeValid(cv::Mat *img, RecognizeSidewalkParams *params);

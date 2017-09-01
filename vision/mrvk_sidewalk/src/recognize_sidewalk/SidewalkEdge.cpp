@@ -1,12 +1,15 @@
 #include "SidewalkEdge.h"
 #include "../misc_tools/misc_tools.h"
 #include <unistd.h>
+#include <math.h>
 
 #define COLOR_EDGE_RAW cv::Scalar(128, 0, 128) //purple
 #define COLOR_EDGE_VALID cv::Scalar(0, 255, 0) //green
 #define COLOR_EDGE_FIX cv::Scalar(255, 255, 0) //yellow
 #define COLOR_POINTS_OPTICAL_FLOW cv::Scalar(0, 140, 255) //orange
 #define COLOR_POINTS_DETECTED cv::Scalar(255, 0, 0) //blue
+
+#define M_PI 3.14159265358979323846
 
 Edge::Edge()
 {
@@ -24,8 +27,8 @@ void Edge::computeLineEquation()
         if (edge.at(i).end.x == edge.at(i).start.x)
         {
             ///perpendicular line
-            edge.at(i).myLineEquation.slope = 0;
-            edge.at(i).myLineEquation.yIntercept = 0;
+            edge.at(i).myLineEquation.slope = std::numeric_limits<double>::max();
+            edge.at(i).myLineEquation.yIntercept = edge.at(i).start.y - (double)(edge.at(i).myLineEquation.slope*edge.at(i).start.x);
         }
         else
         {
@@ -68,21 +71,21 @@ void SidewalkEdge::validateEdge(RecognizeSidewalkParams *params, int pavementCen
     int sideOffset = (params->edge_side_offset_promile*newImg.cols)/1000;
     *getEdgeValid() = *getEdgeRaw();
     getSidewalkArea(&newImg, params);
-    slopeValidate(params);
+    computeLineEquation();
 
     validPoints.clear();
     for (int i = 0; i < getEdgeRaw()->size(); i++)
     {
         getEdgeValid()->at(i).valid = false;
-        if (!glitchedFrame()&&!glitchedFrameSlope())
+        if (!glitchedFrame())
         {
             if (!isOpening(newImg.cols, getEdgeRaw()->at(i).start.x, getEdgeRaw()->at(i).end.x, params->sideOffest))
             {
                 if (!notPavement(getEdgeRaw()->at(i).start.x, getEdgeRaw()->at(i).end.x, pavementCenter, sideOffset))
                 {
                     getEdgeValid()->at(i).valid = true;
-                    //validPoints.push_back(getEdgeValid()->at(i).start);
-                    fillLineWithPoints(&validPoints, getEdgeValid()->at(i).myLineEquation, getEdgeValid()->at(i).start, getEdgeValid()->at(i).end);
+                    validPoints.push_back(getEdgeValid()->at(i).start);
+                    //fillLineWithPoints(&validPoints, getEdgeValid()->at(i).myLineEquation, getEdgeValid()->at(i).start, getEdgeValid()->at(i).end);
                 }
             }
         }
@@ -91,7 +94,22 @@ void SidewalkEdge::validateEdge(RecognizeSidewalkParams *params, int pavementCen
             //todo try to repair glitched frame - leave for last
         }
     }
-
+    slopeValidate(params);
+    for (int i = 0; i < getEdgeValid()->size(); i++)
+    {
+        if (getEdgeValid()->at(i).valid)
+        {
+            getEdgeValid()->at(i).valid = false;
+            if (!glitchedFrameSlope())
+            {
+                getEdgeValid()->at(i).valid = true;
+            }
+            else
+            {
+                //todo try to repair glitched frame - leave for last
+            }
+        }
+    }
 }
 void SidewalkEdge::fillLineWithPoints(std::vector<cv::Point> *outFilledPointsEdge, lineEquation lineEquationC, cv::Point lineCmStart, cv::Point lineCmEnd)
 {
@@ -154,30 +172,66 @@ void SidewalkEdge::fillLineWithPoints(std::vector<cv::Point> *outFilledPointsEdg
         }
     }
 }
-void SidewalkEdge::computeSlopeMedian(RecognizeSidewalkParams *params)
+int SidewalkEdge::computeSlopeMedian(RecognizeSidewalkParams *params)
 {
     int maxNumMedianSlope = 10;
-
+    int numPoints = 0;
+    int lineAngle = 0;
     std::vector<double> slopeVector;
     for (int i = 0; i < getEdgeValid()->size(); i++)
     {
-        slopeVector.push_back(getEdgeValid()->at(i).myLineEquation.slope);
+        if (getEdgeValid()->at(i).valid)
+        {
+            lineAngle = atan(getEdgeValid()->at(i).myLineEquation.slope)/M_PI*180;
+            if (lineAngle < 0)
+            {
+                lineAngle = lineAngle + 180;
+            }
+            slopeVector.push_back(lineAngle);
+            numPoints++;
+        }
     }
+
     medianSlopeFrame = doubleMedian(slopeVector);
+    return numPoints;
 }
 void SidewalkEdge::slopeValidate(RecognizeSidewalkParams *params)
 {
-    int maxSlopeDeviation = 10;
-    computeSlopeMedian(params);
-    if (fabs(doubleMedian(medianSlope) - medianSlopeFrame) < doubleMedian(medianSlope)/maxSlopeDeviation)
+    invalidFrame = false;
+    glitchedFrameSlopeVal = false;
+    perpendicularSidewalk = isSidewalkPerpendicular(params);
+    if (!computeSlopeMedian(params)) return;
+    if (medianSlope.size() >= 10)
+    {
+        ROS_ERROR("Angle deviation %lf", fabs(doubleMedian(medianSlope) - medianSlopeFrame));
+        if (fabs(doubleMedian(medianSlope) - medianSlopeFrame) < params->glitchFrame.max_slope_deviation)
+        {
+
+            medianSlope.push_back(medianSlopeFrame);
+            medianSlope.erase(medianSlope.begin());
+        }
+        else
+        {
+            invalidFrame = true;
+            glitchedFrameSlopeVal = true;
+        }
+    }
+    else
     {
         medianSlope.push_back(medianSlopeFrame);
     }
-    if (medianSlope.size() > 10)
+    //TODO validate single lines
+}
+bool SidewalkEdge::isSidewalkPerpendicular(RecognizeSidewalkParams *params)
+{
+    bool perpendicular = false;
+    double slopePerpendicularSpread = 10;
+    if ((medianSlopeFrame > (180 - params->glitchFrame.slope_perpendicular_spread))&&(medianSlopeFrame < (params->glitchFrame.slope_perpendicular_spread)))
     {
-        medianSlope.erase(medianSlope.begin());
+        perpendicular = true;
+        ROS_ERROR("Perpendicular motherfucker!");
     }
-    //TODO magic
+    return perpendicular;
 }
 void SidewalkEdge::fixEdge()
 {
@@ -206,10 +260,8 @@ int SidewalkEdge::computeOpticalFlow(cv::Mat *gray, cv::Mat *prevGray, std::vect
                              3, termcrit, 0, 0.001);
         std::cout << "prevPoints" << prevPoints->size() << std::endl;
     }
-
     std::swap(*prevPoints, *points);
     //cv::swap(*prevGray, *gray);
-
     return 0;
 }
 void SidewalkEdge::new_line()

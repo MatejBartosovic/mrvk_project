@@ -20,13 +20,20 @@ double intMedian(std::vector<int> data)
 {
     double median = 0;
     std::sort(data.begin(), data.end());
-    if (data.size()%2 == 0)
+    if (data.size() > 1)
     {
-        median = (data.at((int)(data.size()/2)) + data.at((int)(data.size()/2 + 1)))/2;
+        if (data.size()%2 == 0)
+        {
+            median = (data.at((int)(data.size()/2)) + data.at((int)(data.size()/2 - 1)))/2;
+        }
+        else
+        {
+            median = data.at((int)(data.size()/2));
+        }
     }
-    else
+    else if (data.size() > 0)
     {
-        median = data.at((int)(data.size()/2 + 1));
+        median = data.at(0);
     }
     return median;
 }
@@ -34,13 +41,20 @@ double doubleMedian(std::vector<double> data)
 {
     double median = 0;
     std::sort(data.begin(), data.end());
-    if (data.size()%2 == 0)
+    if (data.size() > 1)
     {
-        median = (data.at((int)(data.size()/2)) + data.at((int)(data.size()/2 + 1)))/2;
+        if (data.size()%2 == 0)
+        {
+            median = (data.at((int)(data.size()/2)) + data.at((int)(data.size()/2 - 1)))/2;
+        }
+        else
+        {
+            median = data.at((int)(data.size()/2));
+        }
     }
-    else
+    else if (data.size() > 0)
     {
-        median = data.at((int)(data.size()/2 + 1));
+        median = data.at(0);
     }
     return median;
 }
