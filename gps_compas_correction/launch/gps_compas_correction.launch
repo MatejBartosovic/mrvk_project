@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <node  name="GpsCompasCorrectionNode" pkg="gps_compas_correction" type="GpsCompasCorrectionNode">
+        <rosparam file="$(find gps_compas_correction)/config/config.yaml" command="load"/>
+    </node>
+</launch>

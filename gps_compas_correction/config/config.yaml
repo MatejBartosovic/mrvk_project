@@ -1,0 +1,9 @@
+tf_rate: 20
+correction_interval: 30
+parrent_frame: world
+child_frame: map
+target_frame: base_link;
+block_movement_server_name: /block_movement
+clear_costmap_server_name: /move_base/clear_costmaps
+imu_topic: /imu
+gps_topic: /gps
