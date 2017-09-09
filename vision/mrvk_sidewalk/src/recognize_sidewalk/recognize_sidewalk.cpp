@@ -81,7 +81,7 @@ short recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, Reco
     //imageResult = picture_segmentation_frame(image);
     //imageResult = picture_segmentation_frame_HSV(*imageOrig);
     //imageResult = picture_segmentation_frame_c1c2c3(*imageOrig);
-	imageResult = picture_segmentation_frame_c1c2c3_check(*imageOrig, &isValid);
+	imageResult = picture_segmentation_frame_c1c2c3_check(*imageOrig, &isValid, sidewalkEdges);
 
     //START draw pavement boundaries
     pavementCenter = imageResult.cols/2;
