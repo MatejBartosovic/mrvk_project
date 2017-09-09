@@ -13,6 +13,7 @@ struct GlitchFrame{
     int webSize = 30;
     double max_slope_deviation = 20;
     double slope_perpendicular_spread = 10;
+    double max_slope_variance = 90;
 };
 
 struct DisplayRecognized{

@@ -26,7 +26,8 @@ sidewalk_params:
     maxAreaDifference: 100
     webSize: 30
     max_slope_deviation: 30
-    slope_perpendicular_spread: 20
+    max_slope_variance: 70
+    slope_perpendicular_spread: 2
 
   edge_points_distribution:
     edge_points_dist: 20

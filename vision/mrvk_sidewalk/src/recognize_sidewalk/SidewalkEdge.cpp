@@ -110,6 +110,7 @@ void SidewalkEdge::validateEdge(RecognizeSidewalkParams *params, int pavementCen
             }
         }
     }
+
 }
 void SidewalkEdge::fillLineWithPoints(std::vector<cv::Point> *outFilledPointsEdge, lineEquation lineEquationC, cv::Point lineCmStart, cv::Point lineCmEnd)
 {
@@ -172,38 +173,54 @@ void SidewalkEdge::fillLineWithPoints(std::vector<cv::Point> *outFilledPointsEdg
         }
     }
 }
-int SidewalkEdge::computeSlopeMedian(RecognizeSidewalkParams *params)
-{
+int SidewalkEdge::computeSlopeMedian(RecognizeSidewalkParams *params) {
     int maxNumMedianSlope = 10;
     int numPoints = 0;
     int lineAngle = 0;
     std::vector<double> slopeVector;
-    for (int i = 0; i < getEdgeValid()->size(); i++)
-    {
-        if (getEdgeValid()->at(i).valid)
-        {
-            lineAngle = atan(getEdgeValid()->at(i).myLineEquation.slope)/M_PI*180;
-            if (lineAngle < 0)
-            {
+    for (int i = 0; i < getEdgeValid()->size(); i++) {
+        if (getEdgeValid()->at(i).valid) {
+            lineAngle = atan(getEdgeValid()->at(i).myLineEquation.slope) / M_PI * 180;
+            if (lineAngle < 0) {
                 lineAngle = lineAngle + 180;
             }
             slopeVector.push_back(lineAngle);
             numPoints++;
         }
     }
-
     medianSlopeFrame = doubleMedian(slopeVector);
+
+    //detect frame with high variance
+    //A = 1:10
+    //A = [2 2 2 2 2 1 1 1 1 5 ]
+    //meanA = mean(A)
+    //variance = mean(abs((A - meanA).*2))
+    double variance = 0;
+    for (int i = 0; i < slopeVector.size(); i++) {
+        variance += fabs(slopeVector.at(i) - medianSlopeFrame) * 2;
+    }
+    if (slopeVector.size() != 0) {
+        variance = variance / slopeVector.size();
+    } else {
+        variance = std::numeric_limits<double>::max();
+    }
+    glitchedFrameSlopeVal = false;
+    if (variance > params->glitchFrame.max_slope_variance)
+    {
+        glitchedFrameSlopeVal = true;
+    }
+    //ROS_ERROR("Variance = %lf", variance);
     return numPoints;
 }
 void SidewalkEdge::slopeValidate(RecognizeSidewalkParams *params)
 {
     invalidFrame = false;
-    glitchedFrameSlopeVal = false;
+    //glitchedFrameSlopeVal = false;
     perpendicularSidewalk = isSidewalkPerpendicular(params);
     if (!computeSlopeMedian(params)) return;
     if (medianSlope.size() >= 10)
     {
-        ROS_ERROR("Angle deviation %lf", fabs(doubleMedian(medianSlope) - medianSlopeFrame));
+        //ROS_ERROR("Angle deviation %lf", fabs(doubleMedian(medianSlope) - medianSlopeFrame));
         if (fabs(doubleMedian(medianSlope) - medianSlopeFrame) < params->glitchFrame.max_slope_deviation)
         {
 
@@ -213,7 +230,7 @@ void SidewalkEdge::slopeValidate(RecognizeSidewalkParams *params)
         else
         {
             invalidFrame = true;
-            glitchedFrameSlopeVal = true;
+            //glitchedFrameSlopeVal = true;
         }
     }
     else
@@ -226,10 +243,11 @@ bool SidewalkEdge::isSidewalkPerpendicular(RecognizeSidewalkParams *params)
 {
     bool perpendicular = false;
     double slopePerpendicularSpread = 10;
-    if ((medianSlopeFrame > (180 - params->glitchFrame.slope_perpendicular_spread))&&(medianSlopeFrame < (params->glitchFrame.slope_perpendicular_spread)))
+    //ROS_ERROR("Slope median %lf", medianSlopeFrame);
+    if ((medianSlopeFrame > (180 - params->glitchFrame.slope_perpendicular_spread))||(medianSlopeFrame < (params->glitchFrame.slope_perpendicular_spread)))
     {
         perpendicular = true;
-        ROS_ERROR("Perpendicular motherfucker!");
+        //ROS_ERROR("Perpendicular motherfucker!");
     }
     return perpendicular;
 }
