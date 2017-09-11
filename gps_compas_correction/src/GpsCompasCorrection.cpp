@@ -21,7 +21,7 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
     n.param<std::string>("clear_costmap_server_name",clearCostMapServerName,"/move_base/clear_costmaps");
     n.param<std::string>("imu_topic",imuTopic,"/imu");
     n.param<std::string>("gps_topic",gpsTopic,"/gps");
-    n.param<std::string>("map",gpsTopic,"");
+    n.param<std::string>("osm_map_path",map,"");
     n.getParam("filter_of_ways",types_of_ways);
 
 

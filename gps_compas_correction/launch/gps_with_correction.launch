@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="osm_map_path"/>
+    <include file="$(find gps_compas_correction)/launch/gps.launch"/>
+    <include file="$(find gps_compas_correction)/launch/gps_compas_correction.launch">
+        <arg name="osm_map_path" default="$(arg osm_map_path)"/>
+    </include>
+</launch>

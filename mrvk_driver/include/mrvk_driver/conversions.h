@@ -49,7 +49,7 @@ public:
 	double getCameraPositionX();
 
     template <typename TMember>
-	auto getStatus(TMember member){
+	auto getStatusMB(TMember member){
 		boost::unique_lock<boost::mutex> lock(data_mutex);
         return statusMB.*member;
 	}

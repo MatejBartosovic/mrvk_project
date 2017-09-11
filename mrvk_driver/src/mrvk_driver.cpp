@@ -34,6 +34,8 @@ namespace Mrvk{
 			if (!comunication_interface.init())
 				return false;
 
+			//inicializacia je este pred 1. zapisom do robota v callbacku dynamic reconfigure
+
 			SET_MAIN_BOARD config;
 
 			callbacks.getMbFromParam(&config);							//nastavi default parametre
@@ -97,8 +99,8 @@ namespace Mrvk{
 
 	private:
 
-		MrvkCallbacks callbacks;
 		CommunicationInterface comunication_interface;
+		MrvkCallbacks callbacks;
 		std::thread thread;
 
 

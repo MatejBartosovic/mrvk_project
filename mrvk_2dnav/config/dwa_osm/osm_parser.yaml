@@ -1,0 +1,3 @@
+interpolation_max_distance: 2.0 # Max distance between two nodes of orientated graph
+filter_of_ways: ["all"]         # Filter for parser. Parse only routes, which have value on the list
+                                # If value is all, then parse all routes

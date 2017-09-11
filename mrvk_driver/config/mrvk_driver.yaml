@@ -16,10 +16,10 @@ parity: 1       #0 - none #1 - odd parity #2 - even parity
 byte_size: 8    #5 - fivebits #6 - sixbits #7 - sevenbits #8 eightbits
  
 status_period: 5
- 
+
 mcb_5V: True
 mcb_12V: True
-wifi: True
+wifi: False
 video_transmitter: True #spustenie kinectu
 laser_scanner: True
 gps: False
