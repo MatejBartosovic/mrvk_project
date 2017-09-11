@@ -11,6 +11,8 @@
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <osm_planner/osm_parser.h>
+#include <osm_planner/computeBearing.h>
+
 
 class GpsCompasCorrection {
 public:
@@ -37,6 +39,63 @@ private:
 
     ros::ServiceClient blockMovementClient, clearCostMapClient;
     ros::ServiceServer correctionService; //todo dorobit
+    ros::ServiceServer computeBearing;
+
+    ros::Publisher gps_odom_pub;
+
+    bool computeBearingCallback(osm_planner::computeBearing::Request &req, osm_planner::computeBearing::Response &res);
+
+    /*template<class N> void publishOdometry(N gpsPose, tf::Quaternion quat = tf::createQuaternionFromYaw(0)){
+
+        //gps to odom publisher
+        nav_msgs::Odometry odom;
+        odom.header.stamp = ros::Time::now();
+        odom.header.frame_id = childFrame;
+        odom.child_frame_id = target_frame;
+
+        odom.pose.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(mapOrigin, gpsPose);
+        odom.pose.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, gpsPose);
+        odom.pose.pose.position.z = 0;
+
+        odom.pose.pose.orientation.x = 0;
+        odom.pose.pose.orientation.y = 0;
+        odom.pose.pose.orientation.z = 0;
+        odom.pose.pose.orientation.w = 1;
+
+        gps_odom_pub.publish(odom);
+    }*/
+
+    template<class N>
+    void sendTransform(N gpsPose, tf::Quaternion quat, bool waitForTransform = false){
+
+        //get transformation
+        tf::StampedTransform relativeTransform;
+        try{
+
+            if (waitForTransform)
+                listener.waitForTransform(childFrame, targetFrame, ros::Time(0), ros::Duration(1));
+
+            listener.lookupTransform(childFrame, targetFrame, ros::Time(0), relativeTransform);
+        }
+        catch (tf::TransformException ex){
+            ROS_ERROR("%s",ex.what());
+            runRobot();
+            return;
+        }
+
+        //construct gps translation
+        tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin,gpsPose),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, gpsPose),0); //todo misov prepocet dorobit
+
+        //absolute orientation
+        tf::Transform absolutTransform(quat, gpsTranslation);
+
+        //compute correction
+        correctionTransform = absolutTransform * relativeTransform.inverse();
+
+        //publish correction
+        tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
+
+    }
 };
 
 
