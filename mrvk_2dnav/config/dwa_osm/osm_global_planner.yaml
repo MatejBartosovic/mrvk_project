@@ -1,0 +1,27 @@
+Planner:
+  global_frame: world
+  robot_base_frame: base_link
+
+  #names of topics
+  topic_shortest_path: "shortest_path"
+  topic_gps_name: "/fix"
+
+  set_origin_pose: 1          # Set the origin pose on the map for cartesian calculator
+                              # 0 - origin pose from service
+                              # 1 - origin pose from 1. point on the map
+                              # 2 - random origin pose
+  footway_width: 2
+
+
+  use_tf_broadcaster: false
+ # This params has usage, when param use_tf_broadcaster is true
+  local_map_frame: map    #TF frame for correction
+  update_tf_pose_from_gps: 0       # 0 - no tf correction from gps
+                                   # 1 - Do correction only when gps accuracy is better
+                                   # 2 - Do correction always when is received correct gps message
+
+  matching_tf_with_map: 1         # Compute correction angle between TF pose and path
+                                  # 0 - no correction
+                                  # 1 - only one correction
+                                  # correction allways
+  distance_for_update_rotation: 3.0 # Minimal distance needed for update rotation. Param has usage, when matching_tf_with_map isn`t 0
