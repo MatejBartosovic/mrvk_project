@@ -53,8 +53,8 @@ bool CommunicationInterface::isActive(){
 
 void CommunicationInterface::close(){
 	if (active){
-		serialInterface.close();
 		active = false;
+		serialInterface.close();
 	}
 }
 
@@ -413,7 +413,7 @@ void CommunicationInterface::receiveFlagsToHumanReadable(int flags){
 	//1 mb 2 mcbl 4 mcbr (1 +2 +4 =7)
 	if(flags != serialInterface.flagsSum)
 		ROS_WARN("Receive timout flags: %d",flags);
-	for(int i;i<serialInterface.size();i++){
+	for(int i = 0 ;i<serialInterface.size();i++){
 		if(!(flags&(serialInterface.boards[i]->flag)))
 			ROS_WARN("%s TIMEOUT",serialInterface.boards[i]->name.c_str());
 	}

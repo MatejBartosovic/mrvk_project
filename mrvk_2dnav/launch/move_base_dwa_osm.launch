@@ -2,20 +2,21 @@
 <launch>
   <master auto="start"/>
 
-   <arg name="filepath" default="$(find osm_planner)/osm_example/fei.osm"/>
+   <arg name="osm_map_path"/>
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
     <param name="controller_frequency" value="10"/>
     <param name="base_global_planner" value="osm_planner/Planner"/>
-    <rosparam file="$(find mrvk_2dnav)/config/osm/costmap_common.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find mrvk_2dnav)/config/osm/costmap_common.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find mrvk_2dnav)/config/osm/local_costmap.yaml" command="load" />
-    <rosparam file="$(find mrvk_2dnav)/config/osm/global_costmap.yaml" command="load"/>
-    <param name="global_costmap/filepath" value="$(arg filepath)"/>
-    <rosparam file="$(find mrvk_2dnav)/config/dwa/base_local_planner.yaml" command="load" />
-    <!--remap from="odom" to="/mrvk/diff_drive_controller/odom"/-->
-    <!--remap from="cmd_vel" to="/mrvk/diff_drive_controller/cmd_vel"/-->
+    <param name="Planner/osm_map_path" value="$(arg osm_map_path)"/>
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_parser.yaml" command="load" ns:=Planner/>
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_common.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_common.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/local_costmap.yaml" command="load" />
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/global_costmap.yaml" command="load"/>
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_observaion_sources.yaml" command="load"/>
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/base_local_planner.yaml" command="load" />
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_global_planner.yaml" command="load" />
   </node>
 
  <node name="osm_helper" pkg="osm_planner" type="osm_helper" ns="move_base"/>
