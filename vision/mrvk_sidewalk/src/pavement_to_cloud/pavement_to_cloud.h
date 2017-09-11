@@ -13,7 +13,7 @@
 //Cm - centimeters
 
 #define DEFAULT_PAV_Z 0.01 //10cm
-#define PAV_LINE_RESOLUTION 0.1 //5cm
+#define PAV_LINE_RESOLUTION 1 //5cm
 #define MAX_DISTANCE_CM 500000 //500m
 #define MAX_NUM_POINTS_POINTCLOUD 10000
 

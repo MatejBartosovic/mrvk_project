@@ -104,7 +104,7 @@ private:
 public:
 
     Sidewalk():cloudProcessing(){
-        ROS_ERROR_STREAM("SIDEWALKINIT");
+        //ROS_ERROR_STREAM("SIDEWALKINIT");
         //START get parameters
         params.getParametersFromServer(n);
         valid_data = 0;
