@@ -61,7 +61,8 @@ void CloudProcessing::parseCloud() {
     pcl::PointCloud<pcl::PointXYZRGB> cloud;
     pcl::fromROSMsg(final_cloud, cloud);
     cv::Point3d point;
-    ROS_ERROR_STREAM(cloud.size());
+    //
+    // ROS_ERROR_STREAM(cloud.size());
     for (int i = 0; i<cloud.size();i++){
 
         point.x = cloud.points[i].x-KINECT_X;
