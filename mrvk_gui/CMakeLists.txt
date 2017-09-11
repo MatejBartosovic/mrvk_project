@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   rqt_gui
   rqt_gui_cpp
   std_msgs
+  osm_planner
   diagnostic_msgs
 )
 
@@ -20,6 +21,7 @@ set(${PROJECT_NAME}_cpp_SRCS
 set(${PROJECT_NAME}_cpp_UIS
         uis/MainWidget.ui
         uis/DiagnosticsWidget.ui
+	    uis/ControlWidget.ui
         )
 
 set(${PROJECT_NAME}_diagnostics_cpp_HDRS

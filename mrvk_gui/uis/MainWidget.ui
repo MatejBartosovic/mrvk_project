@@ -28,6 +28,9 @@
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
      <widget class="QWidget" name="diagnosticsAndControlTab">
       <attribute name="title">
        <string>Diagnostics and control</string>
@@ -35,7 +38,7 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Tab 2</string>
+       <string>Robot Control</string>
       </attribute>
      </widget>
     </widget>

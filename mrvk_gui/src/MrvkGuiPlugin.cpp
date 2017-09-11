@@ -4,6 +4,7 @@
 
 #include "mrvk_gui/MrvkGuiPlugin.h"
 #include <pluginlib/class_list_macros.h>
+#include <QMessageBox>
 
 namespace mrvk_gui {
 
@@ -22,10 +23,14 @@ namespace mrvk_gui {
         mainUi.setupUi(mainWidget);
 
         //setup diagnosticsWidget
-        diagnosticsWidget.setupUi(mainUi.tabWidget->widget(0));
+        //diagnosticsWidget.setupUi(mainUi.tabWidget->widget(0));
+        controlWidget.setupUi(mainUi.tabWidget->widget(1));
 
         //add to cintext
         context.addWidget(mainWidget);
+
+        connect(controlWidget.setGoal,SIGNAL(clicked()),this,SLOT(setGoal()));
+        connect(controlWidget.cancelGoal,SIGNAL(clicked()),this,SLOT(cancelGoal()));
 
     }
 
@@ -45,6 +50,56 @@ namespace mrvk_gui {
         // TODO restore intrinsic configuration, usually using:
         // v = instance_settings.value(k)
     }
+
+    void MrvkGui::readNavigData(){
+
+        if(controlWidget.decimal_check)
+
+        longitude.stupne= controlWidget.long_stupne->toPlainText().toInt();
+        longitude.min = controlWidget.long_minuty->toPlainText().toInt();
+        longitude.sec = controlWidget.long_sekundy->toPlainText().toInt();
+
+        latitude.stupne  = controlWidget.lat_stupne->toPlainText().toInt();
+        latitude.min  = controlWidget.lat_minuty->toPlainText().toInt();
+        latitude.sec  = controlWidget.lat_sekundy->toPlainText().toInt();
+
+    }
+
+    void MrvkGui::setGoal(){
+        QMessageBox msgBox;
+        msgBox.setText(QString("Do you want to start robot movement ?"));
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+
+        switch (msgBox.exec()){
+            case QMessageBox::Cancel:
+                // Cancel was clicked
+                break;
+            case QMessageBox::Ok:
+            default:
+                // should never be reached
+                break;
+        }
+
+    }
+
+    void MrvkGui::cancelGoal(){
+        QMessageBox msgBox;
+        msgBox.setText(QString("Do you want to cancel robot movement ?"));
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        switch (msgBox.exec()){
+            case QMessageBox::Cancel:
+                // Cancel was clicked
+                break;
+            case QMessageBox::Ok:
+            default:
+                // should never be reached
+                break;
+        }
+
+    }
+
 
 }; // namespace
 PLUGINLIB_EXPORT_CLASS(mrvk_gui::MrvkGui, rqt_gui_cpp::Plugin)
