@@ -2,5 +2,5 @@ adis_16488_params:
   baud_rate: 115200
   port_name: /dev/ttyACM0 #/dev/pts/18 #/dev/ttyusb0
   test_port_name: /dev/pts/19 #/dev/ttyusb1
-  enable_print_data: false
+  enable_print_data: true
   topic_name: imu_data

@@ -38,6 +38,23 @@ struct dataADIS{
     float data[NUM_DATA];
 };
 
+struct packetADIS{
+    unsigned char header[4];
+    unsigned char numBytes = 0;
+    uint32_t counter = 0;
+    float data[NUM_DATA];
+    unsigned char crc = 0;
+    unsigned char footer[4];
+}__attribute__((packed));
+
+struct packetADISnohead{
+    unsigned char numBytes = 0;
+    uint32_t counter = 0;
+    float data[NUM_DATA];
+    //unsigned char crc = 0;
+    unsigned char footer[4];
+}__attribute__((packed));
+
 bool calibAdis(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
 {
     sendCommandCalib = true;
@@ -57,10 +74,14 @@ bool resetGyro(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res
 int main(int argc, char **argv)
 {
     dataADIS readDataADIS;
+    packetADIS readPacketADIS;
+    packetADISnohead readPacketADISnohead;
+    bool synched = false;
     bool openFailed = false;
     unsigned char dataSize;
     sensor_msgs::Imu imu;
     unsigned char calibrateCommand = 0;
+    int retVal = 0;
 
     long long int dataCounter = 0;
     bool enable_print_data = false;
@@ -68,6 +89,7 @@ int main(int argc, char **argv)
     for (int i = 0; NUM_DATA > i; i++)
     {
         readDataADIS.data[i] = 0;
+        readPacketADIS.data[i] = 0;
     }
     ros::init(argc, argv, "comADIS");
     ros::NodeHandle n;
@@ -96,24 +118,62 @@ int main(int argc, char **argv)
 
     if (!openFailed)
     {
-        while(ros::ok())
-        {
-            int initCount = 0;
-            while (initCount < 4)
-            {
-                my_serial->read((uint8_t *) (&startComChar), sizeof(unsigned char));
-                if (startComChar == 0x42)
-                {
-                    initCount++;
+        while(ros::ok()) {
+            if (!synched) {
+                int initCount = 0;
+                unsigned char headerConst;
+                headerConst = 0x42;
+                while (initCount < 4) {
+                    ROS_ERROR("KOKOTI pojebany %d %d", initCount, headerConst);
+                    my_serial->read((&startComChar), sizeof(unsigned char));
+                    if (startComChar == headerConst) {
+                        initCount++;
+                        headerConst++;
+                    } else {
+                        ROS_ERROR("Error ADIS serial: unexpectet byte!");
+                        initCount = 0;
+                        headerConst = 0x42;
+                    }
                 }
-                else
+                synched = true;
+                printf("retVal: %d \n", my_serial->read((uint8_t *) (&readPacketADISnohead), sizeof(packetADISnohead)));
+                printf("size: %d \n", sizeof(packetADISnohead));
+                if (enable_print_data) {
+                    printf("footer: %x", readPacketADISnohead.footer[0]);
+                    printf(" %x", readPacketADISnohead.footer[1]);
+                    printf(" %x", readPacketADISnohead.footer[2]);
+                    printf(" %x", readPacketADISnohead.footer[3]);
+                }
+                ROS_ERROR("KOKOTsky size: %d ", readPacketADISnohead.numBytes);
+                ROS_ERROR("Kokotsky counter: %d ", readPacketADISnohead.counter);
+                for (int i = 0; i < NUM_DATA; i++)
                 {
-                    ROS_ERROR("Error ADIS serial: unexpectet byte!");
-                    initCount = 0;
+                    ROS_ERROR("DATA %d: %f", i, readPacketADISnohead.data[i]);
                 }
             }
-            my_serial->read((uint8_t *) (&dataSize), sizeof(unsigned char));
-            my_serial->read((uint8_t *) (&readDataADIS), sizeof(dataADIS));
+            printf("retVal: %d \n", my_serial->read((uint8_t *) (&readPacketADIS), sizeof(packetADIS)));
+            printf("size %d \n", sizeof(packetADIS));
+            if (enable_print_data) {
+                printf("header: %x ", readPacketADIS.header[0]);
+                printf(" %x ", readPacketADIS.header[1]);
+                printf(" %x ", readPacketADIS.header[2]);
+                printf(" %x ", readPacketADIS.header[3]);
+                printf("\n");
+
+                printf("footer: %x", readPacketADIS.footer[0]);
+                printf(" %x", readPacketADIS.footer[1]);
+                printf(" %x", readPacketADIS.footer[2]);
+                printf(" %x", readPacketADIS.footer[3]);
+            }
+
+            if (readPacketADIS.header[0] != 0x42 ||
+                readPacketADIS.header[0] != 0x43 ||
+                readPacketADIS.header[0] != 0x44 ||
+                readPacketADIS.header[0] != 0x45)
+            {
+                ROS_ERROR("Rozsynchronizovalo sa to!");
+                synched = false;
+            }
 
             //publish imu data
             dataCounter++;
@@ -136,7 +196,7 @@ int main(int argc, char **argv)
                 ROS_ERROR("Counter: %d", readDataADIS.counter);
                 for (int i = 0; i < NUM_DATA; i++)
                 {
-                    ROS_ERROR("DATA %d: %f", i, readDataADIS.data[i]);
+                    ROS_ERROR("DATA %d: %f", i, readPacketADIS.data[i]);
                 }
             }
             std::cout << enable_print_data << std::endl;
