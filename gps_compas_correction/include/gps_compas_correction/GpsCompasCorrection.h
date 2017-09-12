@@ -12,15 +12,19 @@
 #include <sensor_msgs/NavSatFix.h>
 #include <osm_planner/osm_parser.h>
 #include <osm_planner/computeBearing.h>
+#include <mutex>
 
 
 class GpsCompasCorrection {
 public:
     GpsCompasCorrection();
+    void init();
+
 protected:
     bool stopRobot();
     void runRobot();
     osm_planner::Parser::OSM_NODE mapOrigin;
+
 private:
     //functions
     void tfTimerCallback(const ros::TimerEvent& event);
@@ -42,6 +46,8 @@ private:
     ros::ServiceServer computeBearing;
 
     ros::Publisher gps_odom_pub;
+
+    std::mutex transformationMutex;
 
     bool computeBearingCallback(osm_planner::computeBearing::Request &req, osm_planner::computeBearing::Response &res);
 
@@ -86,15 +92,18 @@ private:
         //construct gps translation
         tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin,gpsPose),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, gpsPose),0); //todo misov prepocet dorobit
 
+        ROS_ERROR("x: %f y: %f",gpsTranslation.x(),gpsTranslation.y());
         //absolute orientation
         tf::Transform absolutTransform(quat, gpsTranslation);
 
         //compute correction
+       // std::lock_guard(transformationMutex);
+        transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 
         //publish correction
         tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
-
+        transformationMutex.unlock();
     }
 };
 

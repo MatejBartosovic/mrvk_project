@@ -9,7 +9,7 @@
     <param name="controller_frequency" value="10"/>
     <param name="base_global_planner" value="osm_planner/Planner"/>
     <param name="Planner/osm_map_path" value="$(arg osm_map_path)"/>
-    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_parser.yaml" command="load" ns:=Planner/>
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_parser.yaml" command="load" ns="Planner"/>
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_common.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_common.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/local_costmap.yaml" command="load" />
@@ -19,6 +19,6 @@
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_global_planner.yaml" command="load" />
   </node>
 
- <node name="osm_helper" pkg="osm_planner" type="osm_helper" ns="move_base"/>
+ <!--node name="osm_helper" pkg="osm_planner" type="osm_helper" ns="move_base"/-->
 
 </launch>

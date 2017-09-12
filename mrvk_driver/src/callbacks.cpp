@@ -101,6 +101,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 	{
 		boost::unique_lock<boost::mutex> lock(communicationInterface.write_mutex);
         communicationInterface.blockMovement(req.data);
+		res.success = true;
 		return true;
 	}
 

@@ -61,9 +61,21 @@ void GpsCompasCorrection::correctionTimerCallback(const ros::TimerEvent& event){
 
     //get imu and gps data
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
-    boost::shared_ptr<const sensor_msgs::Imu> imuData  = ros::topic::waitForMessage<sensor_msgs::Imu>(imuTopic, ros::Duration(1));
-    if(!imuData || !gpsData){
-        ROS_ERROR("IMU or GPS data timeout");
+    //boost::shared_ptr<const sensor_msgs::Imu> imuData = ros::topic::waitForMessage<sensor_msgs::Imu>(imuTopic, ros::Duration(1));
+    boost::shared_ptr<sensor_msgs::Imu> imuData(new sensor_msgs::Imu());
+    imuData->orientation.x = 0;
+    imuData->orientation.y = 0;
+    imuData->orientation.z = 0;
+    imuData->orientation.w = 1;
+
+    if(!gpsData || !imuData){
+        ROS_WARN("IMU or GPS data timeout");
+        runRobot();
+        return;
+    }
+
+    if(gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
+        ROS_WARN("Bad GPS data");
         runRobot();
         return;
     }
@@ -90,23 +102,20 @@ void GpsCompasCorrection::correctionTimerCallback(const ros::TimerEvent& event){
 }
 
 bool GpsCompasCorrection::stopRobot(){
-    tfTimer.stop();
     std_srvs::SetBool srv;
     srv.request.data = true;
     if(!blockMovementClient.call(srv)|| !srv.response.success){
         ROS_ERROR("Unable to stop robot");
-        tfTimer.start();
         return false;
     }
     std_srvs::Empty emptySrv;
-    if(!clearCostMapClient.call(emptySrv))
-        ROS_ERROR("Unable to clear costmaps");
+   // if(!clearCostMapClient.call(emptySrv))
+    //    ROS_ERROR("Unable to clear costmaps");
     sleep(2);
     return  true;
 }
 
 void GpsCompasCorrection::runRobot(){
-    tfTimer.start();
     std_srvs::SetBool srv;
     srv.request.data = false;
     if(!blockMovementClient.call(srv)|| !srv.response.success){
@@ -120,10 +129,11 @@ bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Re
 
     static osm_planner::Parser::OSM_NODE firstPoint;
     static bool firstPointAdded = false;
+    boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
 
     if (!firstPointAdded){
-        firstPoint.longitude = req.longitude;
-        firstPoint.latitude = req.latitude;
+        firstPoint.longitude = gpsData->longitude;
+        firstPoint.latitude = gpsData->latitude;
         res.message = "Added first point, please move robot forward and call service again";
         res.bearing = 0;
         firstPointAdded  = true;
@@ -131,8 +141,8 @@ bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Re
     } else{
 
         osm_planner::Parser::OSM_NODE secondPoint;
-        secondPoint.longitude = req.longitude;
-        secondPoint.latitude = req.latitude;
+        secondPoint.longitude = gpsData->longitude;
+        secondPoint.latitude = gpsData->latitude;
         double angle = osm_planner::Parser::Haversine::getBearing(firstPoint, secondPoint);
         res.message = "Bearing was calculated";
         firstPointAdded = false;
@@ -142,4 +152,24 @@ bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Re
         res.bearing = angle;
         return true;
     }
+}
+void GpsCompasCorrection::init(){
+
+        boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(0));
+        //boost::shared_ptr<const sensor_msgs::Imu> imuData = ros::topic::waitForMessage<sensor_msgs::Imu>(imuTopic, ros::Duration(0));
+    boost::shared_ptr< sensor_msgs::Imu> imuData(new sensor_msgs::Imu());
+    imuData->orientation.x = 0;
+    imuData->orientation.y = 0;
+    imuData->orientation.z = 0;
+    imuData->orientation.w = 1;
+
+    if(!imuData || !gpsData){
+        init();
+        ROS_ERROR("no imu or gps data");
+        return;
+    }
+    tf::Quaternion imuQuaternion;
+    tf::quaternionMsgToTF(imuData->orientation,imuQuaternion);
+    sendTransform(*gpsData,imuQuaternion,true);
+    return;
 }

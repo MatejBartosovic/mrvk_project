@@ -58,19 +58,21 @@
             </collision>
         </link>
 
-        <!--Old imu <joint name="stabilizer_to_imu" type="fixed">
-            <origin  xyz="-0.1 0.1 -0.01"/>
+        <joint name="stabilizer_to_adis16350" type="fixed">
+            <origin  xyz="0.0 0.0 -0.01"/>
             <parent link="base_stabilized"/>
-            <child link="imu"/>
-        </joint>-->
-
-        <joint name="stabilizer_to_imu" type="fixed">
-            <origin rpy = "0 3.14 0" xyz="0.09 0.0 0.625"/>
-            <parent link="base_stabilized"/>
-            <child link="imu"/>
+            <child link="adis16350"/>
         </joint>
 
-        <link name = "imu"/>
+        <link name = "adis16350"/>
+
+        <joint name="stabilizer_to_adis16488" type="fixed">
+            <origin rpy = "0 3.14 0" xyz="0.09 0.0 0.625"/>
+            <parent link="base_stabilized"/>
+            <child link="adis16488"/>
+        </joint>
+
+        <link name = "adis16488"/>
 
         <link name="laser">
             <visual>

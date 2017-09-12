@@ -9,9 +9,10 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "gps_correction_node");
 
     GpsCompasCorrection correction;
-
-    ros::spin();
-    ros::shutdown();
+    ros::MultiThreadedSpinner spinner(2);
+    spinner.spin();
+    correction.init();
+    ros::waitForShutdown();
 
     return 0;
 }

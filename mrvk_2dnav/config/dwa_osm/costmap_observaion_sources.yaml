@@ -10,6 +10,6 @@ laser_scan_sensor:
 point_cloud_sensor:
   sensor_frame: /base_stabilized
   data_type: PointCloud2
-  topic: /paw_pointCloud
+  topic: /pav_pointCloud
   marking: true
-  clearing: true
+  clearing: false

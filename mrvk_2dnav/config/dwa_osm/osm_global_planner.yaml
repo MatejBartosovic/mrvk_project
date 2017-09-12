@@ -13,6 +13,7 @@ Planner:
   footway_width: 2
 
 
+  use_localization: true
   use_tf_broadcaster: false
  # This params has usage, when param use_tf_broadcaster is true
   local_map_frame: map    #TF frame for correction

@@ -19,6 +19,7 @@
 	<include file="$(find mrvk_laser_filters)/launch/hokuyo_filter.launch"/>
 
 	<!--run adis node-->
+	<!--include file="$(find adis16488)/launch/adis_driver.launch" if="$(arg use_imu)"/-->
 	<include file="$(find adis16350)/launch/adis_driver.launch" if="$(arg use_imu)"/>
 
 	<!--run robot pose ekf node-->
@@ -30,7 +31,7 @@
 	  <param name="odom_used" value="true"/>
 	  <param name="imu_used" value="true"/>
 	  <param name="vo_used" value="$(arg vo_used)"/>
-	  <remap from="imu_data" to="/adis16350/imu_data" if="$(arg use_imu)"/>
+	  <remap from="imu_data" to="/adis16488/imu_data" if="$(arg use_imu)"/>
 	</node>
 
 	<!--run gmapping node-->

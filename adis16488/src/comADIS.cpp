@@ -34,6 +34,14 @@ bool sendCommandResetAdis = false;
 bool sendCommandResetGyro = false;
 
 struct dataADIS{
+    unsigned char header[4];
+    unsigned char length = 0;
+    unsigned int counter = 0;
+    float data[NUM_DATA];
+};
+
+struct dataADISnohead{
+    unsigned char length = 0;
     unsigned int counter = 0;
     float data[NUM_DATA];
 };
@@ -69,20 +77,19 @@ int main(int argc, char **argv)
     {
         readDataADIS.data[i] = 0;
     }
-    ros::init(argc, argv, "comADIS");
-    ros::NodeHandle n;
-    std::string topicName = "imu_data";
-    n.getParam("adis_16488_params/topic_name", topicName);
-    ros::Publisher imu_pub = n.advertise<sensor_msgs::Imu>("chatter", 1);
+    ros::init(argc, argv, "adis16488");
+    ros::NodeHandle n("~");
+    ros::Publisher imu_pub = n.advertise<sensor_msgs::Imu>("imu_data", 10);
     ros::ServiceServer calib_adis_srv_n = n.advertiseService("calib_adis_srv", calibAdis);
     ros::ServiceServer reset_adis_srv_n = n.advertiseService("reset_adis_srv", resetAdis);
     ros::ServiceServer reset_gyro_srv_n = n.advertiseService("reset_gyro_srv", resetGyro);
 
     std::string port = "/dev/ttyUSB0";
     int baudRate = 9600;
-    n.getParam("adis_16488_params/port_name", port);
-    n.getParam("adis_16488_params/baud_rate", baudRate);
-    n.getParam("adis_16488_params/enable_print_data", enable_print_data);
+    n.getParam("port_name", port);
+    n.getParam("baud_rate", baudRate);
+    n.getParam("enable_print_data", enable_print_data);
+    ROS_INFO("port %s",port.c_str());
 
     serial::Serial* my_serial;
     try{
@@ -93,33 +100,47 @@ int main(int argc, char **argv)
         openFailed = true;
     }
     unsigned char startComChar;
+    int readRet = 0;
 
     if (!openFailed)
     {
         while(ros::ok())
         {
+            /*ROS_ERROR("KOKOT");
             int initCount = 0;
             while (initCount < 4)
             {
-                my_serial->read((uint8_t *) (&startComChar), sizeof(unsigned char));
-                if (startComChar == 0x42)
+                ROS_ERROR("KOKOT2");
+                readRet = my_serial->read((&startComChar), sizeof(unsigned char));
+                ROS_ERROR("read ret %d %x", readRet,startComChar);
+                if (readRet != 0)
                 {
-                    initCount++;
+                    if (startComChar == 0x42)
+                    {
+                        initCount++;
+                        ROS_ERROR("KOKOT3");
+                    }
+                    else
+                    {
+                        ROS_ERROR("Error ADIS serial: unexpectet byte!");
+                        initCount = 0;
+                    }
                 }
                 else
                 {
-                    ROS_ERROR("Error ADIS serial: unexpectet byte!");
-                    initCount = 0;
+                    ROS_ERROR("Nothing read!");
                 }
             }
-            my_serial->read((uint8_t *) (&dataSize), sizeof(unsigned char));
-            my_serial->read((uint8_t *) (&readDataADIS), sizeof(dataADIS));
+            my_serial->read((uint8_t *) (&dataSize), sizeof(unsigned char));*/
+            readRet = my_serial->read((uint8_t *) (&readDataADIS), sizeof(dataADIS));
+
+            ROS_ERROR("Read number: %d, header %x %x %x %x",readRet, readDataADIS.header[0], readDataADIS.header[1], readDataADIS.header[2], readDataADIS.header[3]);
 
             //publish imu data
             dataCounter++;
             imu.header.frame_id = "imu";
             imu.header.seq = dataCounter;
-            imu.header.stamp.nsec = ros::Time::now().nsec;
+            imu.header.stamp = ros::Time::now();
             imu.angular_velocity.x = (double)readDataADIS.data[VEL_X];
             imu.angular_velocity.y = (double)readDataADIS.data[VEL_Y];
             imu.angular_velocity.z = (double)readDataADIS.data[VEL_Z];
@@ -127,7 +148,6 @@ int main(int argc, char **argv)
             imu.linear_acceleration.y = (double)readDataADIS.data[ACCEL_Y];
             imu.linear_acceleration.z = (double)readDataADIS.data[ACCEL_Z];
             imu.orientation = tf::createQuaternionMsgFromRollPitchYaw((double)readDataADIS.data[MAG_Z],(double)readDataADIS.data[MAG_Y],(double)readDataADIS.data[MAG_X]);
-
 
             //display read data
             if (enable_print_data)
@@ -139,7 +159,6 @@ int main(int argc, char **argv)
                     ROS_ERROR("DATA %d: %f", i, readDataADIS.data[i]);
                 }
             }
-            std::cout << enable_print_data << std::endl;
 
             imu_pub.publish(imu);
             ros::spinOnce();
