@@ -9,14 +9,8 @@
 #include <mrvk_gui/DiagnosticsWidget.h>
 #include <ui_ControlWidget.h>
 #include <osm_planner/osm_parser.h>
-
-
-struct gps_data{
-    int8_t stupne;
-    int8_t min;
-    int8_t sec;
-    double value;
-};
+#include <geometry_msgs/PoseStamped.h>
+#include <actionlib_msgs/GoalID.h>
 
 namespace mrvk_gui{
 
@@ -29,16 +23,24 @@ namespace mrvk_gui{
         virtual void restoreSettings(const qt_gui_cpp::Settings& plugin_settings, const qt_gui_cpp::Settings& instance_settings);
     private:
 
-        gps_data latitude,longitude;
+
+        osm_planner::Parser::OSM_NODE map_origin, goal_target;
+        geometry_msgs::PoseStamped goalXY;
+
         Ui::MainWidget mainUi;
         QWidget* mainWidget;
         DiagnosticsWidget diagnosticsWidget;
         Ui::ControlWidget controlWidget;
         //DiagnosticModel treeModel;
+        ros::Publisher goal_pub, cancel_pub;
+        actionlib_msgs::GoalID cancel_goal_msg;
+
         private slots:
-        void setGoal();
-        void cancelGoal();
-        void readNavigData();
+            void setGoal();
+            void cancelGoal();
+            void readNavigData();
+
+
     };
 };
 
