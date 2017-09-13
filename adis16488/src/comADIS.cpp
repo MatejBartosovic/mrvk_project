@@ -71,6 +71,9 @@ bool calibAdis(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res
     calibrateCommand = 139;
     my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
     sendCommandCalib = false;
+    ROS_ERROR_STREAM("COMMAND NA KALIBRACIU POSLANY");
+    sleep(30);
+    ROS_ERROR_STREAM("GYRO NAKALIBROVANÉ Môžete hýbať robotom");
     res.success = true;
     return true;
 }
@@ -100,6 +103,7 @@ bool resetGyro(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res
     my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
     sendCommandResetGyro = false;
     res.success = true;
+
     return true;
 }
 
@@ -130,11 +134,15 @@ int main(int argc, char **argv)
     long long int dataCounter = 0;
     bool enable_print_data = false;
     //init read data
+
     for (int i = 0; NUM_DATA > i; i++)
     {
         readDataADIS.data[i] = 0;
         readPacketADIS.data[i] = 0;
     }
+
+
+
     ros::init(argc, argv, "adis16488");
     ros::NodeHandle n("~");
     ros::Publisher imu_pub = n.advertise<sensor_msgs::Imu>("imu_data", 10);
@@ -209,6 +217,29 @@ int main(int argc, char **argv)
 
     if (!openFailed)
     {
+
+        //reset adis
+        int calibrateCommand = 50;
+        my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
+        calibrateCommand = 87;
+        my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
+        calibrateCommand = 140;
+        my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
+        sendCommandResetAdis = false;
+
+        ROS_ERROR_STREAM("ORIENTÁCIE ZRESETOVANÉ KALIBRUJE SA GYRO robot musí byť 30 sec v pokoji");
+        sleep(1);
+        // int calibrateCommand = 50;
+        my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
+        calibrateCommand = 87;
+        my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
+        calibrateCommand = 139;
+        my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
+        sendCommandCalib = false;
+
+        sleep(30);
+        ROS_ERROR_STREAM("GYRO NAKALIBROVANÉ Môžete hýbať robotom");
+
         while(ros::ok()) {
 
             if (!synched) {
@@ -230,6 +261,7 @@ int main(int argc, char **argv)
                     }
                 }
                 synched = true;
+
                 my_serial->read((uint8_t *) (&readPacketADISnohead), sizeof(packetADISnohead));
                 //printf("retVal: %d \n", my_serial->read((uint8_t *) (&readPacketADISnohead), sizeof(packetADISnohead)));
                 //printf("size: %d \n", sizeof(packetADISnohead));
@@ -243,10 +275,10 @@ int main(int argc, char **argv)
 
                 //ROS_ERROR("KOKOTsky size: %d ", readPacketADISnohead.numBytes);
                 //ROS_ERROR("Kokotsky counter: %d ", readPacketADISnohead.counter);
-                for (int i = 0; i < NUM_DATA; i++)
+                /*for (int i = 0; i < NUM_DATA; i++)
                 {
                     ROS_ERROR("DATA %d: %f", i, readPacketADISnohead.data[i]);
-                }
+                }*/
             }
 
             int retval = my_serial->read((uint8_t *) (&readPacketADIS), sizeof(packetADIS));
