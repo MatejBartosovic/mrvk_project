@@ -49,6 +49,8 @@ private:
 
     std::mutex transformationMutex;
 
+    tf::Quaternion quat;
+
     bool computeBearingCallback(osm_planner::computeBearing::Request &req, osm_planner::computeBearing::Response &res);
 
     /*template<class N> void publishOdometry(N gpsPose, tf::Quaternion quat = tf::createQuaternionFromYaw(0)){
@@ -72,19 +74,17 @@ private:
     }*/
 
     template<class N>
-    void sendTransform(N gpsPose, tf::Quaternion quat, bool waitForTransform = false){
+    void sendTransform(N gpsPose, tf::Quaternion quat){
 
         //get transformation
         tf::StampedTransform relativeTransform;
         try{
 
-            if (waitForTransform)
-                listener.waitForTransform(childFrame, targetFrame, ros::Time(0), ros::Duration(1));
-
+            listener.waitForTransform(childFrame, targetFrame, ros::Time(0), ros::Duration(1));
             listener.lookupTransform(childFrame, targetFrame, ros::Time(0), relativeTransform);
         }
         catch (tf::TransformException ex){
-            ROS_ERROR("%s",ex.what());
+            ROS_WARN("Nekorigujem polohu tf timout. %s",ex.what());
             runRobot();
             return;
         }
@@ -97,6 +97,37 @@ private:
 
         //compute correction
        // std::lock_guard(transformationMutex);
+        transformationMutex.lock();
+        correctionTransform = absolutTransform * relativeTransform.inverse();
+
+        //publish correction
+        tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
+        transformationMutex.unlock();
+    }
+
+     template<class N>
+    void sendTransform(N gpsPose){
+
+        //get transformation
+        tf::StampedTransform relativeTransform;
+        try{
+            listener.waitForTransform(childFrame, targetFrame, ros::Time(0), ros::Duration(1));
+            listener.lookupTransform(childFrame, targetFrame, ros::Time(0), relativeTransform);
+        }
+        catch (tf::TransformException ex){
+            ROS_WARN("Nekorigujem polohu tf timout. %s",ex.what());
+            runRobot();
+            return;
+        }
+
+        //construct gps translation
+        tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin,gpsPose),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, gpsPose),0); //todo misov prepocet dorobit
+
+        //absolute orientation
+        tf::Transform absolutTransform(relativeTransform.getRotation(), gpsTranslation);
+
+        //compute correction
+        // std::lock_guard(transformationMutex);
         transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 

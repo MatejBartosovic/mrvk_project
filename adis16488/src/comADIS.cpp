@@ -73,7 +73,7 @@ bool calibAdis(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res
     sendCommandCalib = false;
     ROS_ERROR_STREAM("COMMAND NA KALIBRACIU POSLANY");
     sleep(30);
-    ROS_ERROR_STREAM("GYRO NAKALIBROVANÉ Môžete hýbať robotom");
+    ROS_ERROR_STREAM("GYRO NAKALIBROVANE mozete hybat robotom");
     res.success = true;
     return true;
 }
@@ -227,7 +227,7 @@ int main(int argc, char **argv)
         my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
         sendCommandResetAdis = false;
 
-        ROS_ERROR_STREAM("ORIENTÁCIE ZRESETOVANÉ KALIBRUJE SA GYRO robot musí byť 30 sec v pokoji");
+        ROS_ERROR_STREAM("ORIENTACIE ZRESETOVANE KALIBRUJE SA GYRO robot musi byt 30 sec v pokoji");
         sleep(1);
         // int calibrateCommand = 50;
         my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
@@ -238,14 +238,14 @@ int main(int argc, char **argv)
         sendCommandCalib = false;
 
         sleep(30);
-        ROS_ERROR_STREAM("GYRO NAKALIBROVANÉ Môžete hýbať robotom");
+        ROS_ERROR_STREAM("GYRO NAKALIBROVANE Môžete hybat robotom");
 
         while(ros::ok()) {
 
             if (!synched) {
                 int initCount = 0;
                 unsigned char headerConst = 0x42;
-
+                ROS_WARN("ADIS serial: syncing");
                 while (initCount < 4) {
                     //ROS_ERROR("KOKOTI pojebany %d %c", initCount, headerConst);
                     my_serial->read((&startComChar), sizeof(unsigned char));
@@ -255,11 +255,11 @@ int main(int argc, char **argv)
                         initCount++;
                         headerConst++;
                     } else {
-                        ROS_ERROR("Error ADIS serial: unexpectet byte!");
                         initCount = 0;
                         headerConst = 0x42;
                     }
                 }
+                ROS_WARN("ADIS serial: synced");
                 synched = true;
 
                 my_serial->read((uint8_t *) (&readPacketADISnohead), sizeof(packetADISnohead));

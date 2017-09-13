@@ -76,10 +76,11 @@ void GpsCompasCorrection::correctionTimerCallback(const ros::TimerEvent& event){
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
     //boost::shared_ptr<const sensor_msgs::Imu> imuData = ros::topic::waitForMessage<sensor_msgs::Imu>(imuTopic, ros::Duration(1));
     boost::shared_ptr<sensor_msgs::Imu> imuData(new sensor_msgs::Imu());
-    imuData->orientation.x = 0;
-    imuData->orientation.y = 0;
-    imuData->orientation.z = 0;
-    imuData->orientation.w = 1;
+
+    /*imuData->orientation.x = quat.x();
+    imuData->orientation.y = quat.y();
+    imuData->orientation.z = quat.z();
+    imuData->orientation.w = quat.w();*/
 
     if(!gpsData || !imuData){
         ROS_WARN("IMU or GPS data timeout");
@@ -97,19 +98,9 @@ void GpsCompasCorrection::correctionTimerCallback(const ros::TimerEvent& event){
     tf::Quaternion imuQuaternion;
     tf::quaternionMsgToTF(imuData->orientation,imuQuaternion);
 
-    sendTransform(*gpsData, imuQuaternion);
-    //construct gps translation
-   /* tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin,*gpsData),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin,*gpsData),0); //todo misov prepocet dorobit
+    //sendTransform(*gpsData, imuQuaternion); //TODO compas
+    sendTransform(*gpsData);
 
-    //absolute orientation
-    tf::Transform absolutTransform(imuQuaternion,gpsTranslation);
-
-    //compute correction
-    correctionTransform = absolutTransform * relativeTransform.inverse();
-
-    //publish correction
-    tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
-*/
     //run robot
     runRobot();
 }
@@ -142,7 +133,13 @@ bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Re
 
     static osm_planner::Parser::OSM_NODE firstPoint;
     static bool firstPointAdded = false;
+
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
+    if(gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
+        ROS_WARN("No fixed GPS data");
+        res.message = "No fixed GPS data";
+        return true;
+    }
 
     if (!firstPointAdded){
         firstPoint.longitude = gpsData->longitude;
@@ -159,9 +156,9 @@ bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Re
         double angle = osm_planner::Parser::Haversine::getBearing(firstPoint, secondPoint);
         res.message = "Bearing was calculated";
         firstPointAdded = false;
-        tf::Quaternion q;
-        q.setRPY(0, 0, angle);
-        sendTransform(secondPoint, q, true);
+        //tf::Quaternion q;
+        quat.setRPY(0, 0, angle);
+        sendTransform(secondPoint, quat);
         res.bearing = angle;
         return true;
     }
@@ -169,7 +166,7 @@ bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Re
 void GpsCompasCorrection::init(){
 
         boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(0));
-        //boost::shared_ptr<const sensor_msgs::Imu> imuData = ros::topic::waitForMessage<sensor_msgs::Imu>(imuTopic, ros::Duration(0));
+        //boost::shared_ptr<const sensor_msgs::Imu> imuData = ros::topic::waitForMessage<sensor_msgs::Imu>(imuTopic, ros::Duration(0)); //TODO compas
     boost::shared_ptr< sensor_msgs::Imu> imuData(new sensor_msgs::Imu());
 
  //miso test
@@ -181,10 +178,6 @@ void GpsCompasCorrection::init(){
     tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin, *gpsData),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, *gpsData),0); //todo misov prepocet dorobit
 
     ROS_ERROR("x: %f y: %f",gpsTranslation.x(),gpsTranslation.y());*/
-    imuData->orientation.x = 0;
-    imuData->orientation.y = 0;
-    imuData->orientation.z = 0;
-    imuData->orientation.w = 1;
 
     if(gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
         ROS_ERROR("Bad GPS data - status no fix");
@@ -199,6 +192,7 @@ void GpsCompasCorrection::init(){
     }
     tf::Quaternion imuQuaternion;
     tf::quaternionMsgToTF(imuData->orientation,imuQuaternion);
-    sendTransform(*gpsData,imuQuaternion,true);
+    //sendTransform(*gpsData,imuQuaternion);//TODO compas
+    sendTransform(*gpsData);
     return;
 }
