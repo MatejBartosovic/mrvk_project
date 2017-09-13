@@ -11,6 +11,7 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
     double tfRate, correctioninterval;
     std::string blockMovementServerName, clearCostMapServerName, map;
     std::vector<std::string> types_of_ways;
+    std::string cmd_vel_topic_name;
     int settingOrigin;
     double latitude, longitude;
 
@@ -23,6 +24,9 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
     n.param<std::string>("clear_costmap_server_name",clearCostMapServerName,"/move_base/clear_costmaps");
     n.param<std::string>("imu_topic",imuTopic,"/imu");
     n.param<std::string>("gps_topic",gpsTopic,"/gps");
+    n.param<std::string>("cmd_vel_topic", cmd_vel_topic_name, "cmd_vel");
+    n.param<double>("moving_time", wait, 2);
+    n.param<double>("moving_velocity", velocity, 1);
     n.param<std::string>("osm_map_path",map,"");
     n.getParam("filter_of_ways",types_of_ways);
     n.getParam("set_origin_pose", settingOrigin);
@@ -31,11 +35,14 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
 
     blockMovementClient = n.serviceClient<std_srvs::SetBool>(blockMovementServerName);
     clearCostMapClient = n.serviceClient<std_srvs::SetBool>(clearCostMapServerName);
-    computeBearing = n.advertiseService("compute_bearing", &GpsCompasCorrection::computeBearingCallback, this);
 
     tfTimer = n.createTimer(ros::Duration(1/tfRate), &GpsCompasCorrection::tfTimerCallback,this);
     correctionTimer = n.createTimer(ros::Duration(correctioninterval), &GpsCompasCorrection::correctionTimerCallback,this);
 
+    computeBearing = n.advertiseService("compute_bearing", &GpsCompasCorrection::computeBearingCallback, this);
+    autoComputeBearing = n.advertiseService("auto_compute_bearing", &GpsCompasCorrection::autoComputeBearingCallback, this);
+
+    cmd_vel_pub = n.advertise<geometry_msgs::Twist>(cmd_vel_topic_name, 1);
 
     osm_planner::Parser parser;
     parser.setNewMap(map);
@@ -49,6 +56,8 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
         mapOrigin = parser.getNodeByID(0);
         // ROS_ERROR("lat %f, lon %f", mapOrigin.latitude,mapOrigin.longitude);
     }
+
+    firstPointAdded = false;
 }
 
 void GpsCompasCorrection::tfTimerCallback(const ros::TimerEvent& event){
@@ -119,65 +128,20 @@ bool GpsCompasCorrection::stopRobot(){
     return  true;
 }
 
-void GpsCompasCorrection::runRobot(){
+void GpsCompasCorrection::runRobot() {
     std_srvs::SetBool srv;
     srv.request.data = false;
-    if(!blockMovementClient.call(srv)|| !srv.response.success){
+    if (!blockMovementClient.call(srv) || !srv.response.success) {
         ROS_ERROR("Unable to run robot");
         return;
     }
 }
 
-
-bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Request &req, osm_planner::computeBearing::Response &res){
-
-    static osm_planner::Parser::OSM_NODE firstPoint;
-    static bool firstPointAdded = false;
-
-    boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
-    if(gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
-        ROS_WARN("No fixed GPS data");
-        res.message = "No fixed GPS data";
-        return true;
-    }
-
-    if (!firstPointAdded){
-        firstPoint.longitude = gpsData->longitude;
-        firstPoint.latitude = gpsData->latitude;
-        res.message = "Added first point, please move robot forward and call service again";
-        res.bearing = 0;
-        firstPointAdded  = true;
-        return true;
-    } else{
-
-        osm_planner::Parser::OSM_NODE secondPoint;
-        secondPoint.longitude = gpsData->longitude;
-        secondPoint.latitude = gpsData->latitude;
-        double angle = osm_planner::Parser::Haversine::getBearing(firstPoint, secondPoint);
-        res.message = "Bearing was calculated";
-        firstPointAdded = false;
-        //tf::Quaternion q;
-        quat.setRPY(0, 0, angle);
-        sendTransform(secondPoint, quat);
-        res.bearing = angle;
-        return true;
-    }
-}
 void GpsCompasCorrection::init(){
 
         boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(0));
         //boost::shared_ptr<const sensor_msgs::Imu> imuData = ros::topic::waitForMessage<sensor_msgs::Imu>(imuTopic, ros::Duration(0)); //TODO compas
     boost::shared_ptr< sensor_msgs::Imu> imuData(new sensor_msgs::Imu());
-
- //miso test
-   /* boost::shared_ptr<sensor_msgs::NavSatFix> gpsData(new sensor_msgs::NavSatFix());
-   ROS_ERROR("correction node init");
-    gpsData->latitude =  48.1532431;
-    gpsData->longitude = 17.0743601;
-    //construct gps translation
-    tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin, *gpsData),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, *gpsData),0); //todo misov prepocet dorobit
-
-    ROS_ERROR("x: %f y: %f",gpsTranslation.x(),gpsTranslation.y());*/
 
     if(gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
         ROS_ERROR("Bad GPS data - status no fix");
@@ -194,5 +158,138 @@ void GpsCompasCorrection::init(){
     tf::quaternionMsgToTF(imuData->orientation,imuQuaternion);
     //sendTransform(*gpsData,imuQuaternion);//TODO compas
     sendTransform(*gpsData);
+    ROS_ERROR("init end");
     return;
+}
+
+
+//Compute Bearing callbacks
+
+bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Request &req, osm_planner::computeBearing::Response &res){
+
+    double angle;
+    int result = addPointAndCompute(&angle);
+
+    firstPointAdded = false;
+
+    if (result < 0 ){
+        ROS_WARN("No fixed GPS data");
+        res.message = "No fixed GPS data";
+
+    } else if (result == 0){
+        res.message = "Added first point, please move robot forward and call service again";
+        res.bearing = 0;
+    } else{
+        res.message = "Bearing was calculated";
+        res.bearing = angle;
+    }
+
+    return true;
+}
+
+bool GpsCompasCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request &req,
+                                                     std_srvs::Trigger::Response &res) {
+    int result = -1;
+    double angle;
+    int numberOfRead = 0;
+
+    //Add First point
+    while (result < 0){
+
+        result = addPointAndCompute(&angle);
+        numberOfRead++;
+
+        if (numberOfRead > 5) {
+            ROS_WARN("No fixed GPS data");
+            res.success = false;
+            res.message = "No fixed GPS data in first point";
+            return true;
+        }
+    }
+
+    ROS_WARN("Added first point");
+    numberOfRead = 0;
+    result = -1;
+
+    //Move robot
+    //Set twist message
+    geometry_msgs::Twist twist;
+    twist.angular.x = 0;
+    twist.angular.y = 0;
+    twist.angular.z = 0;
+    twist.linear.x = 0;
+    twist.linear.y = 0;
+    twist.linear.z = velocity;
+
+    //set timing and publish cmd_vel
+    ros::Time start = ros::Time::now();
+    ros::Time current = ros::Time::now();
+    ros::Rate rate(5);
+
+    while ((current - start).toSec() < wait){
+
+        cmd_vel_pub.publish(twist);
+        rate.sleep();
+        current = ros::Time::now();
+    }
+
+    //stop publishing cmd_vel
+    twist.linear.z = 0;
+    cmd_vel_pub.publish(twist);
+
+    //Add second point and compute
+    while (result < 0){
+
+        result = addPointAndCompute(&angle);
+        numberOfRead++;
+
+        if (numberOfRead > 5) {
+            ROS_WARN("No fixed GPS data");
+            res.message = "No fixed GPS data in second point";
+            res.success = false;
+            return true;
+        }
+    }
+
+    //Print result
+    res.message = "Computed angle: " + std::to_string(angle);
+    res.success = true;
+    return true;
+}
+
+int GpsCompasCorrection::addPointAndCompute(double *angle) {
+
+
+    static osm_planner::Parser::OSM_NODE firstPoint;
+    static bool firstPointAdded = false;
+
+    boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
+    if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
+        ROS_WARN("No fixed GPS data");
+     //   res.message = "No fixed GPS data";
+        return -1;
+    }
+
+    if (!firstPointAdded){
+        firstPoint.longitude = gpsData->longitude;
+        firstPoint.latitude = gpsData->latitude;
+       // res.message = "Added first point, please move robot forward and call service again";
+       // res.bearing = 0;
+        firstPointAdded  = true;
+        return 0;
+    } else{
+
+        osm_planner::Parser::OSM_NODE secondPoint;
+        secondPoint.longitude = gpsData->longitude;
+        secondPoint.latitude = gpsData->latitude;
+        double calculatedAngle = osm_planner::Parser::Haversine::getBearing(firstPoint, secondPoint);
+        //res.message = "Bearing was calculated";
+        firstPointAdded = false;
+        //tf::Quaternion q;
+        quat.setRPY(0, 0, calculatedAngle);
+        sendTransform(secondPoint, quat);
+        *angle = calculatedAngle;
+        //res.bearing = angle;
+        return 1;
+    }
 }

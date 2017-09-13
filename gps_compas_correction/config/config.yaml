@@ -7,5 +7,8 @@ block_movement_server_name: /block_movement
 clear_costmap_server_name: /move_base/clear_costmaps
 imu_topic: /imu
 gps_topic: /fix
-filter_of_ways: ["all"]         # Filter for parser. Parse only routes, which have value on the list
-                                # If value is all, ten parse all routes
+
+#Compute bearing params
+cmd_vel_topic: /cmd_vel
+moving_time: 2 #s
+moving_velocity: 5

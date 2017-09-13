@@ -12,6 +12,8 @@
 #include <sensor_msgs/NavSatFix.h>
 #include <osm_planner/osm_parser.h>
 #include <osm_planner/computeBearing.h>
+#include <std_srvs/Trigger.h>
+#include <geometry_msgs/Twist.h>
 #include <mutex>
 
 
@@ -43,7 +45,10 @@ private:
 
     ros::ServiceClient blockMovementClient, clearCostMapClient;
     ros::ServiceServer correctionService; //todo dorobit
+
+
     ros::ServiceServer computeBearing;
+    ros::ServiceServer autoComputeBearing;
 
     ros::Publisher gps_odom_pub;
 
@@ -51,7 +56,15 @@ private:
 
     tf::Quaternion quat;
 
+    //compute bearing from gps functions and datatypes
     bool computeBearingCallback(osm_planner::computeBearing::Request &req, osm_planner::computeBearing::Response &res);
+    bool autoComputeBearingCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
+    ros::Publisher cmd_vel_pub;
+    double wait;
+    double velocity;
+    bool firstPointAdded;
+    int addPointAndCompute(double *angle);
+
 
     /*template<class N> void publishOdometry(N gpsPose, tf::Quaternion quat = tf::createQuaternionFromYaw(0)){
 
