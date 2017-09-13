@@ -100,6 +100,10 @@ private:
         transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 
+        printTransform(absolutTransform,"absolut");
+        printTransform(relativeTransform,"relative");
+        printTransform(correctionTransform,"correction");
+
         //publish correction
         tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
         transformationMutex.unlock();
@@ -131,9 +135,18 @@ private:
         transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 
-        //publish correction
+        printTransform(absolutTransform,"absolut");
+        printTransform(relativeTransform,"relative");
+        printTransform(correctionTransform,"correction");
+
+         //publish correction
         tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
         transformationMutex.unlock();
+    }
+
+    void printTransform(tf::Transform &t,std::string s){
+        ROS_ERROR("%s x = %lf y = %lf z = %lf x = %lf y = %lf z = %lf w = %lf",s.c_str(),t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z(),t.getRotation().x(),t.getRotation().y(),t.getRotation().z(),t.getRotation().w());
+
     }
 };
 
