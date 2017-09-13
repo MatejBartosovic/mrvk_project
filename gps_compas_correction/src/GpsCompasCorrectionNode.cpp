@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 
     GpsCompasCorrection correction;
     ros::MultiThreadedSpinner spinner(2);
-    spinner.spin();
+   spinner.spin();
     correction.init();
     ros::waitForShutdown();
 

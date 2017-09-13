@@ -11,6 +11,8 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
     double tfRate, correctioninterval;
     std::string blockMovementServerName, clearCostMapServerName, map;
     std::vector<std::string> types_of_ways;
+    int settingOrigin;
+    double latitude, longitude;
 
     n.param<double>("tf_rate", tfRate, 20);
     n.param<double>("correction_interval", correctioninterval, 30);
@@ -23,7 +25,9 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
     n.param<std::string>("gps_topic",gpsTopic,"/gps");
     n.param<std::string>("osm_map_path",map,"");
     n.getParam("filter_of_ways",types_of_ways);
-
+    n.getParam("set_origin_pose", settingOrigin);
+    n.getParam("origin_latitude", latitude);
+    n.getParam("origin_longitude",longitude);
 
     blockMovementClient = n.serviceClient<std_srvs::SetBool>(blockMovementServerName);
     clearCostMapClient = n.serviceClient<std_srvs::SetBool>(clearCostMapServerName);
@@ -31,11 +35,20 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
 
     tfTimer = n.createTimer(ros::Duration(1/tfRate), &GpsCompasCorrection::tfTimerCallback,this);
     correctionTimer = n.createTimer(ros::Duration(correctioninterval), &GpsCompasCorrection::correctionTimerCallback,this);
+
+
     osm_planner::Parser parser;
     parser.setNewMap(map);
     parser.setTypeOfWays(types_of_ways);
-    parser.parse(true);
-    mapOrigin = parser.getNodeByID(0);
+
+    if (settingOrigin == 3) {
+        parser.parse();
+        mapOrigin = parser.getNodeByID(parser.getNearestPoint(latitude, longitude));
+    }else{
+        parser.parse(true);
+        mapOrigin = parser.getNodeByID(0);
+        // ROS_ERROR("lat %f, lon %f", mapOrigin.latitude,mapOrigin.longitude);
+    }
 }
 
 void GpsCompasCorrection::tfTimerCallback(const ros::TimerEvent& event){
@@ -158,12 +171,28 @@ void GpsCompasCorrection::init(){
         boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(0));
         //boost::shared_ptr<const sensor_msgs::Imu> imuData = ros::topic::waitForMessage<sensor_msgs::Imu>(imuTopic, ros::Duration(0));
     boost::shared_ptr< sensor_msgs::Imu> imuData(new sensor_msgs::Imu());
+
+ //miso test
+   /* boost::shared_ptr<sensor_msgs::NavSatFix> gpsData(new sensor_msgs::NavSatFix());
+   ROS_ERROR("correction node init");
+    gpsData->latitude =  48.1532431;
+    gpsData->longitude = 17.0743601;
+    //construct gps translation
+    tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin, *gpsData),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, *gpsData),0); //todo misov prepocet dorobit
+
+    ROS_ERROR("x: %f y: %f",gpsTranslation.x(),gpsTranslation.y());*/
     imuData->orientation.x = 0;
     imuData->orientation.y = 0;
     imuData->orientation.z = 0;
     imuData->orientation.w = 1;
 
-    if(!imuData || !gpsData){
+    if(gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
+        ROS_ERROR("Bad GPS data - status no fix");
+        init();
+        return;
+    }
+
+    if(!imuData || !gpsData ){
         init();
         ROS_ERROR("no imu or gps data");
         return;

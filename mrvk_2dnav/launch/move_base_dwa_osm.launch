@@ -14,7 +14,7 @@
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_common.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/local_costmap.yaml" command="load" />
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/global_costmap.yaml" command="load"/>
-    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_observaion_sources.yaml" command="load"/>
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_observaion_sources.yaml" command="load" ns="local_costmap"/>
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/base_local_planner.yaml" command="load" />
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_global_planner.yaml" command="load" />
   </node>

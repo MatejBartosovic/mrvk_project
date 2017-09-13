@@ -19,8 +19,8 @@
 	<include file="$(find mrvk_laser_filters)/launch/hokuyo_filter.launch"/>
 
 	<!--run adis node-->
-	<!--include file="$(find adis16488)/launch/adis_driver.launch" if="$(arg use_imu)"/-->
-	<include file="$(find adis16350)/launch/adis_driver.launch" if="$(arg use_imu)"/>
+	<include file="$(find adis16488)/launch/adis_driver.launch" if="$(arg use_imu)"/>
+	<!--include file="$(find adis16350)/launch/adis_driver.launch" if="$(arg use_imu)"/-->
 
 	<!--run robot pose ekf node-->
 	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf" if="$(arg use_ekf)">

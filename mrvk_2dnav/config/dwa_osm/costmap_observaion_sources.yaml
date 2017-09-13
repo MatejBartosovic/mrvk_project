@@ -1,4 +1,4 @@
-observation_sources: laser_scan_sensor
+observation_sources: laser_scan_sensor point_cloud_sensor
 
 laser_scan_sensor:
   sensor_frame: laser

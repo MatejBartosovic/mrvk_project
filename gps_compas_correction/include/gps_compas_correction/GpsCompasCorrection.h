@@ -92,7 +92,6 @@ private:
         //construct gps translation
         tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin,gpsPose),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, gpsPose),0); //todo misov prepocet dorobit
 
-        ROS_ERROR("x: %f y: %f",gpsTranslation.x(),gpsTranslation.y());
         //absolute orientation
         tf::Transform absolutTransform(quat, gpsTranslation);
 
