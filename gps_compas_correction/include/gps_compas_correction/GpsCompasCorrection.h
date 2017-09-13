@@ -96,7 +96,7 @@ private:
         tf::Transform absolutTransform(quat, gpsTranslation);
 
         //compute correction
-       // std::lock_guard(transformationMutex);
+        //std::lock_guard<std::mutex>(transformationMutex);
         transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 
@@ -120,14 +120,26 @@ private:
             return;
         }
 
+         //get transformation
+         tf::StampedTransform baseLinkTransform;
+         try{
+             listener.waitForTransform(parrentFrame, targetFrame, ros::Time(0), ros::Duration(1));
+             listener.lookupTransform(parrentFrame, targetFrame, ros::Time(0), baseLinkTransform);
+         }
+         catch (tf::TransformException ex){
+             ROS_WARN("Nekorigujem polohu tf timout. %s",ex.what());
+             runRobot();
+             return;
+         }
+
         //construct gps translation
         tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin,gpsPose),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, gpsPose),0); //todo misov prepocet dorobit
 
         //absolute orientation
-        tf::Transform absolutTransform(relativeTransform.getRotation(), gpsTranslation);
+        tf::Transform absolutTransform(baseLinkTransform.getRotation(), gpsTranslation);
 
         //compute correction
-        // std::lock_guard(transformationMutex);
+         //std::lock_guard<std::mutex>(transformationMutex);
         transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 

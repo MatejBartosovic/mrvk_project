@@ -58,8 +58,8 @@ void GpsCompasCorrection::tfTimerCallback(const ros::TimerEvent& event){
 void GpsCompasCorrection::correctionTimerCallback(const ros::TimerEvent& event){
 
     //stop robot
-    if(!stopRobot())
-        return;
+    //if(!stopRobot())
+    //    return;
 
     //get transformation
  /*   tf::StampedTransform relativeTransform;
@@ -84,13 +84,13 @@ void GpsCompasCorrection::correctionTimerCallback(const ros::TimerEvent& event){
 
     if(!gpsData || !imuData){
         ROS_WARN("IMU or GPS data timeout");
-        runRobot();
+      //  runRobot();
         return;
     }
 
     if(gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
         ROS_WARN("Bad GPS data");
-        runRobot();
+    //    runRobot();
         return;
     }
 
@@ -102,7 +102,7 @@ void GpsCompasCorrection::correctionTimerCallback(const ros::TimerEvent& event){
     sendTransform(*gpsData);
 
     //run robot
-    runRobot();
+   // runRobot();
 }
 
 bool GpsCompasCorrection::stopRobot(){
