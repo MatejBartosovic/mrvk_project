@@ -219,16 +219,17 @@ int main(int argc, char **argv)
     {
 
         //reset adis
-        int calibrateCommand = 50;
+        /*int calibrateCommand = 50;
         my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
         calibrateCommand = 87;
         my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
         calibrateCommand = 140;
         my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
         sendCommandResetAdis = false;
-
-        ROS_ERROR_STREAM("ORIENTACIE ZRESETOVANE KALIBRUJE SA GYRO robot musi byt 30 sec v pokoji");
         sleep(1);
+        ROS_ERROR_STREAM("ORIENTACIE ZRESETOVANE");
+
+        /*sleep(1);
         // int calibrateCommand = 50;
         my_serial->write((uint8_t *) (&calibrateCommand), sizeof(unsigned char));
         calibrateCommand = 87;
@@ -239,7 +240,7 @@ int main(int argc, char **argv)
 
         sleep(30);
         ROS_ERROR_STREAM("GYRO NAKALIBROVANE Môžete hybat robotom");
-
+        */
         while(ros::ok()) {
 
             if (!synched) {

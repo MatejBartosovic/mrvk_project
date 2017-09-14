@@ -1,0 +1,7 @@
+<?xml version='1.0'?>
+
+<launch>
+    <node pkg="mrvk_supervisor" name="mrvk_supervisor" type="mrvk_supervisor" output="screen">
+        <rosparam command="load" file="$(find mrvk_supervisor)/config/supervisor_param.yaml" />
+    </node>
+</launch>

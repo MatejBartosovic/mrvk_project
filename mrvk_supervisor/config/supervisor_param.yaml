@@ -1,0 +1,11 @@
+clear_costmap_srv: /move_base/clear_costmaps
+blok_movement_srv: /block_movement
+init_gyro_srv: /adis16488/calib_adis_srv
+reset_gyro_srv: /adis16488/reset_gyro_srv
+gps_angle_srv: /lolo
+
+odom_topic: /odom
+init_robot_srv: /init
+
+sleep_limit: 3.0
+speed_limit: 0.05
