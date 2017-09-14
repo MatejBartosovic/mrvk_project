@@ -104,6 +104,11 @@ bool Supervisor::init(std_srvs::Trigger::Request &req, std_srvs::Trigger::Respon
                initialized = true;
                res.success = true;
            }
+           else{
+               initialized = false;
+               res.success = false;
+               return false;
+           }
        }
     }
     return true;
