@@ -47,22 +47,32 @@ namespace mrvk_gui {
         n.getParam("/move_base/Planner/filter_of_ways",way_types);
 
         double latitude, longitude;
-        bool settingOrigin;
-        n.getParam("/move_base/Planner/origin_latitude", latitude);
-        n.getParam("/move_base/Planner/origin_longitude",longitude);
-        n.getParam("/move_base/Planner/set_origin_pose", settingOrigin);
+        int settingOrigin;
+        n.param<double>("/move_base/Planner/origin_latitude", latitude,0.0);
+        n.param<double>("/move_base/Planner/origin_longitude",longitude,0.0);
+        n.param<int>("/move_base/Planner/set_origin_pose", settingOrigin,0);
 
         parser.setNewMap(filepath);
         parser.setTypeOfWays(way_types);
 
         if (settingOrigin == 3) {
             parser.parse();
-            map_origin = parser.getNodeByID(parser.getNearestPoint(latitude, longitude));
-        }else{
+           // map_origin = parser.getNodeByID(parser.getNearestPoint(latitude, longitude));
+	        ROS_INFO("PRVA MOZNOST");
+            map_origin.latitude = latitude;
+            map_origin.longitude = longitude;
+
+        }
+        else{
             parser.parse(true);
             map_origin = parser.getNodeByID(0);
             // ROS_ERROR("lat %f, lon %f", mapOrigin.latitude,mapOrigin.longitude);
-        }
+            ROS_INFO("DRUHA MOZNOST");
+       
+}
+
+	    ROS_INFO("MAP ORIGIN LATITUDE %lf", map_origin.latitude );
+	    ROS_INFO("MAP ORIGIN LONGITUDE %lf",map_origin.longitude );
 
         //Init goal message and publisher
         goalXY.header.frame_id = global_frame;
@@ -118,6 +128,8 @@ namespace mrvk_gui {
         sec  = controlWidget.lat_sekundy->toPlainText().toDouble();
 
         goal_target.latitude = stupne + (min/60) + (sec/3600);
+        ROS_ERROR("MAP ORIGIN LATITUDE %lf",goal_target.latitude );
+        ROS_ERROR("MAP ORIGIN LONGITUDE %lf", goal_target.longitude );
 
     }
 
@@ -134,8 +146,8 @@ namespace mrvk_gui {
                 // Cancel was clicked
                 break;
             case QMessageBox::Ok:
+                this->readNavigData();
                 if(init_robot.call(trigger_init) && trigger_init.response.success){
-                    this->readNavigData();
                     goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,goal_target);
                     goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,goal_target);
                     goalXY.header.stamp = ros::Time::now();

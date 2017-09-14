@@ -132,6 +132,12 @@ void CommunicationInterface::setMotorsVel(double left_vel,double right_vel){
 		//ROS_ERROR("blocked");
 	} //else ROS_ERROR("ok");
 
+	if(left_vel!=left_vel || right_vel!=right_vel){ //check if nan
+		left_vel = 0;
+		right_vel=0;
+		ROS_ERROR("nan in vel");
+	}
+
 	lavy.setMotorSpeed(-left_vel/ODOMETRY_CONSTANT_VELOCITY);
 	pravy.setMotorSpeed(right_vel/ODOMETRY_CONSTANT_VELOCITY);
 

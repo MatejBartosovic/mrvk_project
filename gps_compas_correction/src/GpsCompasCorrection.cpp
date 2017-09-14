@@ -31,8 +31,8 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
     n.param<std::string>("osm_map_path",map,"");
     n.getParam("filter_of_ways",types_of_ways);
     n.getParam("set_origin_pose", settingOrigin);
-    n.getParam("origin_latitude", latitude);
-    n.getParam("origin_longitude",longitude);
+    n.param<double>("origin_latitude", latitude,0);
+    n.param<double>("origin_longitude",longitude,0);
 
 
     blockMovementClient = n.serviceClient<std_srvs::SetBool>(blockMovementServerName);
@@ -52,7 +52,9 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
 
     if (settingOrigin == 3) {
         parser.parse();
-        mapOrigin = parser.getNodeByID(parser.getNearestPoint(latitude, longitude));
+        //mapOrigin = parser.getNodeByID(parser.getNearestPoint(latitude, longitude));
+        mapOrigin.latitude = latitude;
+        mapOrigin.longitude = longitude;
     }else{
         parser.parse(true);
         mapOrigin = parser.getNodeByID(0);
@@ -230,9 +232,9 @@ bool GpsCompasCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request 
     twist.angular.x = 0;
     twist.angular.y = 0;
     twist.angular.z = 0;
-    twist.linear.x = 0;
+    twist.linear.z = 0;
     twist.linear.y = 0;
-    twist.linear.z = velocity;
+    twist.linear.x = velocity;
 
     //set timing and publish cmd_vel
     ros::Time start = ros::Time::now();
@@ -247,7 +249,7 @@ bool GpsCompasCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request 
     }
 
     //stop publishing cmd_vel
-    twist.linear.z = 0;
+    twist.linear.x = 0;
     cmd_vel_pub.publish(twist);
 
     //Add second point and compute
@@ -372,9 +374,12 @@ void GpsCompasCorrection::bearingAutoUpdate() {
     tf::Quaternion relativeQuaternion;
     relativeQuaternion = firstRotation * secondRotation.inverse();
     ROS_ERROR("relative rotation x %f, y %f, z %f, w %f", relativeQuaternion.x(), relativeQuaternion.y(), relativeQuaternion.z(), relativeQuaternion.w());
-   double diff = 1 - fabs(relativeQuaternion.w());
-    if ( diff > 0.1){
-        ROS_ERROR("Quaterion w diff %f", diff);
+   double diffAngle = 1 - fabs(relativeQuaternion.w());
+    double dist = osm_planner::Parser::Haversine::getDistance(*gpsDataFirst, *gpsDataSecond);
+
+
+    if ( diffAngle > 0.025 || dist < 0.5){
+        ROS_ERROR("Quaterion w diff %f dist %f", diffAngle, dist);
         sendTransform(*gpsDataSecond);
         return;
     }
