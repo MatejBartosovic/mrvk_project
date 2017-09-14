@@ -27,6 +27,8 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
     n.param<std::string>("cmd_vel_topic", cmd_vel_topic_name, "cmd_vel");
     n.param<double>("moving_time", wait, 2);
     n.param<double>("moving_velocity", velocity, 1);
+    n.param<double>("min_quaternion_w", minQuaternionWForUpdate, 0.02);
+    n.param<double>("min_distance", minDistanceForUpdate, 0.5);
     n.param<bool>("use_bearing_auto_update", useBearingAutoUpdate, false);
     n.param<std::string>("osm_map_path",map,"");
     n.getParam("filter_of_ways",types_of_ways);
@@ -201,6 +203,8 @@ bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Re
 
 bool GpsCompasCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request &req,
                                                      std_srvs::Trigger::Response &res) {
+
+    autoUpdateMutex.lock();
     int result = -1;
     double angle;
     int numberOfRead = 0;
@@ -216,6 +220,7 @@ bool GpsCompasCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request 
             ROS_WARN("No fixed GPS data");
             res.success = false;
             res.message = "No fixed GPS data in first point";
+            autoUpdateMutex.unlock();
             return true;
         }
     }
@@ -260,13 +265,16 @@ bool GpsCompasCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request 
             ROS_WARN("No fixed GPS data");
             res.message = "No fixed GPS data in second point";
             res.success = false;
+            autoUpdateMutex.unlock();
             return true;
         }
+
     }
 
     //Print result
     res.message = "Computed angle: " + std::to_string(angle);
     res.success = true;
+    autoUpdateMutex.unlock();
     return true;
 }
 
@@ -329,6 +337,9 @@ bool GpsCompasCorrection::getTransformQuaternion(tf::Quaternion *quat) {
 
 void GpsCompasCorrection::bearingAutoUpdate() {
 
+   if ( !autoUpdateMutex.try_lock() )
+       return;
+
     ROS_ERROR("auto update start");
     tf::Quaternion firstRotation, secondRotation;
 
@@ -338,6 +349,7 @@ void GpsCompasCorrection::bearingAutoUpdate() {
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsDataFirst = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
     if(!gpsDataFirst || gpsDataFirst->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
         ROS_WARN("No fixed GPS data");
+        autoUpdateMutex.unlock();
         return;
     }
 
@@ -347,35 +359,47 @@ void GpsCompasCorrection::bearingAutoUpdate() {
     if (!getTransformQuaternion(&firstRotation)){
 
         ROS_ERROR("no transform received");
+        autoUpdateMutex.unlock();
         return;
     }
 
-    //Get second point from GPS
-    boost::shared_ptr<const sensor_msgs::NavSatFix> gpsDataSecond = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
-    if(!gpsDataSecond || gpsDataSecond->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
-        ROS_WARN("No fixed GPS data");
-        return;
+    double dist = 0;
+    boost::shared_ptr<const sensor_msgs::NavSatFix> gpsDataSecond;
+
+    while (dist < minDistanceForUpdate) {
+        //Get second point from GPS
+        gpsDataSecond = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(
+                gpsTopic, ros::Duration(3));
+        if (!gpsDataSecond || gpsDataSecond->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX) {
+            ROS_WARN("No fixed GPS data");
+            autoUpdateMutex.unlock();
+            return;
+        }
+
+        dist = osm_planner::Parser::Haversine::getDistance(*gpsDataFirst, *gpsDataSecond);
+
+        //Get rotation on Second Point
+        if (!getTransformQuaternion(&secondRotation)) {
+
+            sendTransform(*gpsDataSecond);
+            ROS_ERROR("no second transform received");
+            autoUpdateMutex.unlock();
+            return;
+        }
+
     }
-
-
-    //Get rotation on Second Point
-    if (!getTransformQuaternion(&secondRotation)){
-
-        sendTransform(*gpsDataSecond);
-        ROS_ERROR("no second transform received");
-
-        return;
-    }
-
 
     //Compare Quaternions
     tf::Quaternion relativeQuaternion;
     relativeQuaternion = firstRotation * secondRotation.inverse();
     ROS_ERROR("relative rotation x %f, y %f, z %f, w %f", relativeQuaternion.x(), relativeQuaternion.y(), relativeQuaternion.z(), relativeQuaternion.w());
-   double diff = 1 - fabs(relativeQuaternion.w());
-    if ( diff > 0.1){
-        ROS_ERROR("Quaterion w diff %f", diff);
+    double diffW = 1 - fabs(relativeQuaternion.w());
+   // double dist = osm_planner::Parser::Haversine::getDistance(*gpsDataFirst, *gpsDataSecond);
+
+    if ( diffW > 0.1 && dist < 0.2){
+        ROS_ERROR("Quaterion w diff %f", diffW);
         sendTransform(*gpsDataSecond);
+        autoUpdateMutex.unlock();
         return;
     }
 
@@ -383,4 +407,5 @@ void GpsCompasCorrection::bearingAutoUpdate() {
     double calculatedAngle = -osm_planner::Parser::Haversine::getBearing(*gpsDataFirst, *gpsDataSecond);
     quat.setRPY(0, 0, calculatedAngle);
     sendTransform(*gpsDataSecond, quat);
+    autoUpdateMutex.unlock();
 }
