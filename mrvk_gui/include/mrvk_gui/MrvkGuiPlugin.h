@@ -33,6 +33,7 @@ namespace mrvk_gui{
         Ui::ControlWidget controlWidget;
         //DiagnosticModel treeModel;
         ros::Publisher goal_pub, cancel_pub;
+        ros::ServiceClient init_robot;
         actionlib_msgs::GoalID cancel_goal_msg;
 
         private slots:
