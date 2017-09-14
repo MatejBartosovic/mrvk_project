@@ -1,0 +1,164 @@
+#include <ros/ros.h>
+#include "nav_msgs/Odometry.h"
+#include <geometry_msgs/Twist.h>
+#include <std_srvs/Trigger.h>
+#include <std_srvs/Empty.h>
+#include <std_srvs/SetBool.h>
+
+using namespace std;
+
+class Supervisor{
+
+public:
+    Supervisor(): n("mrvk_supervisor"){
+
+        //parameter_reading
+        n.param<string>("clear_costmap_srv", clear_costmap_srv, "/move_base/clear_costmaps");
+        n.param<string>("odom_topic", odom_topic, "/mrvk_driver/odom");
+        n.param<string>("block_movement_srv", block_movement_srv, "/block_movement");
+        n.param<string>("init_gyro_srv", init_gyro_srv, "/adis16488/calib_adis_srv");
+        n.param<string>("reset_gyro_srv", reset_gyro_srv, "/adis16488/reset_gyro_srv");
+        n.param<string>("init_robot_srv", init_robot_srv, "/init");
+        n.param<string>("gps_angle_srv", gps_angle_srv, "/GpsCompas");
+
+        n.param<double>("sleep_limit", sleep_limit, 3.0);
+        n.param<double>("speed_limit", speed_limit, 0.05);
+
+
+        //subscribers
+        odom_sub = n_.subscribe(odom_topic, 1, &Supervisor::odomListener,this);
+
+        //servers
+        init_robot = n.advertiseService(init_robot_srv, &Supervisor::init,this);
+
+        //service clients
+        reset_costmap = n_.serviceClient<std_srvs::Empty>(clear_costmap_srv);
+        block_movement =  n_.serviceClient<std_srvs::SetBool>(block_movement_srv);
+        gps_calib = n_.serviceClient<std_srvs::Trigger>(gps_angle_srv);
+
+        //gyro clients
+        init_gyro = n_.serviceClient<std_srvs::Trigger>(init_gyro_srv);
+        reset_gyro =  n_.serviceClient<std_srvs::Trigger>(reset_gyro_srv);
+
+        //init_movement
+
+        initialized = false;
+        robot_stopped = false;
+        stop_history = false;
+    }
+
+    ~Supervisor(){
+    }
+
+private:
+
+    ros::NodeHandle n_;
+    ros::NodeHandle n;
+
+    //clients
+    ros::ServiceClient reset_costmap;
+    ros::ServiceClient block_movement;
+    ros::ServiceClient init_gyro;
+    ros::ServiceClient reset_gyro;
+    ros::ServiceClient gps_calib;
+
+    //listen
+    ros::ServiceServer init_robot;
+    ros::Subscriber odom_sub;
+
+
+
+    bool initialized,robot_stopped;
+    bool stop_history;
+
+    ros::Time stop_time;
+
+    //parametres
+    std::string odom_topic;
+    std::string clear_costmap_srv;
+    std::string block_movement_srv;
+    std::string init_gyro_srv;
+    std::string reset_gyro_srv;
+    std::string gps_angle_srv;
+    std::string init_robot_srv;
+
+    double speed_limit;
+    double sleep_limit;
+
+
+    //methods
+    void odomListener(const nav_msgs::Odometry::ConstPtr& msg);
+    bool init(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
+};
+
+
+bool Supervisor::init(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
+{
+
+    ROS_WARN_STREAM("CALIBRUJEM GYRO");
+    std_srvs::Trigger trig_reset, trig_calib,trig_gps_calib;
+    if(init_gyro.call(trig_calib)){
+       if(reset_gyro.call(trig_reset)){
+           ROS_WARN_STREAM("GYRO SKALIBROVANE NASTAVUJEM POZICIU");
+           if(gps_calib.call(trig_gps_calib) && trig_gps_calib.response.success){
+               initialized = true;
+               res.success = true;
+           }
+           else{
+               initialized = false;
+               res.success = false;
+               return false;
+           }
+       }
+    }
+    return true;
+}
+
+void Supervisor::odomListener(const nav_msgs::Odometry::ConstPtr& msg)
+{
+    if(initialized) {
+        if ((msg->twist.twist.linear.x < speed_limit) && (msg->twist.twist.linear.x > -speed_limit) &&
+            (msg->twist.twist.angular.z < speed_limit) && (msg->twist.twist.angular.z > -speed_limit)) {
+            robot_stopped = true;
+        } else {
+            robot_stopped = false;
+        }
+
+        if (robot_stopped == true && stop_history == false) {
+            stop_time = ros::Time::now();
+        }
+
+        if (robot_stopped) {
+            if (ros::Time::now() - stop_time > ros::Duration(sleep_limit)) {
+
+
+                //stop robot
+                std_srvs::SetBool bool_srv;
+                std_srvs::Empty empty_srv;
+
+                bool_srv.request.data = true;
+
+                if (block_movement.call(bool_srv) && bool_srv.response.success) {
+                    if (reset_costmap.call(empty_srv)) {
+                        sleep(1);
+
+                        bool_srv.request.data = false;
+                        if (block_movement.call(bool_srv)) {
+                            robot_stopped = false;
+                        }
+                    }
+                }
+            }
+        }
+        stop_history = robot_stopped;
+    }
+}
+
+
+
+int main(int argc, char** argv)
+{
+    ros::init(argc, argv, "mrvk_supervisor");
+    Supervisor supervisor;
+    ros::spin();
+}

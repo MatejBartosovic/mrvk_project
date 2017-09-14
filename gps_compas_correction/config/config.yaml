@@ -1,0 +1,18 @@
+tf_rate: 20
+correction_interval: 5
+parrent_frame: world
+child_frame: map
+target_frame: base_link
+block_movement_server_name: /block_movement
+clear_costmap_server_name: /move_base/clear_costmaps
+imu_topic: /imu
+gps_topic: /fix
+
+#Compute bearing params
+cmd_vel_topic: /cmd_vel
+moving_time: 4 #s
+moving_velocity: 0.25
+#auto update
+use_bearing_auto_update: false
+min_quaternion_w: 0.025
+min_distance: 0.5

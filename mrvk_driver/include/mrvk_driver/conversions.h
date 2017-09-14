@@ -49,7 +49,7 @@ public:
 	double getCameraPositionX();
 
     template <typename TMember>
-	auto getStatus(TMember member){
+	auto getStatusMB(TMember member){
 		boost::unique_lock<boost::mutex> lock(data_mutex);
         return statusMB.*member;
 	}
@@ -99,17 +99,19 @@ private:
 	int velWheels[2];
 	int velActuators[2];
 
-	uint16_t posWheels[2];
-	uint16_t posActuators[2];
+	std::vector<uint16_t> posWheels;
+	std::vector<uint16_t> posActuators;
 
-	uint16_t posWheelsLast[2];
-	uint16_t posActuatorsLast[2];
+	std::vector<uint16_t> posWheelsLast;
+	std::vector<uint16_t> posActuatorsLast;
 
 	double cameraPositionX;
 	double cameraPositionZ;
 
 	mrvk_driver::Mb_status statusMB;
 	mrvk_driver::Mcb_status statusMCB[2]; //0 - lavy a 1 - pravy
+
+	std::vector<bool> inicialized;
 
 };
 

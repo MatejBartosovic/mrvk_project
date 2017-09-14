@@ -68,6 +68,7 @@ private:
     void kinectImageCallback(const sensor_msgs::ImageConstPtr& msg);
     void kinectDepthImageCallback(const sensor_msgs::ImageConstPtr& depth_msg);
     void sidewalkPublish();
+    short valid_data;
 
     ros::NodeHandle n;
 
@@ -103,9 +104,10 @@ private:
 public:
 
     Sidewalk():cloudProcessing(){
-        ROS_ERROR_STREAM("SIDEWALKINIT");
+        //ROS_ERROR_STREAM("SIDEWALKINIT");
         //START get parameters
         params.getParametersFromServer(n);
+        valid_data = 0;
         //END get parameters
 
         //init subscribers
@@ -137,7 +139,7 @@ void Sidewalk::sidewalkPublish()
 
     imageOrig = kinectImage.clone();
 
-    pointCloud_msg = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges);
+    valid_data = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges);
 
     //publish processed image
     header.stamp = ros::Time::now();
@@ -161,20 +163,25 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
     pcl::PointCloud<pcl::PointXYZRGB> cloud;
 
     long int data_point;
-    for(int i = 0; i < sidewalkEdges.left.validPoints.size();i++){
-        data_point = (960-sidewalkEdges.left.validPoints[i].x) * 540 + (540-sidewalkEdges.left.validPoints[i].y);
-        cloud.push_back(cloudProcessing.returnPoint(0,data_point));
+    if(valid_data == 0) {
+        for (int i = 0; i < sidewalkEdges.left.validPoints.size(); i++) {
+            data_point =
+                    (960 - sidewalkEdges.left.validPoints[i].x) * 540 + (540 - sidewalkEdges.left.validPoints[i].y);
+            cloud.push_back(cloudProcessing.returnPoint(0, data_point));
 
+        }
+
+        for (int i = 0; i < sidewalkEdges.right.validPoints.size(); i++) {
+            data_point =
+                    (960 - sidewalkEdges.right.validPoints[i].x) * 540 + (540 - sidewalkEdges.right.validPoints[i].y);
+            cloud.push_back(cloudProcessing.returnPoint(0, data_point));
+
+        }
     }
 
-    for(int i = 0; i < sidewalkEdges.right.validPoints.size();i++){
-        data_point = (960-sidewalkEdges.right.validPoints[i].x) * 540 + (540-sidewalkEdges.right.validPoints[i].y);
-        cloud.push_back(cloudProcessing.returnPoint(0,data_point));
-
-    }
 
     toROSMsg (cloud, final_cloud2);
-    final_cloud2.header.frame_id = "world";
+    final_cloud2.header.frame_id = "base_stabilized";
     final_cloud2.header.stamp = ros::Time::now();
     pub_pav_pointCloud.publish(final_cloud2);
 

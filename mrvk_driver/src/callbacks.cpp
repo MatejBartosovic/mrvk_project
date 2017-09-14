@@ -66,13 +66,18 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
         //wait to unblock
         for(int i =0;i<100;i++){
             if(communicationInterface.getNewDataStatus(CommunicationInterface::MainBoardFlag)){
-                if(!communicationInterface.getStatus(&mrvk_driver::Mb_status::central_stop)) {
+                if(!communicationInterface.getStatusMB(&mrvk_driver::Mb_status::central_stop)) {
                     communicationInterface.blockMovement(false);
                     res.success = true;
                     res.message = "Ok";
                     return true;
                 }
             }
+        }
+        if(communicationInterface.getStatusMB(&mrvk_driver::Mb_status::hardware_central_stop)){
+            res.success = false;
+            res.message = "hardware central stop active";
+            return true;
         }
         res.message = "TIMEOUT";
         res.success = false;
@@ -96,6 +101,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 	{
 		boost::unique_lock<boost::mutex> lock(communicationInterface.write_mutex);
         communicationInterface.blockMovement(req.data);
+		res.success = true;
 		return true;
 	}
 
@@ -292,6 +298,10 @@ void MrvkCallbacks::dynamicReconfigureCallback(mrvk_driver::RobotDynParamConfig 
     right_reg.PH = (((uint16_t) config.right_P) & 0xFF00) >> 8;
     right_reg.IL = ((uint16_t) config.right_I ) & 0x00FF;
     right_reg.IH = (((uint16_t) config.right_I) & 0xFF00) >> 8;
+
+    //iba otackova regulacia
+    left_reg.pwm_control = false;
+    right_reg.pwm_control = false;
 
     boost::unique_lock<boost::mutex> lock(communicationInterface.write_mutex);
     communicationInterface.getMotorControlBoardLeft()->setRegulatorPID(left_reg);

@@ -2,10 +2,10 @@
 #define COMMUNICATION_INTERFACE_H_
 
 #include <mrvk_driver/command.h>
-#include <serial/serial.h>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <mrvk_driver/conversions.h>
+#include <mrvk_driver/mrvk_serial.h>
 
 
 class CommunicationInterface : public Conversions{
@@ -55,6 +55,7 @@ private:
 	int write(int id,uint8_t *dataWrite, int lengthWrite);
 	bool read(int lengthRead);
 	void setFds(fd_set *set,int* flag);
+	void receiveFlagsToHumanReadable(int flags);
 	int getReadableFd(fd_set *set,int* flag);
 	int writeMB();
 	int writeMotors();
@@ -73,7 +74,8 @@ private:
     int MBSendControlCommd();
     int MBSendUnitedCommd();
 
-	std::vector<serial::Serial*> my_serials;
+	//serial communication class
+	MrvkSerial serialInterface;
 
     //command generation classes
 	MCBCommand lavy;
@@ -84,7 +86,6 @@ private:
     bool active;
     bool blocked;
 	std::vector<std::string> ports;
-	int fd_max;
 	std::vector<int> read_lengths;
 	int baud;
 	int byteSize;

@@ -11,7 +11,7 @@
 	<rosparam file="$(find mrvk_driver)/config/mrvk_driver.yaml" command="load"/>
 
     <!-- run mrvk driver node-->
-	<node  name="mrvk_driver" pkg="mrvk_driver" type="mrvk_driver">
+	<node  name="mrvk_driver" pkg="mrvk_driver" type="mrvk_driver" output="screen">
 		<remap from="/diff_drive_controller/odom" to="odom"/>
 		<remap from="/diff_drive_controller/cmd_vel" to="cmd_vel"/>
 	</node>

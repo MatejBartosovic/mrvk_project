@@ -26,7 +26,7 @@ void CloudProcessing::createVectors(int width, int height) {
 
     toROSMsg (cloud, ros_cloud);
     std::string kinFrame("kinect_ir");
-    std::string baseLinkFrame("world");
+    std::string baseLinkFrame("base_link");
 #ifdef DEBUG
     ROS_ERROR_STREAM(kinFrame);
     ROS_ERROR_STREAM(baseLinkFrame);
@@ -61,7 +61,8 @@ void CloudProcessing::parseCloud() {
     pcl::PointCloud<pcl::PointXYZRGB> cloud;
     pcl::fromROSMsg(final_cloud, cloud);
     cv::Point3d point;
-    ROS_ERROR_STREAM(cloud.size());
+    //
+    // ROS_ERROR_STREAM(cloud.size());
     for (int i = 0; i<cloud.size();i++){
 
         point.x = cloud.points[i].x-KINECT_X;

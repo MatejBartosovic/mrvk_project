@@ -34,6 +34,8 @@ namespace Mrvk{
 			if (!comunication_interface.init())
 				return false;
 
+			//inicializacia je este pred 1. zapisom do robota v callbacku dynamic reconfigure
+
 			SET_MAIN_BOARD config;
 
 			callbacks.getMbFromParam(&config);							//nastavi default parametre
@@ -63,8 +65,18 @@ namespace Mrvk{
             pos[1] += vel[1] * getPeriod().toSec();*/
 			double lavy = -comunication_interface.getPosLeftWheel();
 			double pravy = comunication_interface.getPosRightWheel();
+			//ROS_ERROR("l = %lf  r = %lf",lavy,pravy);
+			//static int start_read_blog = 0;
+			//if(start_read_blog > 10){
 			pos[0] += lavy;
 			pos[1] += pravy;
+			//}
+			//else{
+			//start_read_blog++;
+			//pos[0] = 0;
+			//pos[1] = 0;
+			//}
+			
 			pos[3] = comunication_interface.getCameraPositionX();
 			pos[4] = comunication_interface.getCameraPositionZ();
 		}
@@ -87,8 +99,8 @@ namespace Mrvk{
 
 	private:
 
-		MrvkCallbacks callbacks;
 		CommunicationInterface comunication_interface;
+		MrvkCallbacks callbacks;
 		std::thread thread;
 
 
@@ -152,9 +164,9 @@ int main (int argc, char **argv){
 
 	Mrvk::Driver driver(ports,baud,stopBits,parity,byteSize);
 	driver.init();
-
+	
 	controller_manager::ControllerManager cm(&driver);
-
+		
 	ros::AsyncSpinner spinner(4);
 	spinner.start();
 

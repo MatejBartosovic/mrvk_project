@@ -1,0 +1,6 @@
+<launch>
+    <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch"/>
+    <rosparam command="load" file="$(find mrvk_sidewalk)/config/sidewalk_config.yaml" />
+    <rosparam command="load" file="$(find mrvk_sidewalk)/calib/sidewalkTransformCalib.yaml" />
+    <node pkg="mrvk_sidewalk" name="recognize_sidewalk_kinect" type="recognize_sidewalk_kinect"/>
+</launch>
