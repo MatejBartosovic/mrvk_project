@@ -182,7 +182,7 @@ bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Re
 
         double angle;
         int result = addPointAndCompute(&angle);
-        firstPointAdded = false;
+      //  firstPointAdded = false;
 
         if (result < 0) {
             ROS_WARN("No fixed GPS data");
@@ -205,6 +205,7 @@ bool GpsCompasCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request 
     double angle;
     int numberOfRead = 0;
 
+    firstPointAdded = false;
     //Add First point
     while (result < 0){
 
@@ -273,7 +274,7 @@ int GpsCompasCorrection::addPointAndCompute(double *angle) {
 
 
     static osm_planner::Parser::OSM_NODE firstPoint;
-    static bool firstPointAdded = false;
+    //static bool firstPointAdded = false;
 
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
     if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
