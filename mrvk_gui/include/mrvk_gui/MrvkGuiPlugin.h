@@ -29,7 +29,6 @@ namespace mrvk_gui{
 
         Ui::MainWidget mainUi;
         QWidget* mainWidget;
-        DiagnosticsWidget diagnosticsWidget;
         Ui::ControlWidget controlWidget;
         //DiagnosticModel treeModel;
         ros::Publisher goal_pub, cancel_pub;
