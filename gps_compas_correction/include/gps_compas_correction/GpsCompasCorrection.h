@@ -68,6 +68,9 @@ private:
     void gpsCompasUpdate();
     bool getTransformQuaternion(tf::Quaternion *quat);
     void bearingAutoUpdate();
+    double minDistanceForUpdate;
+    double minQuaternionWForUpdate;
+    std::mutex autoUpdateMutex;
 
     /*template<class N> void publishOdometry(N gpsPose, tf::Quaternion quat = tf::createQuaternionFromYaw(0)){
 
