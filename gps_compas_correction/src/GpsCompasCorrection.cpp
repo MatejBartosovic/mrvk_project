@@ -164,23 +164,38 @@ void GpsCompasCorrection::init(){
 
 bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Request &req, osm_planner::computeBearing::Response &res){
 
-    double angle;
-    int result = addPointAndCompute(&angle);
+    if (req.bearing != 0){
 
-    firstPointAdded = false;
+        quat.setRPY(0, 0, req.bearing);
 
-    if (result < 0 ){
-        ROS_WARN("No fixed GPS data");
-        res.message = "No fixed GPS data";
+        //Get second point from GPS
+        boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
+        if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
+            ROS_WARN("No fixed GPS data");
 
-    } else if (result == 0){
-        res.message = "Added first point, please move robot forward and call service again";
-        res.bearing = 0;
-    } else{
-        res.message = "Bearing was calculated";
-        res.bearing = angle;
+            return computeBearingCallback(req, res);
+        }
+        sendTransform(*gpsData, quat);
+        return true;
+
+    }else {
+
+        double angle;
+        int result = addPointAndCompute(&angle);
+        firstPointAdded = false;
+
+        if (result < 0) {
+            ROS_WARN("No fixed GPS data");
+            res.message = "No fixed GPS data";
+
+        } else if (result == 0) {
+            res.message = "Added first point, please move robot forward and call service again";
+            res.bearing = 0;
+        } else {
+            res.message = "Bearing was calculated";
+            res.bearing = angle;
+        }
     }
-
     return true;
 }
 
