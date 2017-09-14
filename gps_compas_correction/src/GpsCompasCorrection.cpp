@@ -72,8 +72,6 @@ void GpsCompasCorrection::correctionTimerCallback(const ros::TimerEvent& event){
     //if(!stopRobot())
     //    return;
 
-    ROS_ERROR("timer");
-
     if (useBearingAutoUpdate){
         bearingAutoUpdate();
     } else {
@@ -158,7 +156,6 @@ void GpsCompasCorrection::init(){
     tf::quaternionMsgToTF(imuData->orientation,imuQuaternion);
     //sendTransform(*gpsData,imuQuaternion);//TODO compas
     sendTransform(*gpsData);
-    ROS_ERROR("init end");
     return;
 }
 

@@ -34,6 +34,7 @@ public:
         //service clients
         reset_costmap = n_.serviceClient<std_srvs::Empty>(clear_costmap_srv);
         block_movement =  n_.serviceClient<std_srvs::SetBool>(block_movement_srv);
+        gps_calib = n_.serviceClient<std_srvs::Trigger>(gps_angle_srv);
 
         //gyro clients
         init_gyro = n_.serviceClient<std_srvs::Trigger>(init_gyro_srv);
@@ -54,12 +55,12 @@ private:
     ros::NodeHandle n_;
     ros::NodeHandle n;
 
-
     //clients
     ros::ServiceClient reset_costmap;
     ros::ServiceClient block_movement;
     ros::ServiceClient init_gyro;
     ros::ServiceClient reset_gyro;
+    ros::ServiceClient gps_calib;
 
     //listen
     ros::ServiceServer init_robot;
@@ -95,12 +96,14 @@ bool Supervisor::init(std_srvs::Trigger::Request &req, std_srvs::Trigger::Respon
 {
 
     ROS_WARN_STREAM("CALIBRUJEM GYRO");
-    std_srvs::Trigger trig_reset, trig_calib;
+    std_srvs::Trigger trig_reset, trig_calib,trig_gps_calib;
     if(init_gyro.call(trig_calib)){
        if(reset_gyro.call(trig_reset)){
-           //do robot movement from miso
-           initialized = true;
-           res.success = true;
+           ROS_WARN_STREAM("GYRO SKALIBROVANE NASTAVUJEM POZICIU");
+           if(gps_calib.call(trig_gps_calib) && trig_gps_calib.response.success){
+               initialized = true;
+               res.success = true;
+           }
        }
     }
     return true;

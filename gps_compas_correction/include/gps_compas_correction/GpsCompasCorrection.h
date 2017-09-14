@@ -63,11 +63,11 @@ private:
     double wait;
     double velocity;
     bool firstPointAdded;
-    bool useBearingAutoUpdate;
     int addPointAndCompute(double *angle);
+    bool useBearingAutoUpdate;
+    void gpsCompasUpdate();
     bool getTransformQuaternion(tf::Quaternion *quat);
     void bearingAutoUpdate();
-    void gpsCompasUpdate();
 
     /*template<class N> void publishOdometry(N gpsPose, tf::Quaternion quat = tf::createQuaternionFromYaw(0)){
 
@@ -101,7 +101,7 @@ private:
         }
         catch (tf::TransformException ex){
             ROS_WARN("Nekorigujem polohu tf timout. %s",ex.what());
-         //   runRobot();
+            runRobot();
             return;
         }
 
@@ -116,9 +116,13 @@ private:
         transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 
-        //printTransform(absolutTransform,"absolut");
-        //printTransform(relativeTransform,"relative");
-        //printTransform(correctionTransform,"correction");
+       /* ROS_ERROR("service");
+        printTransform(absolutTransform,"absolut");
+        printTransform(relativeTransform,"relative");
+        printTransform(correctionTransform,"correction");
+        tf::Transform result = correctionTransform * relativeTransform;
+        printTransform(result,"result");
+       */
 
         //publish correction
         tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
@@ -136,7 +140,7 @@ private:
         }
         catch (tf::TransformException ex){
             ROS_WARN("Nekorigujem polohu tf timout. %s",ex.what());
-          //  runRobot();
+            runRobot();
             return;
         }
 
@@ -148,7 +152,7 @@ private:
          }
          catch (tf::TransformException ex){
              ROS_WARN("Nekorigujem polohu tf timout. %s",ex.what());
-            // runRobot();
+             runRobot();
              return;
          }
 
@@ -163,9 +167,13 @@ private:
         transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 
-       // printTransform(absolutTransform,"absolut");
-       // printTransform(relativeTransform,"relative");
-       // printTransform(correctionTransform,"correction");
+       /*  ROS_ERROR("timer");
+
+         printTransform(absolutTransform,"absolut");
+        printTransform(relativeTransform,"relative");
+        printTransform(correctionTransform,"correction");
+         tf::Transform result = correctionTransform * relativeTransform;
+         printTransform(result,"result");*/
 
          //publish correction
         tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
@@ -173,7 +181,7 @@ private:
     }
 
     void printTransform(tf::Transform &t,std::string s){
-        ROS_ERROR("%s x = %lf y = %lf z = %lf x = %lf y = %lf z = %lf w = %lf",s.c_str(),t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z(),t.getRotation().x(),t.getRotation().y(),t.getRotation().z(),t.getRotation().w());
+        ROS_INFO("%s x = %lf y = %lf z = %lf x = %lf y = %lf z = %lf w = %lf",s.c_str(),t.getOrigin().x(),t.getOrigin().y(),t.getOrigin().z(),t.getRotation().x(),t.getRotation().y(),t.getRotation().z(),t.getRotation().w());
 
     }
 };
