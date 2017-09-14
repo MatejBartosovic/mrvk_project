@@ -98,6 +98,7 @@ bool Supervisor::init(std_srvs::Trigger::Request &req, std_srvs::Trigger::Respon
     std_srvs::Trigger trig_reset, trig_calib;
     if(init_gyro.call(trig_calib)){
        if(reset_gyro.call(trig_reset)){
+           ROS_WARN_STREAM("GYRO SKALIBROVANE NASTAVUJEM POZICIU");
            //do robot movement from miso
            initialized = true;
            res.success = true;

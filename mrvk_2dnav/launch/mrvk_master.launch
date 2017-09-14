@@ -10,6 +10,7 @@
   <arg name="use_gps" default="true" />
   <arg name="use_user_interface" default="false"/>
   <arg name="use_kinect" default="true"/>
+  <arg name="use_supervisor" default="true"/>
   <arg name="osm_map_path" default="$(find osm_planner)/osm_example/fei.osm"/>
 
   <!--Start MRVK Driver, Gmapping, EKF, IMU, Hokuyo-->
@@ -38,4 +39,5 @@
 
   <!--Start user interface (robot control)-->
   <include file="$(find mrvk_driver)/launch/user_interface.launch" if="$(arg use_user_interface)"/>
+  <include file="$(find mrvk_supervisor)/launch/mrvk_supervisor.launch" if="$(arg use_supervisor)"/>
 </launch>
