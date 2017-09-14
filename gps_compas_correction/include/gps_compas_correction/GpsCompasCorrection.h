@@ -63,8 +63,11 @@ private:
     double wait;
     double velocity;
     bool firstPointAdded;
+    bool useBearingAutoUpdate;
     int addPointAndCompute(double *angle);
-
+    bool getTransformQuaternion(tf::Quaternion *quat);
+    void bearingAutoUpdate();
+    void gpsCompasUpdate();
 
     /*template<class N> void publishOdometry(N gpsPose, tf::Quaternion quat = tf::createQuaternionFromYaw(0)){
 
@@ -98,7 +101,7 @@ private:
         }
         catch (tf::TransformException ex){
             ROS_WARN("Nekorigujem polohu tf timout. %s",ex.what());
-            runRobot();
+         //   runRobot();
             return;
         }
 
@@ -113,9 +116,9 @@ private:
         transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 
-        printTransform(absolutTransform,"absolut");
-        printTransform(relativeTransform,"relative");
-        printTransform(correctionTransform,"correction");
+        //printTransform(absolutTransform,"absolut");
+        //printTransform(relativeTransform,"relative");
+        //printTransform(correctionTransform,"correction");
 
         //publish correction
         tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
@@ -133,7 +136,7 @@ private:
         }
         catch (tf::TransformException ex){
             ROS_WARN("Nekorigujem polohu tf timout. %s",ex.what());
-            runRobot();
+          //  runRobot();
             return;
         }
 
@@ -145,7 +148,7 @@ private:
          }
          catch (tf::TransformException ex){
              ROS_WARN("Nekorigujem polohu tf timout. %s",ex.what());
-             runRobot();
+            // runRobot();
              return;
          }
 
@@ -160,9 +163,9 @@ private:
         transformationMutex.lock();
         correctionTransform = absolutTransform * relativeTransform.inverse();
 
-        printTransform(absolutTransform,"absolut");
-        printTransform(relativeTransform,"relative");
-        printTransform(correctionTransform,"correction");
+       // printTransform(absolutTransform,"absolut");
+       // printTransform(relativeTransform,"relative");
+       // printTransform(correctionTransform,"correction");
 
          //publish correction
         tfBroadcaster.sendTransform(tf::StampedTransform(correctionTransform, ros::Time::now(), parrentFrame, childFrame));
