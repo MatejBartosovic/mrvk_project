@@ -4,12 +4,13 @@ raytrace_range: 4.5
 min_obstacle_height: 0.5 #TODO checknut ci je toto dobre
 max_obstacle_height: 1   #TODO checknut ci je toto dobre
 
-footprint: [[-0.33, -0.28], [-0.33, 0.28], [0.33, 0.28], [0.33, -0.28]]
+#footprint: [[-0.33, -0.28], [-0.33, 0.28], [0.33, 0.28], [0.33, -0.28]]
+footprint: [[-0.40, -0.35], [-0.40, 0.35], [0.40, 0.35], [0.40, -0.35]]
 footprint_padding: 0
 
 #robot_radius: 0.4
-inflation_radius: 0.7 # the radius to which the cost scaling function is applied
+inflation_radius: 0.85 # the radius to which the cost scaling function is applied
 
 transform_tolerance:  0.5
 map_type: costmap #voxel 3d map
-cost_scaling_factor: 200 #this parameter set the scaling factor that applies over the inflation. This parameter can be adjusted  so the robot has a more aggresive or conservative behaviour near obstacle (Robot operating system Complete reference (Volume 1) page 145)
+cost_scaling_factor: 250 #this parameter set the scaling factor that applies over the inflation. This parameter can be adjusted  so the robot has a more aggresive or conservative behaviour near obstacle (Robot operating system Complete reference (Volume 1) page 145)

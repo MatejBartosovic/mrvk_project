@@ -1,5 +1,5 @@
 tf_rate: 20
-correction_interval: 10
+correction_interval: 5
 parrent_frame: world
 child_frame: map
 target_frame: base_link
@@ -13,6 +13,6 @@ cmd_vel_topic: /cmd_vel
 moving_time: 4 #s
 moving_velocity: 0.25
 #auto update
-use_bearing_auto_update: True
+use_bearing_auto_update: false
 min_quaternion_w: 0.025
 min_distance: 0.5

@@ -368,6 +368,7 @@ void GpsCompasCorrection::bearingAutoUpdate() {
     double dist = 0;
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsDataSecond;
 
+    int counter = 0;
     while (dist < minDistanceForUpdate) {
         //Get second point from GPS
         gpsDataSecond = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(
@@ -381,13 +382,14 @@ void GpsCompasCorrection::bearingAutoUpdate() {
         dist = osm_planner::Parser::Haversine::getDistance(*gpsDataFirst, *gpsDataSecond);
 
         //Get rotation on Second Point
-        if (!getTransformQuaternion(&secondRotation)) {
+        if (!getTransformQuaternion(&secondRotation) || counter > 5) {
 
             sendTransform(*gpsDataSecond);
             ROS_ERROR("no second transform received");
             autoUpdateMutex.unlock();
             return;
         }
+       counter++;
 
     }
 
