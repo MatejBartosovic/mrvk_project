@@ -158,7 +158,6 @@ void GpsCompasCorrection::init(){
     tf::quaternionMsgToTF(imuData->orientation,imuQuaternion);
     //sendTransform(*gpsData,imuQuaternion);//TODO compas
     sendTransform(*gpsData);
-    ROS_ERROR("init end");
     return;
 }
 
@@ -282,7 +281,7 @@ int GpsCompasCorrection::addPointAndCompute(double *angle) {
         osm_planner::Parser::OSM_NODE secondPoint;
         secondPoint.longitude = gpsData->longitude;
         secondPoint.latitude = gpsData->latitude;
-        double calculatedAngle = osm_planner::Parser::Haversine::getBearing(firstPoint, secondPoint);
+        double calculatedAngle = -osm_planner::Parser::Haversine::getBearing(firstPoint, secondPoint);
         //res.message = "Bearing was calculated";
         firstPointAdded = false;
         //tf::Quaternion q;

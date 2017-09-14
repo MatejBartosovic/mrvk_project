@@ -6,7 +6,7 @@ Planner:
   topic_shortest_path: "shortest_path"
   topic_gps_name: "/fix"
 
-  set_origin_pose: 1          # Set the origin pose on the map for cartesian calculator
+#  set_origin_pose: 1          # Set the origin pose on the map for cartesian calculator
                               # 0 - origin pose from service
                               # 1 - origin pose from 1. point on the map
                               # 2 - random origin pose

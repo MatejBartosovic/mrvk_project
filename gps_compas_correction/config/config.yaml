@@ -1,5 +1,5 @@
 tf_rate: 20
-correction_interval: 60
+correction_interval: 10
 parrent_frame: world
 child_frame: map
 target_frame: base_link

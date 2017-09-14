@@ -4,7 +4,7 @@
   <arg name="use_dwa" default="false" />
   <arg name="use_dwa_osm" default="true" />
   <arg name="use_imu" default="true" />
-  <arg name="use_gmapping" default="true" />
+  <arg name="use_gmapping" default="false" />
   <arg name="use_ekf" default="true" />
   <arg name="use_joint_states_publisher" default="true" />
   <arg name="use_gps" default="true" />
