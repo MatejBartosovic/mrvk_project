@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+    <master auto="start"/>
+
+    <arg name="osm_map_path" default="$(find osm_planner)/osm_example/fei.osm"/>
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+
+        <param name="Planner/osm_map_path" value="$(arg osm_map_path)"/>
+        <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_parser.yaml" command="load" ns="Planner"/>
+        <!--remap from="/odom" to="/robot_pose_ekf/odom_combined"/-->
+    </node>
+
+    <!--node name="osm_helper" pkg="osm_planner" type="osm_helper" ns="move_base"/-->
+
+</launch>

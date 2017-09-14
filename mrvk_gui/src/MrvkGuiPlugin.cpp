@@ -5,6 +5,7 @@
 #include "mrvk_gui/MrvkGuiPlugin.h"
 #include <pluginlib/class_list_macros.h>
 #include <QMessageBox>
+#include <std_srvs/Trigger.h>
 
 namespace mrvk_gui {
 
@@ -45,11 +46,23 @@ namespace mrvk_gui {
         n.getParam("/move_base/Planner/global_frame",global_frame);
         n.getParam("/move_base/Planner/filter_of_ways",way_types);
 
+        double latitude, longitude;
+        bool settingOrigin;
+        n.getParam("/move_base/Planner/origin_latitude", latitude);
+        n.getParam("/move_base/Planner/origin_longitude",longitude);
+        n.getParam("/move_base/Planner/set_origin_pose", settingOrigin);
+
         parser.setNewMap(filepath);
         parser.setTypeOfWays(way_types);
 
-        parser.parse(true);
-        map_origin = parser.getNodeByID(0);
+        if (settingOrigin == 3) {
+            parser.parse();
+            map_origin = parser.getNodeByID(parser.getNearestPoint(latitude, longitude));
+        }else{
+            parser.parse(true);
+            map_origin = parser.getNodeByID(0);
+            // ROS_ERROR("lat %f, lon %f", mapOrigin.latitude,mapOrigin.longitude);
+        }
 
         //Init goal message and publisher
         goalXY.header.frame_id = global_frame;
@@ -63,6 +76,7 @@ namespace mrvk_gui {
 
         goal_pub = n.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1);
         cancel_pub = n.advertise<actionlib_msgs::GoalID>("/move_base/cancel", 1);
+        init_robot = n.serviceClient<std_srvs::Trigger>("/mrvk_supervisor/init");
 
 
     }
@@ -113,17 +127,24 @@ namespace mrvk_gui {
         msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Cancel);
 
+        std_srvs::Trigger trigger_init;
+
         switch (msgBox.exec()){
             case QMessageBox::Cancel:
                 // Cancel was clicked
                 break;
             case QMessageBox::Ok:
+                if(init_robot.call(trigger_init) && trigger_init.response.success){
+                    this->readNavigData();
+                    goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,goal_target);
+                    goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,goal_target);
+                    goalXY.header.stamp = ros::Time::now();
+                    goal_pub.publish(goalXY);
+                }
+                else{
+                    ROS_ERROR_STREAM("Problem with robot inicialization and goal setup");
+                }
 
-                this->readNavigData();
-                goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,goal_target);
-                goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,goal_target);
-                goalXY.header.stamp = ros::Time::now();
-                goal_pub.publish(goalXY);
 
             default:
                 // should never be reached
