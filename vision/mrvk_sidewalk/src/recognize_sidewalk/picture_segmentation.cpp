@@ -620,9 +620,9 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	frame = maskExposure123(imageHSV,frame);	
 	improveShadows(imageHSV,frame);	
 
-	double rangeH123rangeC1 = 0.07; // 0.08 -> more tolerant
-	double rangeH123rangeC2 = 0.07; // 0.08 -> more tolerant
-	double rangeH123rangeC3 = 0.15;
+	double rangeH123rangeC1 = 0.03; // 0.08 -> more tolerant
+	double rangeH123rangeC2 = 0.03; // 0.08 -> more tolerant
+	double rangeH123rangeC3 = 0.07;
 	//std::cout<<regionX<<" x "<<regionY<<" Data: "<< imHSV.at<cv::Vec3b>(regionX,regionY)<<endl;
 
 	//region selection
