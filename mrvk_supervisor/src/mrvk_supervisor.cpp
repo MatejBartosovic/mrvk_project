@@ -88,26 +88,33 @@ private:
 
     //methods
     void odomListener(const nav_msgs::Odometry::ConstPtr& msg);
-    bool init(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
+    bool init(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
 };
 
 
-bool Supervisor::init(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res)
+bool Supervisor::init(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res)
 {
 
     ROS_WARN_STREAM("CALIBRUJEM GYRO");
     std_srvs::Trigger trig_reset, trig_calib,trig_gps_calib;
+
     if(init_gyro.call(trig_calib)){
        if(reset_gyro.call(trig_reset)){
            ROS_WARN_STREAM("GYRO SKALIBROVANE NASTAVUJEM POZICIU");
-           if(gps_calib.call(trig_gps_calib) && trig_gps_calib.response.success){
-               initialized = true;
-               res.success = true;
+           if(!req.data) {
+               if (gps_calib.call(trig_gps_calib) && trig_gps_calib.response.success) {
+                   initialized = true;
+                   res.success = true;
+               } else {
+                   initialized = false;
+                   res.success = false;
+                   return false;
+               }
            }
            else{
-               initialized = false;
-               res.success = false;
-               return false;
+               initialized = true;
+               res.success = true;
+               return true;
            }
        }
     }

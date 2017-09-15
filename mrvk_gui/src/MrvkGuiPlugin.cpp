@@ -4,8 +4,10 @@
 
 #include "mrvk_gui/MrvkGuiPlugin.h"
 #include <pluginlib/class_list_macros.h>
+
 #include <QMessageBox>
 #include <std_srvs/Trigger.h>
+#include <std_srvs/SetBool.h>
 
 namespace mrvk_gui {
 
@@ -22,7 +24,7 @@ namespace mrvk_gui {
         //setup mainWidget
         mainWidget = new QWidget();
         mainUi.setupUi(mainWidget);
-
+        uloha = 1;
         //setup diagnosticsWidget
         //diagnosticsWidget.setupUi(mainUi.tabWidget->widget(0));
         controlWidget.setupUi(mainUi.tabWidget->widget(1));
@@ -51,6 +53,7 @@ namespace mrvk_gui {
         n.param<double>("/move_base/Planner/origin_latitude", latitude,0.0);
         n.param<double>("/move_base/Planner/origin_longitude",longitude,0.0);
         n.param<int>("/move_base/Planner/set_origin_pose", settingOrigin,0);
+
 
         parser.setNewMap(filepath);
         parser.setTypeOfWays(way_types);
@@ -84,9 +87,34 @@ namespace mrvk_gui {
         goalXY.pose.orientation.z = 0;
         goalXY.pose.orientation.w = 1;
 
+
+        //Init goal_2 message and publisher
+        goalXY_2.header.frame_id = global_frame;
+        goalXY_2.pose.position.x = 0;
+        goalXY_2.pose.position.y = 0;
+        goalXY_2.pose.position.z = 0;
+        goalXY_2.pose.orientation.x = 0;
+        goalXY_2.pose.orientation.y = 0;
+        goalXY_2.pose.orientation.z = 0;
+        goalXY_2.pose.orientation.w = 1;
+
+
+        //Init goal_3 message and publisher
+        goalXY_3.header.frame_id = global_frame;
+        goalXY_3.pose.position.x = 0;
+        goalXY_3.pose.position.y = 0;
+        goalXY_3.pose.position.z = 0;
+        goalXY_3.pose.orientation.x = 0;
+        goalXY_3.pose.orientation.y = 0;
+        goalXY_3.pose.orientation.z = 0;
+        goalXY_3.pose.orientation.w = 1;
+
+
         goal_pub = n.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1);
         cancel_pub = n.advertise<actionlib_msgs::GoalID>("/move_base/cancel", 1);
-        init_robot = n.serviceClient<std_srvs::Trigger>("/mrvk_supervisor/init");
+        init_robot = n.serviceClient<std_srvs::SetBool>("/mrvk_supervisor/init");
+
+        result_sub = n.subscribe("/move_base/result", 5,&MrvkGui::listenResult,this);
 
 
     }
@@ -116,6 +144,8 @@ namespace mrvk_gui {
 
        // goal_target.longitude = ;
 
+
+        //nakladka
         //longitude
         double stupne = controlWidget.long_stupne->toPlainText().toDouble();
         double min = controlWidget.long_minuty->toPlainText().toDouble();
@@ -128,8 +158,38 @@ namespace mrvk_gui {
         sec  = controlWidget.lat_sekundy->toPlainText().toDouble();
 
         goal_target.latitude = stupne + (min/60) + (sec/3600);
-        ROS_ERROR("MAP ORIGIN LATITUDE %lf",goal_target.latitude );
-        ROS_ERROR("MAP ORIGIN LONGITUDE %lf", goal_target.longitude );
+        /*ROS_ERROR("MAP ORIGIN LATITUDE %lf",goal_target.latitude );
+        ROS_ERROR("MAP ORIGIN LONGITUDE %lf", goal_target.longitude );*/
+
+
+        //vykladka
+
+
+        stupne = controlWidget.long_stupne_2->toPlainText().toDouble();
+        min = controlWidget.long_minuty_2->toPlainText().toDouble();
+        sec = controlWidget.long_sekundy_2->toPlainText().toDouble();
+        goal_target_2.longitude = stupne + (min/60) + (sec/3600);
+
+        //latitude
+        stupne  = controlWidget.lat_stupne_2->toPlainText().toDouble();
+        min  = controlWidget.lat_minuty_2->toPlainText().toDouble();
+        sec  = controlWidget.lat_sekundy_2->toPlainText().toDouble();
+        goal_target_2.latitude = stupne + (min/60) + (sec/3600);
+
+
+        stupne = controlWidget.long_stupne_3->toPlainText().toDouble();
+        min = controlWidget.long_minuty_3->toPlainText().toDouble();
+        sec = controlWidget.long_sekundy_3->toPlainText().toDouble();
+        goal_target_3.longitude = stupne + (min/60) + (sec/3600);
+
+        //latitude
+        stupne  = controlWidget.lat_stupne_3->toPlainText().toDouble();
+        min  = controlWidget.lat_minuty_3->toPlainText().toDouble();
+        sec  = controlWidget.lat_sekundy_3->toPlainText().toDouble();
+        goal_target_3.latitude = stupne + (min/60) + (sec/3600);
+
+       /* ROS_ERROR("MAP ORIGIN LATITUDE %lf",goal_target_.latitude );
+        ROS_ERROR("MAP ORIGIN LONGITUDE %lf", goal_target.longitude );*/
 
     }
 
@@ -139,7 +199,9 @@ namespace mrvk_gui {
         msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Cancel);
 
-        std_srvs::Trigger trigger_init;
+        std_srvs::SetBool setbool_init;
+
+        setbool_init.request.data = controlWidget.sever->isTristate();
 
         switch (msgBox.exec()){
             case QMessageBox::Cancel:
@@ -147,16 +209,39 @@ namespace mrvk_gui {
                 break;
             case QMessageBox::Ok:
                 this->readNavigData();
-                if(init_robot.call(trigger_init) && trigger_init.response.success){
-                    goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,goal_target);
-                    goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,goal_target);
-                    goalXY.header.stamp = ros::Time::now();
-                    goal_pub.publish(goalXY);
-                }
-                else{
-                    ROS_ERROR_STREAM("Problem with robot inicialization and goal setup");
-                }
+                if(uloha == 1) {
 
+                    if (init_robot.call(setbool_init) && setbool_init.response.success) {
+                        goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
+                                                                                                goal_target);
+                        goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,
+                                                                                                goal_target);
+                        goalXY.header.stamp = ros::Time::now();
+                        goal_pub.publish(goalXY);
+                        controlWidget.information_label->setText("IDEM NAKLADAT");
+                    } else {
+                        ROS_ERROR_STREAM("Problem with robot inicialization and goal setup");
+                        controlWidget.information_label->setText("NIEKDE JE CHYBA");
+                    }
+                }
+                if(uloha == 2){
+                    goalXY_2.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
+                                                                                              goal_target_2);
+                    goalXY_2.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,
+                                                                                              goal_target_2);
+                    goalXY_2.header.stamp = ros::Time::now();
+                    goal_pub.publish(goalXY_2);
+                    controlWidget.information_label->setText("IDEM VYKLADAT");
+                }
+                if(uloha==3){
+                    goalXY_3.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
+                                                                                              goal_target_3);
+                    goalXY_3.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,
+                                                                                              goal_target_3);
+                    goalXY_3.header.stamp = ros::Time::now();
+                    goal_pub.publish(goalXY_3);
+                    controlWidget.information_label->setText("IDEM DO CIELA");
+                }
 
             default:
                 // should never be reached
@@ -165,21 +250,21 @@ namespace mrvk_gui {
 
     }
 
-    void MrvkGui::cancelGoal(){
+    void MrvkGui::cancelGoal() {
         QMessageBox msgBox;
         msgBox.setText(QString("Do you want to cancel robot movement ?"));
         msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Cancel);
 
 
-        switch (msgBox.exec()){
+        switch (msgBox.exec()) {
             case QMessageBox::Cancel:
                 // Cancel was clicked
                 break;
             case QMessageBox::Ok:
 
                 cancel_goal_msg.stamp = ros::Time::now();
-                cancel_goal_msg.id="";
+                cancel_goal_msg.id = "";
                 cancel_pub.publish(cancel_goal_msg);
 
                 break;
@@ -189,7 +274,28 @@ namespace mrvk_gui {
         }
 
     }
+    void MrvkGui::listenResult(const move_base_msgs::MoveBaseActionResult::ConstPtr& msg){
+
+        if(uloha == 1){
+            controlWidget.information_label->setText("NALOZIT NAKLAD");
+            uloha = 2;
+        }
+        else if(uloha == 2){
+            controlWidget.information_label->setText("VYLOZIT NAKLAD");
+            uloha = 3;
+        }
+        else if(uloha == 3){
+            controlWidget.information_label->setText("SOM V CIELI");
+            uloha = 1;
+        }
+        else{
+            controlWidget.information_label->setText("PROBLEM");
+        }
+    }
+
+
 
 
 }; // namespace
 PLUGINLIB_EXPORT_CLASS(mrvk_gui::MrvkGui, rqt_gui_cpp::Plugin)
+
