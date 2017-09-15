@@ -30,6 +30,7 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
     n.param<double>("min_quaternion_w", minQuaternionWForUpdate, 0.02);
     n.param<double>("min_distance", minDistanceForUpdate, 0.5);
     n.param<bool>("use_bearing_auto_update", useBearingAutoUpdate, false);
+    n.param<int>("max_count_of_sbas_fix", max_count_of_sbas_fix, 20);
     n.param<std::string>("osm_map_path",map,"");
     n.getParam("filter_of_ways",types_of_ways);
     n.getParam("set_origin_pose", settingOrigin);
@@ -88,6 +89,8 @@ void GpsCompasCorrection::correctionTimerCallback(const ros::TimerEvent& event){
 
 void GpsCompasCorrection::gpsCompasUpdate() {
 
+    static int bad_fix_counter = 0;
+
     //get imu and gps data
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
     //boost::shared_ptr<const sensor_msgs::Imu> imuData = ros::topic::waitForMessage<sensor_msgs::Imu>(imuTopic, ros::Duration(1));
@@ -96,14 +99,22 @@ void GpsCompasCorrection::gpsCompasUpdate() {
 
     if(!gpsData || !imuData){
         ROS_WARN("IMU or GPS data timeout");
+        bad_fix_counter++;
         //  runRobot();
         return;
     }
 
-    if(gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
+    if(gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_FIX){
         ROS_WARN("Bad GPS data");
         //    runRobot();
+        bad_fix_counter++;
         return;
+    }
+
+    if (gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_SBAS_FIX){
+
+        if (++bad_fix_counter < max_count_of_sbas_fix)
+            return;
     }
 
     //construct compads quaternion
@@ -111,9 +122,10 @@ void GpsCompasCorrection::gpsCompasUpdate() {
     // tf::quaternionMsgToTF(imuData->orientation,imuQuaternion);
 
     //sendTransform(*gpsData, imuQuaternion); //TODO compas
+
+    bad_fix_counter = 0;
     sendTransform(*gpsData);
 }
-
 
 
 bool GpsCompasCorrection::stopRobot(){
@@ -156,6 +168,7 @@ void GpsCompasCorrection::init(){
         ROS_ERROR("no imu or gps data");
         return;
     }
+
     tf::Quaternion imuQuaternion;
     tf::quaternionMsgToTF(imuData->orientation,imuQuaternion);
     //sendTransform(*gpsData,imuQuaternion);//TODO compas
@@ -165,7 +178,6 @@ void GpsCompasCorrection::init(){
 
 
 //Compute Bearing callbacks
-
 bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Request &req, osm_planner::computeBearing::Response &res){
 
     if (req.bearing != 0){
@@ -174,7 +186,7 @@ bool GpsCompasCorrection::computeBearingCallback(osm_planner::computeBearing::Re
 
         //Get second point from GPS
         boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
-        if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
+        if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_FIX){
             ROS_WARN("No fixed GPS data");
 
             return computeBearingCallback(req, res);
@@ -287,7 +299,7 @@ int GpsCompasCorrection::addPointAndCompute(double *angle) {
     //static bool firstPointAdded = false;
 
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
-    if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
+    if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_FIX){
         ROS_WARN("No fixed GPS data");
      //   res.message = "No fixed GPS data";
         return -1;
@@ -342,63 +354,107 @@ void GpsCompasCorrection::bearingAutoUpdate() {
    if ( !autoUpdateMutex.try_lock() )
        return;
 
+    static int bad_fix_counter = 0;
+
     ROS_ERROR("auto update start");
     tf::Quaternion firstRotation, secondRotation;
 
     firstPointAdded = false;
 
+    //----------------------//
     //Get first point from GPS
+    //----------------------//
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsDataFirst = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
-    if(!gpsDataFirst || gpsDataFirst->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX){
+    if(!gpsDataFirst || gpsDataFirst->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX || gpsDataFirst->status.status == sensor_msgs::NavSatStatus::STATUS_FIX){
         ROS_WARN("No fixed GPS data");
         autoUpdateMutex.unlock();
+        bad_fix_counter++;
         return;
     }
 
+    //----------------------//
+    // Check gps sbas status
+    //----------------------//
+
+    if (gpsDataFirst->status.status == sensor_msgs::NavSatStatus::STATUS_SBAS_FIX){
+
+        if (++bad_fix_counter < max_count_of_sbas_fix)
+            return;
+        else {
+            bad_fix_counter = 0;
+            sendTransform(*gpsDataFirst);
+            return;
+        }
+    }
+
+    //----------------------//
+    //If fix is gbas - send transform
+    //----------------------//
+    bad_fix_counter = 0;
     sendTransform(*gpsDataFirst);
 
+
+    //----------------------//
     //Get rotation on First point
+    //----------------------//
+
     if (!getTransformQuaternion(&firstRotation)){
 
         ROS_ERROR("no transform received");
+        bad_fix_counter++;
         autoUpdateMutex.unlock();
         return;
     }
 
+
+    //----------------------//
+    //Get second point from GPS
+    //----------------------//
+
     double dist = 0;
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsDataSecond;
-
     int counter = 0;
+
+    //----------------------//
+    //Wait for minimal distance for update and wait for gbas fix. Max count of meassurment is 5
+    //----------------------//
+
     while (dist < minDistanceForUpdate) {
+
         //Get second point from GPS
         gpsDataSecond = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(
                 gpsTopic, ros::Duration(3));
-        if (!gpsDataSecond || gpsDataSecond->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX) {
+        if (!gpsDataSecond || counter > 5 || !gpsDataSecond->status.status == sensor_msgs::NavSatStatus::STATUS_GBAS_FIX) {
             ROS_WARN("No fixed GPS data");
             autoUpdateMutex.unlock();
             return;
         }
 
+        counter++;
         dist = osm_planner::Parser::Haversine::getDistance(*gpsDataFirst, *gpsDataSecond);
-
-        //Get rotation on Second Point
-        if (!getTransformQuaternion(&secondRotation) || counter > 5) {
-
-            sendTransform(*gpsDataSecond);
-            ROS_ERROR("no second transform received");
-            autoUpdateMutex.unlock();
-            return;
-        }
-       counter++;
-
     }
 
+    //----------------------//
+     //Get rotation on Second Point
+    //----------------------//
+     if (!getTransformQuaternion(&secondRotation)) {
+
+         //When rotation is bad send only position
+         sendTransform(*gpsDataSecond);
+         ROS_ERROR("no second transform received");
+         autoUpdateMutex.unlock();
+         return;
+     }
+
+
+    //----------------------//
     //Compare Quaternions
+    //----------------------//
+
     tf::Quaternion relativeQuaternion;
     relativeQuaternion = firstRotation * secondRotation.inverse();
     ROS_ERROR("relative rotation x %f, y %f, z %f, w %f", relativeQuaternion.x(), relativeQuaternion.y(), relativeQuaternion.z(), relativeQuaternion.w());
     double diffW = 1 - fabs(relativeQuaternion.w());
-   // double dist = osm_planner::Parser::Haversine::getDistance(*gpsDataFirst, *gpsDataSecond);
 
     if ( diffW > 0.1 && dist < 0.2){
         ROS_ERROR("Quaterion w diff %f", diffW);
@@ -407,7 +463,10 @@ void GpsCompasCorrection::bearingAutoUpdate() {
         return;
     }
 
+    //----------------------//
     //Calculating angle and send transformation
+    //----------------------//
+
     double calculatedAngle = -osm_planner::Parser::Haversine::getBearing(*gpsDataFirst, *gpsDataSecond);
     quat.setRPY(0, 0, calculatedAngle);
     sendTransform(*gpsDataSecond, quat);

@@ -71,6 +71,7 @@ private:
     double minDistanceForUpdate;
     double minQuaternionWForUpdate;
     std::mutex autoUpdateMutex;
+    int max_count_of_sbas_fix;
 
     /*template<class N> void publishOdometry(N gpsPose, tf::Quaternion quat = tf::createQuaternionFromYaw(0)){
 
