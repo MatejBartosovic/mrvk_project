@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   osm_planner
   diagnostic_msgs
+        move_base_msgs
 )
 
 set(${PROJECT_NAME}_cpp_HDRS

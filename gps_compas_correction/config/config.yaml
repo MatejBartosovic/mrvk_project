@@ -1,5 +1,6 @@
 tf_rate: 20
 correction_interval: 5
+max_count_of_sbas_fix: 5
 parrent_frame: world
 child_frame: map
 target_frame: base_link

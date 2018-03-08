@@ -621,8 +621,8 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	improveShadows(imageHSV,frame);	
 
 	double rangeH123rangeC1 = 0.07; // 0.08 -> more tolerant
-	double rangeH123rangeC2 = 0.07; // 0.08 -> more tolerant
-	double rangeH123rangeC3 = 0.15;
+	double rangeH123rangeC2 = 0.06; // 0.08 -> more tolerant
+	double rangeH123rangeC3 = 0.13;
 	//std::cout<<regionX<<" x "<<regionY<<" Data: "<< imHSV.at<cv::Vec3b>(regionX,regionY)<<endl;
 
 	//region selection
@@ -645,7 +645,7 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	{
 		bufferCnt++;
 		std::cout<< "cnt++ je: " << bufferCnt<<"\n";
-		if (bufferCnt>=5)
+		if (bufferCnt>=25) //5
 		{
 			clust_sample_main = clust_sample_buffer;
 			bufferCnt = 0;
@@ -656,7 +656,7 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	double clusterDistance = calcClusterDistance123(clust_sample_main,clust_sample);
 	double clusterPointDistance = calcPointDistance123(clust_sample_main,clust_sample);
 
-	if ((std::abs(clusterDistance)< 0.05)&& !((sidewalkEdges->right.invalidFrame)||(sidewalkEdges->left.invalidFrame)))
+	if ((std::abs(clusterDistance)< 0.05)&& (true||!((sidewalkEdges->right.invalidFrame)||(sidewalkEdges->left.invalidFrame))))
 	{	updateModel123(clust_sample_main,clust_sample);
 	 	*valid = 0;
 

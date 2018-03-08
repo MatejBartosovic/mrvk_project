@@ -17,6 +17,8 @@
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_observaion_sources.yaml" command="load" ns="local_costmap"/>
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/base_local_planner.yaml" command="load" />
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_global_planner.yaml" command="load" />
+    <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/recovery_behaviors.yaml" command="load"/>
+
     <!--remap from="/odom" to="/robot_pose_ekf/odom_combined"/-->
   </node>
 
