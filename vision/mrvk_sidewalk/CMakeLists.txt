@@ -47,6 +47,8 @@ set(LOCAL_INCLUDES 	src/recognize_sidewalk/recognize_sidewalk.cpp
 					src/cloud_processing.cpp
 					src/recognize_sidewalk/SidewalkEdge.cpp
 					src/recognize_sidewalk/SidewalkEdge.h
+					src/recognize_sidewalk/polyfit2.cpp
+					src/recognize_sidewalk/polyfit2.h
 					)
 
 add_executable(recognize_sidewalk_video src/recognize_sidewalk_video.cpp ${LOCAL_INCLUDES})
