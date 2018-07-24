@@ -32,6 +32,10 @@ sidewalk_params:
   edge_points_distribution:
     edge_points_dist: 20
 
+camera_capture_params:
+  frame_rate: 10
+  publish_topic_name: camera_image
+
   #define EDGE_MARKER_VERTICAL_POINT_DIST 50
 
   #define EDGE_START_OFFSET 30
