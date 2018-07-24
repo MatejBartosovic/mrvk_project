@@ -1,0 +1,63 @@
+nastavenie casu robota: sudo date --set="$(ssh smadas@192.168.12.130 date)"
+
+Connect to robot:
+1. Connect to wifi network MRVK
+2. Estabilish ssh connection - ssh -X mrvk@192.168.12.1
+	password: mrvk
+3. switch off noisy ventilator - roslaunch mrvk_driver driver.launch
+4. ctrl-c
+
+Estabilish Joy-stick connection
+1. launch on mrvk: roslaunch mrvk_driver driver.launch
+2. launch on client PC: roslaunch mrvk_driver user_interface.launch
+3. press 0
+4. Double press space
+5. Release hardware central stop
+6. Robot should be controllable via joy-stick now
+
+Launch navigation
+1. launch on mrvk: roslaunch mrvk_2dnav dwa_navigation.launch 
+2. launch on PC: rviz -d ~/catkin_ws/src/mrvk_project/mrvk_2dnav/rviz/mavigation_kinetic.rviz
+3. calibrate - run on wherever: rosservice call /adis16488/calib_adis_srv
+4. clear local map: rosservice call /move_base/clear_costmaps
+5. drav goal markers
+
+REMOTE CENTRAL STOP
+rosservice call /block_movement "data: true" 
+rosservice call /block_movement "data: false" 
+rosservice call /setCentralStop
+rosservice call /reset_central_stop
+
+ROBOTIC ARM
+roslaunch kv01_driver kv01_driver.launch 
+roslaunch kv01_interface kv01_interface.launch
+
+ROBOT + ARM - MANUAL (arm independent)
+1. on MRVK roscore
+2. on PC roslaunch kv01_driver kv01_driver.launch
+3. on PC roslaunch kv01_interface kv01_interface.launch
+4. on MRVK roslaunch mrvk_driver driver.launch
+5. on PC roslaunch mrvk_driver user_interface.launch
+6. Joistick works for both robot movement and arm, don't forget to block movement of the other when moving with one.
+
+ROBOT + ARM - MANUAL (arm independent)
+1. on MRVK roslaunch mrvk_driver driver.launch
+2. on PC roslaunch mrvk_driver user_interface.launch
+3. on PC roslaunch kv01_driver kv01_driver.launch
+4. on PC roslaunch kv01_interface kv01_interface.launch
+
+
+Nastavit 
+MRVK sudo ifconfig eno1 1.1.1.2 netmask 255.255.255.0
+PC sudo ifconfig sudo ifconfig enx0050b61c8fab 1.1.1.1 netmask 255.255.255.0
+
+ROBOT + ARM - MANUAL
+1. on MRVK roslaunch mrvk_driver driver.launch
+2. on PC roslaunch mrvk_driver user_interface.launch
+2,5 on PC rosrun rqt_reconfigure rqt_reconfigure (zapnut ARV5V, ARM12V)
+3. on MRVK roslaunch kv01_driver kv01_driver.launch
+4. on PC roslaunch kv01_interface kv01_interface.launch
+5. on MRVK roslaunch kv01_interface kv01_interface.launch
+6. Ak blbne komunikacia rameno wifi - spostukat tlacitka na joysticku 4(5) a 3(4)
+
+kv01_driver.launch zmenit z /dev/ARM /dev/ttyUSB0 
