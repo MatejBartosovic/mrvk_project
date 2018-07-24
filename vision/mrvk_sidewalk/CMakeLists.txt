@@ -45,6 +45,8 @@ set(LOCAL_INCLUDES 	src/recognize_sidewalk/recognize_sidewalk.cpp
 					src/cloud_processing.cpp
 					src/recognize_sidewalk/SidewalkEdge.cpp
 					src/recognize_sidewalk/SidewalkEdge.h
+					src/recognize_sidewalk/polyfit2.cpp
+					src/recognize_sidewalk/polyfit2.h
 					)
 
 add_executable(recognize_sidewalk_video src/recognize_sidewalk_video.cpp ${LOCAL_INCLUDES})
@@ -57,3 +59,6 @@ target_link_libraries(recognize_sidewalk_kinect ${PCL_LIBRARIES} ${catkin_LIBRAR
 
 add_executable(camera_calibration src/camera_calibration.cpp ${LOCAL_INCLUDES})
 target_link_libraries(camera_calibration ${catkin_LIBRARIES})
+
+#add_executable(test_polyfit_pub src/recognize_sidewalk/test_polyfit_pub.cpp ${LOCAL_INCLUDES})
+#target_link_libraries(test_polyfit_pub ${catkin_LIBRARIES})

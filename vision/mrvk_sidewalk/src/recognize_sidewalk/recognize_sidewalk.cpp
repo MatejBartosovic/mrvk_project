@@ -1,3 +1,10 @@
+//recognize sidewalk
+//detects edges of sidewalk as pairs of points in two sets - left, right
+//algorithm
+//1. Init variables
+//2.
+
+
 //ros
 #include <ros/ros.h>
 
@@ -48,29 +55,31 @@
 
 #define DIST_GRAD -1
 
+#define RND_INIT_PT 0
+
 using namespace cv;
 
 short recognize_sidewalk_frame(cv::Mat *imageOrig, cv::Mat *imageResultOut, RecognizeSidewalkParams *params, SidewalkEdges *sidewalkEdges)
 {
     //std::string imFile = get_directory("/Pictures/", "calibration", "", "jpg");
     //imwrite( imFile.c_str(), *imageOrig);
+
     //point cloud
     sensor_msgs::PointCloud pointCloud_msg;
-    geometry_msgs::Point32 pavPoint;
     pointCloud_msg.header.stamp = ros::Time::now();
     pointCloud_msg.header.frame_id = "map";
-    std::queue<std::vector<LineStructure> > leftEdge;
-    std::queue<std::vector<LineStructure> > rightEdge;
 
     Mat imageResult;		//Create Matrix to store processed image
 
     //START edge detection variables
-    Point lineStart = Point(100, 100);
-    Point lineEnd = Point(300, 300);
-    Point lineStartRight = Point(100, 100);
-    Point lineEndRight = Point(300, 300);
-    int leftPoint = 0;
-    int rightPoint = 0;
+    //edge lines
+    //left
+    Point lineStart = Point(RND_INIT_PT, RND_INIT_PT);
+    Point lineEnd = Point(RND_INIT_PT, RND_INIT_PT);
+    //right
+    Point lineStartRight = Point(RND_INIT_PT, RND_INIT_PT);
+    Point lineEndRight = Point(RND_INIT_PT, RND_INIT_PT);
+
     int pavementCenter = 0;
     sidewalkEdges->left.clearEdge();
     sidewalkEdges->right.clearEdge();
