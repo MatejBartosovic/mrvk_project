@@ -167,7 +167,7 @@ public:
             return false;
         FileNodeIterator it = n.begin(), it_end = n.end();
         for( ; it != it_end; ++it )
-            l.push_back((string)*it);
+            l.push_back((std::string)*it);
         return true;
     }
 
