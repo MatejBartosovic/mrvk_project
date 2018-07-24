@@ -57,5 +57,5 @@ add_executable(recognize_sidewalk_kinect src/recognize_sidewalk_kinect.cpp ${LOC
 target_link_libraries(recognize_sidewalk_kinect ${PCL_LIBRARIES} ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #add_dependencies(recognize_sidewalk_kinect recognize_sidewalk_kinect_generate_messages_cpp)
 
-add_executable(camera_calibration src/camera_calibration.cpp ${LOCAL_INCLUDES})
+add_executable(camera_calibration src/camera_calibration.cpp ${LOCAL_INCLUDES} ${OpenCV_LIBS})
 target_link_libraries(camera_calibration ${catkin_LIBRARIES})
