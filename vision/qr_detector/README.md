@@ -1,4 +1,7 @@
 ## qr_detector
+
+Requirements: sudo apt-get install libzbar-dev libzbar0
+
 QR codes detector based on zbar library (http://zbar.sourceforge.net). The detector is dedicated to ROS framework.
 
 Subscribes:

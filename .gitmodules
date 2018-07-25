@@ -1,0 +1,2 @@
+[submodule "vision/usb_cam"]
+	url = https://github.com/ros-drivers/usb_cam.git
