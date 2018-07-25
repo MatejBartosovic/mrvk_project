@@ -224,22 +224,16 @@ namespace mrvk_gui {
     }
 
     void MrvkGui::listenCamera(const sensor_msgs::ImageConstPtr& msg){
-        ROS_INFO("SUBS");
-
         try{
-            //cv::imshow("view", cv_bridge::toCvShare(msg, "bgr8")->image);
-            //cv::waitKey(30);
+            cv_bridge::CvImageConstPtr cvb_img = cv_bridge::toCvShare(msg, sensor_msgs::image_encodings::RGB8);
+            cv::Mat mat = cvb_img->image;
+            auto pixmap = QPixmap::fromImage(QImage((unsigned char*) mat.data, mat.cols, mat.rows, QImage::Format_RGB888));
+            controlWidget.cameraOutput->setPixmap(pixmap);
         }
         catch (cv_bridge::Exception& e){
-            ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
-        }
-        catch (...){
-            ROS_INFO("AHOJ");
+            ROS_ERROR("Could not convert from '%s' to 'RGB8'.", msg->encoding.c_str());
         }
     }
-
-
-
 
 }; // namespace
 PLUGINLIB_EXPORT_CLASS(mrvk_gui::MrvkGui, rqt_gui_cpp::Plugin)

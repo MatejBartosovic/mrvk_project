@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1247</width>
+    <width>1331</width>
     <height>718</height>
    </rect>
   </property>
@@ -297,33 +297,30 @@ p, li { white-space: pre-wrap; }
     <string>Go to GOAL</string>
    </property>
   </widget>
-  <widget class="rqt_image_view::RatioLayoutedFrame" name="cameraOutput">
-   <property name="geometry">
-    <rect>
-     <x>606</x>
-     <y>36</y>
-     <width>601</width>
-     <height>441</height>
-    </rect>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-   <property name="text">
-    <string>TextLabel</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="scanBtn">
    <property name="geometry">
     <rect>
-     <x>840</x>
-     <y>510</y>
+     <x>870</x>
+     <y>590</y>
      <width>201</width>
      <height>51</height>
     </rect>
    </property>
    <property name="text">
     <string>Scan QR</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="cameraOutput">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>20</y>
+     <width>651</width>
+     <height>491</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
    </property>
   </widget>
   <zorder>label_2</zorder>
@@ -345,8 +342,8 @@ p, li { white-space: pre-wrap; }
   <zorder>cancelGoal</zorder>
   <zorder>goToGoal</zorder>
   <zorder>information_label</zorder>
-  <zorder>cameraOutput</zorder>
   <zorder>scanBtn</zorder>
+  <zorder>cameraOutput</zorder>
  </widget>
  <resources/>
  <connections/>

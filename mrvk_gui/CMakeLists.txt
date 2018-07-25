@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 2.8.3)
 project(mrvk_gui)
 
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rqt_gui
-  rqt_gui_cpp
-  std_msgs
-  osm_planner
-  diagnostic_msgs
-        move_base_msgs
+    roscpp
+    rqt_gui
+    rqt_gui_cpp
+    std_msgs
+    osm_planner
+    diagnostic_msgs
+    move_base_msgs
     cv_bridge
 )
 
@@ -75,7 +75,7 @@ include_directories(
   include
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
 
 add_library(${PROJECT_NAME}_diagnostics
         ${${PROJECT_NAME}_diagnostics_cpp_HDRS}
