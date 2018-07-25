@@ -1,1 +1,0 @@
-sudo apt-get install libzbar-dev libzbar0
