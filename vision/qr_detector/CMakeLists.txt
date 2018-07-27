@@ -5,7 +5,23 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS "-std=c++11 -Wall ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
-             roscpp nodelet sensor_msgs cv_bridge image_transport)
+             roscpp nodelet sensor_msgs cv_bridge image_transport message_generation)
+
+#add_dependencies(start_scan_qr_server ${qr_detector_EXPORTED_TARGETS})
+#add_dependencies(start_scan_qr_client ${qr_detector_EXPORTED_TARGETS})
+
+
+
+
+add_service_files(
+		FILES
+		StartScanQR.srv
+)
+
+generate_messages(
+		DEPENDENCIES
+		std_msgs
+)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -13,12 +29,15 @@ catkin_package(
   CATKIN_DEPENDS roscpp nodelet sensor_msgs cv_bridge image_transport
 )
 
+
+
 find_library(ZBAR_LIBRARIES NAMES zbar)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_library(qr_detector_nodelet src/qr_detector_nodelet.cpp src/detector.cpp)
 target_link_libraries(qr_detector_nodelet zbar ${catkin_LIBRARIES})
+add_dependencies(qr_detector_nodelet qr_detector_gencpp)
 
 install(TARGETS qr_detector_nodelet
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
