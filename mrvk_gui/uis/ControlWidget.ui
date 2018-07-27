@@ -42,9 +42,9 @@
   <widget class="QTextEdit" name="lat_stupne">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>110</x>
      <y>100</y>
-     <width>101</width>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
@@ -56,13 +56,13 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="cancelGoal">
+  <widget class="QPushButton" name="cancelGoal_btn">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>240</y>
-     <width>161</width>
-     <height>61</height>
+     <x>270</x>
+     <y>230</y>
+     <width>201</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
@@ -72,9 +72,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QTextEdit" name="lat_minuty">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>110</x>
      <y>140</y>
-     <width>101</width>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
@@ -89,9 +89,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QTextEdit" name="lat_sekundy">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>110</x>
      <y>180</y>
-     <width>101</width>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
@@ -108,7 +108,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>340</x>
      <y>140</y>
-     <width>101</width>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
@@ -125,7 +125,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>340</x>
      <y>180</y>
-     <width>101</width>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
@@ -142,7 +142,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>340</x>
      <y>100</y>
-     <width>101</width>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
@@ -284,30 +284,30 @@ p, li { white-space: pre-wrap; }
     <string>Target goal</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="goToGoal">
+  <widget class="QPushButton" name="goToGoal_btn">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>240</y>
-     <width>161</width>
-     <height>61</height>
+     <x>40</x>
+     <y>230</y>
+     <width>201</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
     <string>Go to GOAL</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="scanBtn">
+  <widget class="QPushButton" name="scanQrStart_btn">
    <property name="geometry">
     <rect>
-     <x>870</x>
-     <y>590</y>
-     <width>201</width>
-     <height>51</height>
+     <x>650</x>
+     <y>550</y>
+     <width>321</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
-    <string>Scan QR</string>
+    <string>Start scan QR</string>
    </property>
   </widget>
   <widget class="QLabel" name="cameraOutput">
@@ -316,11 +316,24 @@ p, li { white-space: pre-wrap; }
      <x>650</x>
      <y>20</y>
      <width>651</width>
-     <height>491</height>
+     <height>511</height>
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="scanQrStop_btn">
+   <property name="geometry">
+    <rect>
+     <x>990</x>
+     <y>550</y>
+     <width>311</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Stop scan QR</string>
    </property>
   </widget>
   <zorder>label_2</zorder>
@@ -339,11 +352,12 @@ p, li { white-space: pre-wrap; }
   <zorder>label_9</zorder>
   <zorder>sever</zorder>
   <zorder>label_19</zorder>
-  <zorder>cancelGoal</zorder>
-  <zorder>goToGoal</zorder>
+  <zorder>cancelGoal_btn</zorder>
+  <zorder>goToGoal_btn</zorder>
   <zorder>information_label</zorder>
-  <zorder>scanBtn</zorder>
+  <zorder>scanQrStart_btn</zorder>
   <zorder>cameraOutput</zorder>
+  <zorder>scanQrStop_btn</zorder>
  </widget>
  <resources/>
  <connections/>

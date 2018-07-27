@@ -3,11 +3,6 @@
 //
 
 #include "mrvk_gui/MrvkGuiPlugin.h"
-#include <pluginlib/class_list_macros.h>
-
-#include <QMessageBox>
-#include <std_srvs/Trigger.h>
-#include <std_srvs/SetBool.h>
 
 
 namespace mrvk_gui {
@@ -15,6 +10,10 @@ namespace mrvk_gui {
     MrvkGui::MrvkGui() : rqt_gui_cpp::Plugin(), mainWidget(0)
     {
 
+        //goal_target.latitude = 5.1;
+        //updateGuiText();
+       // controlWidget.plainTextEdit->document()->setPlainText("ahoj");
+       // controlWidget.information_label->setText("NIEKDE JE CHYBA");
     }
 
     void MrvkGui::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -33,10 +32,13 @@ namespace mrvk_gui {
         context.addWidget(mainWidget);
 
         // connect slots for buttons
-        connect(controlWidget.goToGoal,SIGNAL(clicked()),this,SLOT(goToGoal()));
-        connect(controlWidget.cancelGoal,SIGNAL(clicked()),this,SLOT(cancelGoal()));
+        connect(controlWidget.goToGoal_btn, SIGNAL(clicked()), this, SLOT(goToGoal_btn()));
+        connect(controlWidget.cancelGoal_btn, SIGNAL(clicked()), this, SLOT(cancelGoal_btn()));
+        connect(controlWidget.scanQrStart_btn, SIGNAL(clicked()), this, SLOT(scanQrStart_btn()));
+        connect(controlWidget.scanQrStop_btn, SIGNAL(clicked()), this, SLOT(scanQrStop_btn()));
+        // slot for update gui forms
+        connect(this, SIGNAL(valueChanged(double, double)), this, SLOT(updateGuiText(double, double)));
 
-        ros::NodeHandle n;
 
         //get map origin
         osm_planner::Parser parser;
@@ -91,8 +93,7 @@ namespace mrvk_gui {
         cancel_pub = n.advertise<actionlib_msgs::GoalID>("/move_base/cancel", 1);
         init_robot = n.serviceClient<std_srvs::SetBool>("/mrvk_supervisor/init");
 
-        result_sub = n.subscribe("/move_base/result", 5,&MrvkGui::listenResult,this);
-        camera_sub = n.subscribe("/usb_cam/image_raw", 1,&MrvkGui::listenCamera,this);
+        result_sub = n.subscribe("/move_base/result", 5, &MrvkGui::listenResult,this);
 
     }
 
@@ -136,7 +137,7 @@ namespace mrvk_gui {
         ROS_ERROR("MAP ORIGIN LONGITUDE %lf", goal_target.longitude );*/
     }
 
-    void MrvkGui::goToGoal(){
+    void MrvkGui::goToGoal_btn(){
         QMessageBox msgBox;
         msgBox.setText(QString("Do you want to start robot movement ?"));
         msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
@@ -144,7 +145,7 @@ namespace mrvk_gui {
 
         std_srvs::SetBool setbool_init;
 
-        setbool_init.request.data = controlWidget.sever->isTristate();
+        setbool_init.request.data = (unsigned char) controlWidget.sever->isTristate();
 
         switch (msgBox.exec()){
             case QMessageBox::Cancel:
@@ -172,7 +173,7 @@ namespace mrvk_gui {
         }
     }
 
-    void MrvkGui::cancelGoal() {
+    void MrvkGui::cancelGoal_btn() {
         QMessageBox msgBox;
         msgBox.setText(QString("Do you want to cancel robot movement ?"));
         msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
@@ -233,6 +234,68 @@ namespace mrvk_gui {
         catch (cv_bridge::Exception& e){
             ROS_ERROR("Could not convert from '%s' to 'RGB8'.", msg->encoding.c_str());
         }
+    }
+
+    void MrvkGui::listenQrData(const std_msgs::String &msg){
+        //"geo:48.15312,17.07437"
+        using namespace std;
+
+        string geo = msg.data;
+        ROS_INFO("QR Data: %s", msg.data.c_str());
+
+        if (geo.size() < 4) {
+            ROS_ERROR("Read code have less then 4 chars: %s", msg.data.c_str());
+            return;
+        }
+        geo.erase(geo.begin(), geo.begin() + 4);
+        stringstream ss(geo);
+
+        double latitude = 0, longtitude = 0;
+        char delimiter;
+        ss>>longtitude;
+        ss>>delimiter;
+        ss>>latitude;
+
+        if (latitude == 0 || longtitude == 0){
+            ROS_ERROR("QR code is damaged: %s", msg.data.c_str());
+            return;
+        }
+
+        ROS_INFO("Longtitide = %f", longtitude);
+        ROS_INFO("Latitude   = %f", latitude);
+
+        emit valueChanged(longtitude, latitude);
+
+        // shutdown unnecessary subscribers
+        camera_sub.shutdown();
+        qr_data_sub.shutdown();
+    }
+
+    void MrvkGui::updateGuiText(double longitude, double latitude) {
+        // latitude
+        controlWidget.lat_stupne->setText(QString::number(latitude, 'f', 7));
+        controlWidget.lat_minuty->setText("0");
+        controlWidget.lat_sekundy->setText("0");
+
+        // longtitude
+        controlWidget.long_stupne->setText(QString::number(longitude, 'f', 7));
+        controlWidget.long_minuty->setText("0");
+        controlWidget.long_sekundy->setText("0");
+
+        controlWidget.information_label->setText("QR RECOGNIZED");
+    }
+
+    void MrvkGui::scanQrStart_btn() {
+        controlWidget.information_label->setText("SCANNING QR");
+        camera_sub = n.subscribe("/usb_cam/image_raw", 1, &MrvkGui::listenCamera,this);
+        qr_data_sub = n.subscribe("/qr_detector/qr_codes", 1, &MrvkGui::listenQrData,this);
+    }
+
+    void MrvkGui::scanQrStop_btn() {
+        controlWidget.information_label->setText("SCANNING STOPPED");
+        // shutdown subscribers
+        camera_sub.shutdown();
+        qr_data_sub.shutdown();
     }
 
 }; // namespace

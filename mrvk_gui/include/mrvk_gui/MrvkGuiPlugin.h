@@ -4,18 +4,31 @@
 
 #ifndef PROJECT_MRVKGUIPLUGIN_H
 #define PROJECT_MRVKGUIPLUGIN_H
+
+// ui
 #include <rqt_gui_cpp/plugin.h>
 #include <ui_MainWidget.h>
 #include <mrvk_gui/DiagnosticsWidget.h>
 #include <ui_ControlWidget.h>
-#include <osm_planner/osm_parser.h>
+#include <QMessageBox>
+#include <pluginlib/class_list_macros.h>
+
+// msgs
 #include <geometry_msgs/PoseStamped.h>
 #include <actionlib_msgs/GoalID.h>
 #include <move_base_msgs/MoveBaseActionResult.h>
+#include <std_srvs/SetBool.h>
+#include <std_msgs/String.h>
 
+// image transport
 #include <image_transport/image_transport.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
+
+// others
+#include <geometry_msgs/PoseStamped.h>
+#include <sstream>
+#include <osm_planner/osm_parser.h>
 
 
 namespace mrvk_gui{
@@ -37,18 +50,26 @@ namespace mrvk_gui{
         QWidget *mainWidget;
         Ui::ControlWidget controlWidget;
         //DiagnosticModel treeModel;
+        ros::NodeHandle n;
         ros::Publisher goal_pub, cancel_pub;
-        ros::Subscriber result_sub, camera_sub;
+        ros::Subscriber result_sub, camera_sub, qr_data_sub;
         ros::ServiceClient init_robot;
         actionlib_msgs::GoalID cancel_goal_msg;
 
         virtual void listenResult(const move_base_msgs::MoveBaseActionResult::ConstPtr &msg);
-        void listenCamera(const boost::shared_ptr<const sensor_msgs::Image_<std::allocator<void>>> &msg);
+        void listenCamera(const sensor_msgs::ImageConstPtr &msg);
+        void listenQrData(const std_msgs::String &msg);
+        void readNavigData();
+
+    signals:
+        void valueChanged(double longitude, double latitude);
 
     private slots:
-        void goToGoal();
-        void cancelGoal();
-        void readNavigData();
+        void goToGoal_btn();
+        void cancelGoal_btn();
+        void scanQrStart_btn();
+        void scanQrStop_btn();
+        void updateGuiText(double latitude, double longitude);
 
     };
 };
