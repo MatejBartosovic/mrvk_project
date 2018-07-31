@@ -61,3 +61,6 @@ target_link_libraries(recognize_sidewalk_kinect ${PCL_LIBRARIES} ${catkin_LIBRAR
 
 add_executable(camera_calibration src/camera_calibration.cpp ${LOCAL_INCLUDES} )
 target_link_libraries(camera_calibration ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable(camera_capture_publisher src/camera_capture_publisher.cpp)
+target_link_libraries(camera_capture_publisher ${catkin_LIBRARIES})
