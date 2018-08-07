@@ -19,6 +19,8 @@
 #include <move_base_msgs/MoveBaseActionResult.h>
 #include <std_srvs/SetBool.h>
 #include <std_msgs/String.h>
+#include <diagnostic_msgs/DiagnosticArray.h>
+#include <sensor_msgs/NavSatFix.h>
 
 // image transport
 #include <image_transport/image_transport.h>
@@ -29,6 +31,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <sstream>
 #include <osm_planner/osm_parser.h>
+#include <vector>
 
 
 namespace mrvk_gui{
@@ -52,13 +55,16 @@ namespace mrvk_gui{
         //DiagnosticModel treeModel;
         ros::NodeHandle n;
         ros::Publisher goal_pub, cancel_pub;
-        ros::Subscriber result_sub, camera_sub, qr_data_sub;
+        ros::Subscriber result_sub, camera_sub, qr_data_sub, diagnostic_sub, gps_fix_sub;
         ros::ServiceClient init_robot;
         actionlib_msgs::GoalID cancel_goal_msg;
+        std::vector<double> storedPosition;     // memory for start position
 
         virtual void listenResult(const move_base_msgs::MoveBaseActionResult::ConstPtr &msg);
         void listenCamera(const sensor_msgs::ImageConstPtr &msg);
         void listenQrData(const std_msgs::String &msg);
+        void listenDiagnosticMsg(const diagnostic_msgs::DiagnosticArrayConstPtr &msg);
+        void listenGpsFix(const sensor_msgs::NavSatFixConstPtr &msg);
         void readNavigData();
 
     signals:
@@ -69,10 +75,12 @@ namespace mrvk_gui{
         void cancelGoal_btn();
         void scanQrStart_btn();
         void scanQrStop_btn();
+        void storeActualPosition_btn();
+        void restorePosition_btn();
         void updateGuiText(double latitude, double longitude);
 
     };
-};
+}
 
 
 #endif //PROJECT_MRVKGUIPLUGIN_H

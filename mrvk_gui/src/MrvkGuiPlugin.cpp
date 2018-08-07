@@ -36,6 +36,8 @@ namespace mrvk_gui {
         connect(controlWidget.cancelGoal_btn, SIGNAL(clicked()), this, SLOT(cancelGoal_btn()));
         connect(controlWidget.scanQrStart_btn, SIGNAL(clicked()), this, SLOT(scanQrStart_btn()));
         connect(controlWidget.scanQrStop_btn, SIGNAL(clicked()), this, SLOT(scanQrStop_btn()));
+        connect(controlWidget.storePosition_btn, SIGNAL(clicked()), this, SLOT(storeActualPosition_btn()));
+        connect(controlWidget.restorePosition_btn, SIGNAL(clicked()), this, SLOT(restorePosition_btn()));
         // slot for update gui forms
         connect(this, SIGNAL(valueChanged(double, double)), this, SLOT(updateGuiText(double, double)));
 
@@ -94,6 +96,7 @@ namespace mrvk_gui {
         init_robot = n.serviceClient<std_srvs::SetBool>("/mrvk_supervisor/init");
 
         result_sub = n.subscribe("/move_base/result", 5, &MrvkGui::listenResult,this);
+        diagnostic_sub = n.subscribe("/diagnostics",1, &MrvkGui::listenDiagnosticMsg,this);
 
     }
 
@@ -154,7 +157,8 @@ namespace mrvk_gui {
             case QMessageBox::Ok:
                 this->readNavigData();
 
-                // TODO preco sa vola tento servis? co to je?
+                controlWidget.information_label->setText("CALLED INIT ROBOT (gyro calibration)");
+                // this service "init_robot" calibrate gyro and gps
                 if (init_robot.call(setbool_init) && setbool_init.response.success) {
                         goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
                                                                                                 goal_target);
@@ -162,11 +166,11 @@ namespace mrvk_gui {
                                                                                                 goal_target);
                         goalXY.header.stamp = ros::Time::now();
                         goal_pub.publish(goalXY);
-                        controlWidget.information_label->setText("IDEM NAKLADAT");
-                    } else {
+                        controlWidget.information_label->setText("GOING TO GOAL");
+                } else {
                         ROS_ERROR_STREAM("Problem with robot inicialization and goal setup");
-                        controlWidget.information_label->setText("NIEKDE JE CHYBA");
-                    }
+                        controlWidget.information_label->setText("ERROR OCCURED WHILE INIT ROBOT");
+                }
             default:
                 // should never be reached
                 break;
@@ -250,25 +254,28 @@ namespace mrvk_gui {
         geo.erase(geo.begin(), geo.begin() + 4);
         stringstream ss(geo);
 
-        double latitude = 0, longtitude = 0;
+        double latitude = 0, longitude = 0;
         char delimiter;
-        ss>>longtitude;
+        ss>>longitude;
         ss>>delimiter;
         ss>>latitude;
 
-        if (latitude == 0 || longtitude == 0){
+        if (latitude == 0 || longitude == 0){
             ROS_ERROR("QR code is damaged: %s", msg.data.c_str());
             return;
         }
 
-        ROS_INFO("Longtitide = %f", longtitude);
+        ROS_INFO("Longitude = %f", longitude);
         ROS_INFO("Latitude   = %f", latitude);
 
-        emit valueChanged(longtitude, latitude);
+        // change values in UI forms
+        emit valueChanged(longitude, latitude);
 
         // shutdown unnecessary subscribers
         camera_sub.shutdown();
         qr_data_sub.shutdown();
+
+        controlWidget.information_label->setText("QR RECOGNIZED");
     }
 
     void MrvkGui::updateGuiText(double longitude, double latitude) {
@@ -277,12 +284,12 @@ namespace mrvk_gui {
         controlWidget.lat_minuty->setText("0");
         controlWidget.lat_sekundy->setText("0");
 
-        // longtitude
+        // longitude
         controlWidget.long_stupne->setText(QString::number(longitude, 'f', 7));
         controlWidget.long_minuty->setText("0");
         controlWidget.long_sekundy->setText("0");
 
-        controlWidget.information_label->setText("QR RECOGNIZED");
+        controlWidget.information_label->setText("GPS FORMS UPDATED");
     }
 
     void MrvkGui::scanQrStart_btn() {
@@ -297,6 +304,47 @@ namespace mrvk_gui {
         camera_sub.shutdown();
         qr_data_sub.shutdown();
     }
+
+    void MrvkGui::storeActualPosition_btn() {
+        gps_fix_sub = n.subscribe("odom", 1, &MrvkGui::listenGpsFix, this);
+    }
+
+    void MrvkGui::listenGpsFix(const sensor_msgs::NavSatFixConstPtr &msg) {
+        storedPosition.clear();
+        storedPosition.push_back(msg->longitude);
+        storedPosition.push_back(msg->latitude);
+        gps_fix_sub.shutdown();
+
+        controlWidget.information_label->setText("POSITION STORED");
+        ROS_INFO("Longitude = %f", msg->longitude);
+        ROS_INFO("Latitude   = %f", msg->latitude);
+    }
+
+    void MrvkGui::restorePosition_btn() {
+        if(storedPosition.empty()) {
+            controlWidget.information_label->setText("ANY POSITION STORED");
+            return;
+        }
+
+        // change values in UI forms
+        emit valueChanged(storedPosition.at(0), storedPosition.at(1));
+        storedPosition.clear();
+    }
+
+    void MrvkGui::listenDiagnosticMsg(const diagnostic_msgs::DiagnosticArrayConstPtr &msg) {
+        for(auto status : msg->status){
+            if(status.name == "battery1_voltage") {
+                ROS_INFO("BAT1: %s V", status.message.c_str());
+            }
+            if(status.name == "battery2_voltage") {
+                ROS_INFO("BAT2: %s V", status.message.c_str());
+            }
+            if(status.name == "current") {
+                ROS_INFO("CURRENT: %s A", status.message.c_str());
+            }
+        }
+    }
+
 
 }; // namespace
 PLUGINLIB_EXPORT_CLASS(mrvk_gui::MrvkGui, rqt_gui_cpp::Plugin)

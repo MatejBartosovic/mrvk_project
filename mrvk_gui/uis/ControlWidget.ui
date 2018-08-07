@@ -336,6 +336,120 @@ p, li { white-space: pre-wrap; }
     <string>Stop scan QR</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="storePosition_btn">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>90</y>
+     <width>161</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Store actual position</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="restorePosition_btn">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>140</y>
+     <width>161</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Restore saved position</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>596</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Battery #1:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_10">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>620</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Battery #2:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_11">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>640</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Current:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="battery1_label">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>600</y>
+     <width>67</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="battery2_label">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>620</y>
+     <width>67</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="current_label">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>640</y>
+     <width>67</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLCDNumber" name="battery1_lcd">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>600</y>
+     <width>64</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
   <zorder>label_2</zorder>
   <zorder>label_3</zorder>
   <zorder>lat_stupne</zorder>
@@ -358,6 +472,15 @@ p, li { white-space: pre-wrap; }
   <zorder>scanQrStart_btn</zorder>
   <zorder>cameraOutput</zorder>
   <zorder>scanQrStop_btn</zorder>
+  <zorder>storePosition_btn</zorder>
+  <zorder>restorePosition_btn</zorder>
+  <zorder>label</zorder>
+  <zorder>label_10</zorder>
+  <zorder>label_11</zorder>
+  <zorder>battery1_label</zorder>
+  <zorder>battery2_label</zorder>
+  <zorder>current_label</zorder>
+  <zorder>battery1_lcd</zorder>
  </widget>
  <resources/>
  <connections/>
