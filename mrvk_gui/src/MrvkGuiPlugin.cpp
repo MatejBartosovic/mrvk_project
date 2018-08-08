@@ -4,16 +4,10 @@
 
 #include "mrvk_gui/MrvkGuiPlugin.h"
 
-
 namespace mrvk_gui {
 
-    MrvkGui::MrvkGui() : rqt_gui_cpp::Plugin(), mainWidget(0)
-    {
+    MrvkGui::MrvkGui() : rqt_gui_cpp::Plugin(), mainWidget(0){
 
-        //goal_target.latitude = 5.1;
-        //updateGuiText();
-       // controlWidget.plainTextEdit->document()->setPlainText("ahoj");
-       // controlWidget.information_label->setText("NIEKDE JE CHYBA");
     }
 
     void MrvkGui::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -38,9 +32,14 @@ namespace mrvk_gui {
         connect(controlWidget.scanQrStop_btn, SIGNAL(clicked()), this, SLOT(scanQrStop_btn()));
         connect(controlWidget.storePosition_btn, SIGNAL(clicked()), this, SLOT(storeActualPosition_btn()));
         connect(controlWidget.restorePosition_btn, SIGNAL(clicked()), this, SLOT(restorePosition_btn()));
-        // slot for update gui forms
-        connect(this, SIGNAL(valueChanged(double, double)), this, SLOT(updateGuiText(double, double)));
 
+        // slot for update gui data
+        connect(this, SIGNAL(gpsValueChanged(double, double)), this, SLOT(updateGuiGPS(double, double)));
+        connect(this, SIGNAL(diagnosticDataChanged(QString, QString, QString)),
+                this, SLOT(updateGuiDiagnostic(QString, QString, QString)));
+
+        // slot for ventilator control
+        connect(controlWidget.ventilator_cbx, SIGNAL(clicked(bool)), this, SLOT(ventilator_cbx()));
 
         //get map origin
         osm_planner::Parser parser;
@@ -269,7 +268,7 @@ namespace mrvk_gui {
         ROS_INFO("Latitude   = %f", latitude);
 
         // change values in UI forms
-        emit valueChanged(longitude, latitude);
+        emit gpsValueChanged(longitude, latitude);
 
         // shutdown unnecessary subscribers
         camera_sub.shutdown();
@@ -278,7 +277,7 @@ namespace mrvk_gui {
         controlWidget.information_label->setText("QR RECOGNIZED");
     }
 
-    void MrvkGui::updateGuiText(double longitude, double latitude) {
+    void MrvkGui::updateGuiGPS(double longitude, double latitude) {
         // latitude
         controlWidget.lat_stupne->setText(QString::number(latitude, 'f', 7));
         controlWidget.lat_minuty->setText("0");
@@ -327,22 +326,76 @@ namespace mrvk_gui {
         }
 
         // change values in UI forms
-        emit valueChanged(storedPosition.at(0), storedPosition.at(1));
+        emit gpsValueChanged(storedPosition.at(0), storedPosition.at(1));
         storedPosition.clear();
     }
 
     void MrvkGui::listenDiagnosticMsg(const diagnostic_msgs::DiagnosticArrayConstPtr &msg) {
-        for(auto status : msg->status){
-            if(status.name == "battery1_voltage") {
-                ROS_INFO("BAT1: %s V", status.message.c_str());
-            }
-            if(status.name == "battery2_voltage") {
-                ROS_INFO("BAT2: %s V", status.message.c_str());
-            }
-            if(status.name == "current") {
-                ROS_INFO("CURRENT: %s A", status.message.c_str());
+        using namespace std;
+        // check if diagnostic mesage is correct
+        bool correct_diag_msg = false;
+        for(auto status:msg->status){
+            if(status.name == "mrvk_driver: mrvk_driver Status"){
+                correct_diag_msg = true;
             }
         }
+        if(!correct_diag_msg){
+            return;
+        }
+
+        // get the diagnostic value
+        string value;
+        for(auto values:msg->status[0].values) {
+            if(values.key == "main board status") {
+                value = values.value;
+                break;
+            }
+        }
+
+        // parse target data
+        string key_word;
+        size_t begin, end;
+        key_word = "battery1_voltage: ";
+        begin = value.find(key_word) + key_word.length();
+        end = value.find('\n', value.find(key_word) + 1);
+        string battery1 = value.substr(begin, end - begin); //get value behind key_word word
+
+        key_word = "battery2_voltage: ";
+        begin = value.find(key_word) + key_word.length();
+        end = value.find('\n', value.find(key_word) + 1);
+        string battery2 = value.substr(begin, end - begin);
+
+        key_word = "current: ";
+        begin = value.find(key_word) + key_word.length();
+        end = value.find('\n', value.find(key_word) + 1);
+        string current = value.substr(begin, end - begin);
+
+        // update gui
+        emit diagnosticDataChanged(QString::fromStdString(battery1),
+                                   QString::fromStdString(battery2),
+                                   QString::fromStdString(current));
+
+    }
+
+    void MrvkGui::updateGuiDiagnostic(QString battery1, QString battery2, QString current) {
+        controlWidget.battery1_label->setText(battery1);
+        controlWidget.battery2_label->setText(battery2);
+        controlWidget.current_label->setText(current);
+    }
+
+    void MrvkGui::ventilator_cbx() {
+        dynamic_reconfigure::ReconfigureRequest srv_req;
+        dynamic_reconfigure::ReconfigureResponse srv_resp;
+        dynamic_reconfigure::BoolParameter bool_param;
+        dynamic_reconfigure::Config conf;
+
+        bool_param.name = "wifi";
+        bool_param.value = controlWidget.ventilator_cbx->isChecked();
+
+        conf.bools.push_back(bool_param);
+        srv_req.config = conf;
+
+        ros::service::call("/mrvk_driver/set_parameters", srv_req, srv_resp);
     }
 
 

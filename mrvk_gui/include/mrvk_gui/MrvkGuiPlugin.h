@@ -33,6 +33,11 @@
 #include <osm_planner/osm_parser.h>
 #include <vector>
 
+// dinamic reconfigure
+#include <dynamic_reconfigure/DoubleParameter.h>
+#include <dynamic_reconfigure/Reconfigure.h>
+#include <dynamic_reconfigure/Config.h>
+
 
 namespace mrvk_gui{
 
@@ -68,7 +73,8 @@ namespace mrvk_gui{
         void readNavigData();
 
     signals:
-        void valueChanged(double longitude, double latitude);
+        void gpsValueChanged(double longitude, double latitude);
+        void diagnosticDataChanged(QString battery1, QString battery2, QString current);
 
     private slots:
         void goToGoal_btn();
@@ -77,7 +83,9 @@ namespace mrvk_gui{
         void scanQrStop_btn();
         void storeActualPosition_btn();
         void restorePosition_btn();
-        void updateGuiText(double latitude, double longitude);
+        void updateGuiGPS(double latitude, double longitude);
+        void updateGuiDiagnostic(QString battery1, QString battery2, QString current);
+        void ventilator_cbx();
 
     };
 }
