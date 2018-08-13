@@ -124,7 +124,7 @@ bool Supervisor::init(std_srvs::SetBool::Request &req, std_srvs::SetBool::Respon
 void Supervisor::odomListener(const nav_msgs::Odometry::ConstPtr& msg)
 {
     if(initialized) {
-        if ((msg->twist.twist.angular.z < speed_limit) && (msg->twist.twist.angular.z > -speed_limit) && (msg->twist.twist.linear.x < speed_limit) && (msg->twist.twist.linear.x > -speed_limit)) {
+        if ((msg->twist.twist.linear.x < speed_limit) && (msg->twist.twist.linear.x > -speed_limit) && (msg->twist.twist.linear.x < speed_limit) && (msg->twist.twist.linear.x > -speed_limit)) {
             robot_stopped = true;
         } else {
             robot_stopped = false;

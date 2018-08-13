@@ -378,10 +378,12 @@ void GpsCompasCorrection::bearingAutoUpdate() {
 
     if (gpsDataFirst->status.status == sensor_msgs::NavSatStatus::STATUS_SBAS_FIX){
 
-        if (++bad_fix_counter < max_count_of_sbas_fix)
-            return;
-        else {
+        if (++bad_fix_counter < max_count_of_sbas_fix){
+         ROS_ERROR("only sbas fix");  
+	  return;
+	}  else {
             bad_fix_counter = 0;
+	   ROS_ERROR("correction when only sbas fix");
             sendTransform(*gpsDataFirst);
             return;
         }
@@ -392,7 +394,6 @@ void GpsCompasCorrection::bearingAutoUpdate() {
     //----------------------//
     bad_fix_counter = 0;
     sendTransform(*gpsDataFirst);
-
 
     //----------------------//
     //Get rotation on First point
@@ -406,14 +407,13 @@ void GpsCompasCorrection::bearingAutoUpdate() {
         return;
     }
 
-
     //----------------------//
     //Get second point from GPS
     //----------------------//
 
     double dist = 0;
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsDataSecond;
-    int counter = 0;
+    static int counter = 0;
 
     //----------------------//
     //Wait for minimal distance for update and wait for gbas fix. Max count of meassurment is 5
@@ -426,13 +426,16 @@ void GpsCompasCorrection::bearingAutoUpdate() {
                 gpsTopic, ros::Duration(3));
         if (!gpsDataSecond || counter > 5 || !gpsDataSecond->status.status == sensor_msgs::NavSatStatus::STATUS_GBAS_FIX) {
             ROS_WARN("No fixed GPS data");
-            autoUpdateMutex.unlock();
+            counter = 0;
+	    autoUpdateMutex.unlock();
             return;
         }
 
         counter++;
         dist = osm_planner::Parser::Haversine::getDistance(*gpsDataFirst, *gpsDataSecond);
     }
+ 
+   counter = 0;
 
     //----------------------//
      //Get rotation on Second Point
