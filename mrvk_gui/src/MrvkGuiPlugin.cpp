@@ -305,7 +305,8 @@ namespace mrvk_gui {
     }
 
     void MrvkGui::storeActualPosition_btn() {
-        gps_fix_sub = n.subscribe("odom", 1, &MrvkGui::listenGpsFix, this);
+        storedPosition.clear();
+        gps_fix_sub = n.subscribe("fix", 1, &MrvkGui::listenGpsFix, this);
     }
 
     void MrvkGui::listenGpsFix(const sensor_msgs::NavSatFixConstPtr &msg) {
@@ -327,7 +328,6 @@ namespace mrvk_gui {
 
         // change values in UI forms
         emit gpsValueChanged(storedPosition.at(0), storedPosition.at(1));
-        storedPosition.clear();
     }
 
     void MrvkGui::listenDiagnosticMsg(const diagnostic_msgs::DiagnosticArrayConstPtr &msg) {
