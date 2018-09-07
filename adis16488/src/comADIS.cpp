@@ -331,20 +331,20 @@ int main(int argc, char **argv)
                 imu.linear_acceleration.x = (double)readPacketADIS.data[ACCEL_X]*GGG;
                 imu.linear_acceleration.y = (double)readPacketADIS.data[ACCEL_Y]*GGG;
                 imu.linear_acceleration.z = (double)readPacketADIS.data[ACCEL_Z]*GGG;
-                imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(0,0,-(double)readPacketADIS.data[VEL_Z_DEL]*DEG2RAD);
+                imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(0,0,(double)readPacketADIS.data[VEL_Z_DEL]*DEG2RAD);
 
             }
             else{
                 imu.header.frame_id = imu_frame;
                 imu.header.seq = dataCounter;
                 imu.header.stamp = ros::Time::now();
-                imu.angular_velocity.x -(double)readPacketADIS.data[VEL_X]*DEG2RAD;
-                imu.angular_velocity.y = -(double)readPacketADIS.data[VEL_Y]*DEG2RAD;
-                imu.angular_velocity.z = -(double)readPacketADIS.data[VEL_Z]*DEG2RAD;
-                imu.linear_acceleration.x = -(double)readPacketADIS.data[ACCEL_X]*GGG;
-                imu.linear_acceleration.y = -(double)readPacketADIS.data[ACCEL_Y]*GGG;
-                imu.linear_acceleration.z = -(double)readPacketADIS.data[ACCEL_Z]*GGG;
-                imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(-(double)readPacketADIS.data[VEL_X_DEL]*DEG2RAD,-(double)readPacketADIS.data[VEL_Y_DEL]*DEG2RAD,-(double)readPacketADIS.data[VEL_Z_DEL]*DEG2RAD);
+                imu.angular_velocity.x = (double)readPacketADIS.data[VEL_X]*DEG2RAD;
+                imu.angular_velocity.y = (double)readPacketADIS.data[VEL_Y]*DEG2RAD;
+                imu.angular_velocity.z = (double)readPacketADIS.data[VEL_Z]*DEG2RAD;
+                imu.linear_acceleration.x = (double)readPacketADIS.data[ACCEL_X]*GGG;
+                imu.linear_acceleration.y = (double)readPacketADIS.data[ACCEL_Y]*GGG;
+                imu.linear_acceleration.z = (double)readPacketADIS.data[ACCEL_Z]*GGG;
+                imu.orientation = tf::createQuaternionMsgFromRollPitchYaw((double)readPacketADIS.data[VEL_X_DEL]*DEG2RAD,(double)readPacketADIS.data[VEL_Y_DEL]*DEG2RAD,(double)readPacketADIS.data[VEL_Z_DEL]*DEG2RAD);
             }
 
             //display read data
