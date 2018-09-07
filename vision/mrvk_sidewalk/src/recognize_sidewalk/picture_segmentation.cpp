@@ -6,10 +6,10 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <sensor_msgs/Image.h>
 #include "segment_class.hpp"
-#define dilate_size 10
-#define erode_size 10
-#define OVEREXPOSED 245
-#define UNDEREXPOSED 30
+//#define dilate_size 10
+//#define erode_size 10
+//#define OVEREXPOSED 245
+//#define UNDEREXPOSED 30
 #include "SidewalkEdge.h"
 
 using namespace cv;
@@ -17,12 +17,12 @@ using namespace std;
 
 // HSV segmentation
 // ok values  0 175 1 82 36 255 - TODO: update adaptation
-int iLowH = 75;
+/*int iLowH = 75;
 int iHighH = 130;
 int iLowS = 0;
 int iHighS = 162;
 int iLowV = 36;
-int iHighV = 255;
+int iHighV = 255;*/
 cluster123 clust_sample_main, clust_sample_buffer;
 int bufferCnt;
 bool first_time = true;
@@ -62,8 +62,13 @@ cv::Mat picture_segmentation_frame(cv::Mat frame)
  *TO DO: kalibracia farieb/svetla, kontury-DoneOK, scitavanie framov- Kalman??, adaptacia na svetlo
 */
 
-cv::Vec3b computeAdaptationKernels(Mat imageHSV)
+cv::Vec3b computeAdaptationKernels(Mat imageHSV, ros::NodeHandle n)
 {
+	int iLowH = 75;
+	n.getParam("iLowH", iLowH);
+	int iHighH = 130;
+	n.getParam("iHighH", iHighH);
+
 	int regionX = imageHSV.cols/2;
 	int regionY = (imageHSV.rows/4)*3;
 
@@ -109,9 +114,14 @@ cluster::cluster(){
 	covar = (Mat::zeros(3, 3, CV_32S));
 	mass = (0);
 }
-cv::Mat maskExposure(cv::Mat unmasked_image)
+cv::Mat maskExposure(cv::Mat unmasked_image, ros::NodeHandle n)
 {
 	cv::Mat masked_image=unmasked_image;
+
+	int OVEREXPOSED = 245;
+	n.getParam("OVEREXPOSED", OVEREXPOSED);
+	int UNDEREXPOSED = 10;
+	n.getParam("UNDEREXPOSED", UNDEREXPOSED);
 
 	int i,j;
 	for (i=0; i< masked_image.rows;i++)
@@ -158,7 +168,7 @@ cluster extractRegion(cv::Mat unregioned_image)
 }
 
 
-cv::Mat picture_segmentation_frame_HSV(cv::Mat frame)
+cv::Mat picture_segmentation_frame_HSV(cv::Mat frame, ros::NodeHandle n)
 {
 	cv::Mat imageHSV;		//Create Matrix to store processed image
 	cv::Mat imageCont;
@@ -167,7 +177,7 @@ cv::Mat picture_segmentation_frame_HSV(cv::Mat frame)
 	cluster clust_sample;
 	cv::cvtColor(frame,imageHSV,CV_BGR2HSV);
 	//cv::blur(image,imageThresh,cv::Size(60, 60));//blurr image
-	imageHSV = maskExposure(imageHSV);	
+	imageHSV = maskExposure(imageHSV, n);
 	
 	//region selection
 	clust_sample= extractRegion (imageHSV);
@@ -175,15 +185,35 @@ cv::Mat picture_segmentation_frame_HSV(cv::Mat frame)
 		int rangeH = 35;
 	int rangeS = 70;
 
+	int iLowH = 75;
+	n.getParam("iLowH", iLowH);
+	int iHighH = 130;
+	n.getParam("iHighH", iHighH);
+    int iLowS = 0;
+    n.getParam("iLowS", iLowS);
+    int iHighS = 162;
+    n.getParam("iHighS", iHighS);
+    int iHighV = 255;
+    n.getParam("iHighV", iHighV);
+    int iLowV = 36;
+    n.getParam("iLowV", iLowV);
+
+
 	iLowH = setRange(clust_sample.point[0],-rangeH);
 	iHighH = setRange(clust_sample.point[0],+rangeH);
 	iLowS = setRange(clust_sample.point[1],-rangeS);
 	iHighS = setRange(clust_sample.point[1],+rangeS);
 
-	inRange(imageHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imageThresh); //Threshold the image	
+	inRange(imageHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imageThresh); //Threshold the image
+
+	int erode_size = 10;
+	n.getParam("erode_size", erode_size);
 		
 	//morphological opening (remove small objects from the foreground)
 	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
+	int dilate_size = 10;
+	n.getParam("dilate_size", dilate_size);
+
 	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size, dilate_size)) );
 	
 	//morphological closing (fill small holes in the foreground)
@@ -276,9 +306,14 @@ double setRange123(double value, double range, bool flag)
 	return value;
 }
 
-cv::Mat maskExposure123(cv::Mat unmasked_image, cv::Mat unmasked_imageRGB)
+cv::Mat maskExposure123(cv::Mat unmasked_image, cv::Mat unmasked_imageRGB, ros::NodeHandle n)
 {
 	cv::Mat masked_image=unmasked_imageRGB;
+
+	int OVEREXPOSED = 245;
+	n.getParam("OVEREXPOSED", OVEREXPOSED);
+	int UNDEREXPOSED = 10;
+	n.getParam("UNDEREXPOSED", UNDEREXPOSED);
 
 	int i,j;
 	for (i=0; i< unmasked_image.rows;i++)
@@ -297,8 +332,13 @@ cv::Mat maskExposure123(cv::Mat unmasked_image, cv::Mat unmasked_imageRGB)
 	return masked_image;
 }
 
-bool improveShadows(cv::Mat iputImgHSV,cv::Mat inputImgRGB)
+bool improveShadows(cv::Mat iputImgHSV, cv::Mat inputImgRGB, ros::NodeHandle n)
 {
+	int OVEREXPOSED = 245;
+	n.getParam("OVEREXPOSED", OVEREXPOSED);
+	int UNDEREXPOSED = 10;
+	n.getParam("UNDEREXPOSED", UNDEREXPOSED);
+
 	//volat az po maskovani
 	int i,j;
 	for (i=0;i<inputImgRGB.rows;i++)
@@ -482,7 +522,7 @@ cluster123 updateModel123(cluster123 clustLearnt, cluster123 clustTraining)
 
 
 
-cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
+cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame, ros::NodeHandle n)
 {
 	cv::Mat imageHSV;		//Create Matrix to store processed image
 	cv::Mat imageCont;
@@ -492,7 +532,7 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 	cluster123 clust_sample;
 	cv::cvtColor(frame,imageHSV,CV_BGR2HSV);
 	//cv::blur(image,imageThresh,cv::Size(60, 60));//blurr image
-	frame = maskExposure123(imageHSV,frame);	
+	frame = maskExposure123(imageHSV,frame, n);
 	
 
 	double rangeH123rangeC1 = 0.05; // 0.08 -> more tolerant
@@ -549,6 +589,10 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 		}
 
 
+	int dilate_size = 10;
+	n.getParam("dilate_size", dilate_size);
+	int erode_size = 10;
+	n.getParam("erode_size", erode_size);
 
 	//morphological opening (remove small objects from the foreground)
 	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
@@ -607,7 +651,7 @@ cv::Mat picture_segmentation_frame_c1c2c3(cv::Mat frame)
 }
 
 
-cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  SidewalkEdges *sidewalkEdges)
+cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  SidewalkEdges *sidewalkEdges, ros::NodeHandle n)
 {
 	cv::Mat imageHSV;		//Create Matrix to store processed image
 	cv::Mat imageCont;
@@ -617,12 +661,15 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	cluster123 clust_sample;
 	cv::cvtColor(frame,imageHSV,CV_BGR2HSV);
 	//cv::blur(image,imageThresh,cv::Size(60, 60));//blurr image
-	frame = maskExposure123(imageHSV,frame);	
-	improveShadows(imageHSV,frame);	
+	frame = maskExposure123(imageHSV,frame, n);
+	improveShadows(imageHSV,frame, n);
 
-	double rangeH123rangeC1 = 0.03; // 0.08 -> more tolerant
-	double rangeH123rangeC2 = 0.03; // 0.08 -> more tolerant
-	double rangeH123rangeC3 = 0.07;
+	double rangeH123rangeC1 = 0.03; // 0.08 -> more tolerant  //old 0.03
+    n.getParam("rangeH123rangeC1", rangeH123rangeC1);
+	double rangeH123rangeC2 = 0.03; // 0.08 -> more tolerant  //old 0.03
+    n.getParam("rangeH123rangeC2", rangeH123rangeC2);
+	double rangeH123rangeC3 = 0.07; 						  //old 0.07
+    n.getParam("rangeH123rangeC3", rangeH123rangeC3);
 	//std::cout<<regionX<<" x "<<regionY<<" Data: "<< imHSV.at<cv::Vec3b>(regionX,regionY)<<endl;
 
 	//region selection
@@ -640,12 +687,17 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	}
 
 	double bufferDistance = calcClusterDistance123(clust_sample_buffer, clust_sample);
-	
-	if (abs(bufferDistance)<0.03)
+
+	double bufferDistanceThreshold = 0.03;
+	n.getParam("bufferDistanceThreshold", bufferDistanceThreshold);
+	double bufferCountThreshold = 5;
+	n.getParam("bufferCountThreshold", bufferCountThreshold);
+
+	if (abs(bufferDistance)<bufferDistanceThreshold)
 	{
 		bufferCnt++;
 		std::cout<< "cnt++ je: " << bufferCnt<<"\n";
-		if (bufferCnt>=25) //5
+		if (bufferCnt>=bufferCountThreshold)
 		{
 			clust_sample_main = clust_sample_buffer;
 			bufferCnt = 0;
@@ -693,6 +745,10 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 		}
 
 
+	int dilate_size = 10;
+	n.getParam("dilate_size", dilate_size);
+	int erode_size = 10;
+	n.getParam("erode_size", erode_size);
 
 	//morphological opening (remove small objects from the foreground)
 	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
@@ -705,6 +761,8 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	//contours
  	vector<vector<Point> > contours;
   	vector<Vec4i> hierarchy;
+	int rndCore = 12345;
+	n.getParam("rndCore", rndCore);
   	RNG rng(12345);
   	imageCont=imageThresh.clone();
 	findContours( imageCont, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
@@ -714,10 +772,13 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
     vector<vector<Point> > contours_poly( contours.size() );
 	vector<Point2f> center( contours.size() );
 	vector<float> radius( contours.size() );  
-    
+
+	double polyApproxEpsilon = 3;
+	n.getParam("polyApproxEpsilon", polyApproxEpsilon);
+
 	for( int i = 0; i < contours.size(); i++ )
     { 
-        approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
+        approxPolyDP( Mat(contours[i]), contours_poly[i], polyApproxEpsilon, true );
         minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
     }
 

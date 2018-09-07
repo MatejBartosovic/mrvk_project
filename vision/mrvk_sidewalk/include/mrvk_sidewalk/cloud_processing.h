@@ -50,13 +50,34 @@ private:
 
     tf::TransformListener t;
     const struct CameraParams {
-        float cx = 940.9387918663755;
+	//kinect
+        /*float cx = 940.9387918663755;
         float cy = 533.8446166443484f;
         float fx = 1046.881763495155f;
         float fy = 1046.524330950266;
         float k1 = 0.0905474;
         float k2 = -0.26819;
         float k3 = 0.0950862;
+        float p1 = 0.0;
+        float p2 = 0.0;*/
+	//crap camera
+        /*float cx = 320.0;
+        float cy = 240.0;
+        float fx = 1632.5038600214193;
+        float fy = 1632.5038600214193;
+        float k1 = 0.12149974819948649;
+        float k2 = -2.2874352574678793;
+        float k3 = -41.029543326416437;
+        float p1 = 0.0;
+        float p2 = 0.0;*/
+	//Sencor camera
+        float cx = 320.0;
+        float cy = 240.0;
+        float fx = 513.07518547336940;
+        float fy = 513.07518547336940;
+        float k1 = -0.36925125110658569;
+        float k2 = 0.19369148295711350;
+        float k3 = -0.66219869873459750;
         float p1 = 0.0;
         float p2 = 0.0;
     }CameraParams;

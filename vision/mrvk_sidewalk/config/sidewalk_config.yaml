@@ -1,7 +1,7 @@
 sidewalk_params:
   my_param: 1000
   spin_freq: 6
-  image_topic: /kinect2/qhd/image_color
+  image_topic: /usb_cam/image_raw #/kinect2/qhd/image_color#/usb_cam/image_raw#
   depth_image_topic: /kinect2/qhd/image_depth_rect
 
   edge_side_offset: 50

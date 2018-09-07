@@ -1,0 +1,20 @@
+rangeH123rangeC1: 0.05 #orig 0.03
+rangeH123rangeC2: 0.05 #orig 0.03
+rangeH123rangeC3: 0.09 #orig 0.07
+
+bufferDistanceThreshold: 0.03 #orig 0.03
+bufferCountThreshold: 5 #orig 5
+polyApproxEpsilon: 3 #orig 3
+rndCore: 12345 #orig 12345
+
+dilate_size: 10 #orig 10
+erode_size: 10 #orig 10
+OVEREXPOSED: 245 #orig 245
+UNDEREXPOSED: 30 #orig 30
+
+iLowH: 75 #orig 75
+iHighH: 130 #orig 130
+iLowS: 0 #orig 0
+iHighS: 162 #orig 162
+iLowV: 36 #orig 36
+iHighV: 255 #orig 255

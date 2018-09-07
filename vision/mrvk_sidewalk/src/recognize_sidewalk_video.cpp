@@ -376,7 +376,7 @@ int main(int argc, char **argv) {
         }
         imageOrig = image.clone();
 
-        valid_data = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges);
+        valid_data = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges, n);
 
         //publish processed image
         header.stamp = ros::Time::now();
