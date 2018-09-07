@@ -9,7 +9,7 @@
   <arg name="use_joint_states_publisher" default="true" />
   <arg name="use_gps" default="true" />
   <arg name="use_user_interface" default="false"/>
-  <arg name="use_kinect" default="true"/>
+  <arg name="use_vision" default="true"/>
   <arg name="use_supervisor" default="true"/>
   <arg name="osm_map_path" default="$(find osm_planner)/osm_example/fei.osm"/> 
   <!-- <arg name="osm_map_path" default="$(find osm_planner)/osm_example/park_ludovita_stura_2.osm"/> --> 
@@ -36,7 +36,7 @@
 
   </include>>
   <!--Kinect launch-->
-  <include file="$(find mrvk_sidewalk)/launch/mrvk_sidewalk.launch" if="$(arg use_kinect)"/>
+  <include file="$(find mrvk_sidewalk)/launch/mrvk_sidewalk.launch" if="$(arg use_vision)"/>
 
   <!--Start user interface (robot control)-->
   <include file="$(find mrvk_driver)/launch/user_interface.launch" if="$(arg use_user_interface)"/>
