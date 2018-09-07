@@ -19,9 +19,9 @@
 
 
 
-#define KINECT_X 0.1
-#define KINECT_Y -0.07
-#define KINECT_Z 0.663
+#define KINECT_X 0.11//old 0.1
+#define KINECT_Y 0.02//old -0.07
+#define KINECT_Z 0.66//old 0.663
 
 class CloudProcessing{
 public:

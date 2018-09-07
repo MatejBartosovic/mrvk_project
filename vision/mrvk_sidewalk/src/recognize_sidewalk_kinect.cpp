@@ -120,7 +120,7 @@ ROS_ERROR("Sidewalk init");
 //autobusChar = params.image_topic.c_str();
 ROS_ERROR("Sidewalk topic %s", params.image_topic.c_str());
 ROS_INFO("Sidewalk topic %s", params.image_topic.c_str());
-        sub = n.subscribe("/usb_cam/image_raw", 1, &Sidewalk::kinectImageCallback,this);
+        sub = n.subscribe(params.image_topic.c_str(), 1, &Sidewalk::kinectImageCallback,this);
 //        subDepth = n.subscribe(params.depth_image_topic, 1, &Sidewalk::kinectDepthImageCallback,this);
 
         //init publishers
@@ -173,7 +173,7 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
     pcl::PointCloud<pcl::PointXYZRGB> cloud;
 
     long int data_point;
-   /* if(valid_data == 0) {
+    if(valid_data == 0) {
         for (int i = 0; i < sidewalkEdges.left.validPoints.size(); i++) {
             data_point =
                     (PIC_HEIGHT_PIX2 - sidewalkEdges.left.validPoints[i].x) * PIC_HALF_WIDTH_PIX2 + (PIC_HALF_WIDTH_PIX2 - sidewalkEdges.left.validPoints[i].y);
@@ -193,7 +193,7 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
     toROSMsg (cloud, final_cloud2);
     final_cloud2.header.frame_id = "base_stabilized";
     final_cloud2.header.stamp = ros::Time::now();
-    pub_pav_pointCloud.publish(final_cloud2);*/
+    pub_pav_pointCloud.publish(final_cloud2);
 
 #ifdef DEBUG
 
