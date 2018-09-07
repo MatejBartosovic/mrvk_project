@@ -327,10 +327,10 @@ int main(int argc, char **argv)
                 imu.header.stamp = ros::Time::now();
                 imu.angular_velocity.x = 0;
                 imu.angular_velocity.y = 0;
-                imu.angular_velocity.z = -(double)readPacketADIS.data[VEL_Z]*DEG2RAD;
-                imu.linear_acceleration.x = -(double)readPacketADIS.data[ACCEL_X]*GGG;
-                imu.linear_acceleration.y = -(double)readPacketADIS.data[ACCEL_Y]*GGG;
-                imu.linear_acceleration.z = -(double)readPacketADIS.data[ACCEL_Z]*GGG;
+                imu.angular_velocity.z = (double)readPacketADIS.data[VEL_Z]*DEG2RAD;
+                imu.linear_acceleration.x = (double)readPacketADIS.data[ACCEL_X]*GGG;
+                imu.linear_acceleration.y = (double)readPacketADIS.data[ACCEL_Y]*GGG;
+                imu.linear_acceleration.z = (double)readPacketADIS.data[ACCEL_Z]*GGG;
                 imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(0,0,-(double)readPacketADIS.data[VEL_Z_DEL]*DEG2RAD);
 
             }
