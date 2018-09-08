@@ -6,6 +6,7 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QIntValidator>
 
 
 RobotourControl::RobotourControl(){
@@ -15,6 +16,17 @@ RobotourControl::RobotourControl(){
 
 void RobotourControl::setupUi(QWidget *parrent){
     Ui::ControlWidget::setupUi(parrent);
+
+    Ui::ControlWidget::long_stupne->setValidator(new QIntValidator(0,60));
+    Ui::ControlWidget::long_minuty->setValidator(new QIntValidator(0,60));
+    Ui::ControlWidget::long_sekundy->setValidator(new QIntValidator(180,-180));
+    Ui::ControlWidget::lat_stupne->setValidator(new QIntValidator(90,-90));
+    Ui::ControlWidget::lat_minuty->setValidator(new QIntValidator(0,60));
+    Ui::ControlWidget::lat_sekundy->setValidator(new QIntValidator(0,60));
+
+    connect(Ui::ControlWidget::autoScroll,SIGNAL(stateChanged(int)), this, SLOT(autoscroll(int)));
+    Ui::ControlWidget::autoScroll->setChecked(true);
+
     // connect slots for buttons
     connect(Ui::ControlWidget::goToGoal_btn, SIGNAL(clicked()), this, SLOT(goToGoal_btn()));
     connect(Ui::ControlWidget::cancelGoal_btn, SIGNAL(clicked()), this, SLOT(cancelGoal_btn()));
@@ -22,26 +34,23 @@ void RobotourControl::setupUi(QWidget *parrent){
     connect(Ui::ControlWidget::scanQrStop_btn, SIGNAL(clicked()), this, SLOT(scanQrStop_btn()));
     connect(Ui::ControlWidget::storePosition_btn, SIGNAL(clicked()), this, SLOT(storeActualPosition_btn()));
     connect(Ui::ControlWidget::restorePosition_btn, SIGNAL(clicked()), this, SLOT(restorePosition_btn()));
+    connect(Ui::ControlWidget::BrowseBtn, SIGNAL(clicked()), this, SLOT(setMap()));
+
 
     // slot for update gui data
     connect(this, SIGNAL(gpsValueChanged(double, double)), this, SLOT(updateGuiGPS(double, double)));
-    connect(this, SIGNAL(diagnosticDataChanged(QString, QString, QString)),
-    this, SLOT(updateGuiDiagnostic(QString, QString, QString)));
+    connect(this, SIGNAL(diagnosticDataChanged(QString, QString, QString)),this, SLOT(updateGuiDiagnostic(QString, QString, QString)));
 
     // slot for ventilator control
     connect(Ui::ControlWidget::ventilator_cbx, SIGNAL(clicked(bool)), this, SLOT(ventilator_cbx()));
 
-    //get map origin
-    osm_planner::Parser parser;
     // from param server
     std::string filepath;
     std::vector<std::string> way_types;
     std::string global_frame;
 
-    n.getParam("/move_base/Planner/osm_map_path",filepath);
     n.getParam("/move_base/Planner/global_frame",global_frame);
     n.getParam("/move_base/Planner/filter_of_ways",way_types);
-    filepath = "/home/matejko/moveit_ws/src/osm_planner/osm_example/fei.osm";
 
     double latitude, longitude;
     int settingOrigin;
@@ -49,30 +58,12 @@ void RobotourControl::setupUi(QWidget *parrent){
     n.param<double>("/move_base/Planner/origin_longitude",longitude,0.0);
     n.param<int>("/move_base/Planner/set_origin_pose", settingOrigin,0);
 
-
-    bool ok;
-    QStringList filename =  QFileDialog::getOpenFileNames(
-            nullptr,
-            "Open Document",
-            QDir::currentPath(),
-            "Osm map (*.osm) ;; All files (*.*)");
-
-    parser.setNewMap(filepath);
-    parser.setTypeOfWays(way_types);
-
     if (settingOrigin == 3) {
-    parser.parse();
-    // map_origin = parser.getNodeByID(parser.getNearestPoint(latitude, longitude));
-    ROS_INFO("PRVA MOZNOST");
-    map_origin.latitude = latitude;
-    map_origin.longitude = longitude;
+        // map_origin = parser.getNodeByID(parser.getNearestPoint(latitude, longitude));
+        ROS_INFO("PRVA MOZNOST");
+        map_origin.latitude = latitude;
+        map_origin.longitude = longitude;
 
-    }
-    else{
-    parser.parse(true);
-    map_origin = parser.getNodeByID(0);
-    // ROS_ERROR("lat %f, lon %f", mapOrigin.latitude,mapOrigin.longitude);
-    ROS_INFO("DRUHA MOZNOST");
     }
 
     ROS_INFO("MAP ORIGIN LATITUDE %lf", map_origin.latitude );
@@ -101,15 +92,15 @@ void RobotourControl::readNavigData(){
      */
 
     // longitude
-    double stupne = Ui::ControlWidget::long_stupne->toPlainText().toDouble();
-    double min = Ui::ControlWidget::long_minuty->toPlainText().toDouble();
-    double sec = Ui::ControlWidget::long_sekundy->toPlainText().toDouble();
+    double stupne = Ui::ControlWidget::long_stupne->text().toDouble();
+    double min = Ui::ControlWidget::long_minuty->text().toDouble();
+    double sec = Ui::ControlWidget::long_sekundy->text().toDouble();
     goal_target.longitude = stupne + (min/60) + (sec/3600);
 
     // latitude
-    stupne  = Ui::ControlWidget::lat_stupne->toPlainText().toDouble();
-    min  = Ui::ControlWidget::lat_minuty->toPlainText().toDouble();
-    sec  = Ui::ControlWidget::lat_sekundy->toPlainText().toDouble();
+    stupne  = Ui::ControlWidget::lat_stupne->text().toDouble();
+    min  = Ui::ControlWidget::lat_minuty->text().toDouble();
+    sec  = Ui::ControlWidget::lat_sekundy->text().toDouble();
     goal_target.latitude = stupne + (min/60) + (sec/3600);
 
     // TODO log this data
@@ -119,10 +110,7 @@ void RobotourControl::readNavigData(){
 }
 
 void RobotourControl::goToGoal_btn(){
-    QMessageBox msgBox;
-    msgBox.setText(QString("Do you want to start robot movement ?"));
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Cancel);
+    QMessageBox msgBox(QMessageBox::Question,"","Do you want to start robot movement ?",QMessageBox::Ok | QMessageBox::Cancel);
 
     std_srvs::SetBool setbool_init;
 
@@ -135,7 +123,7 @@ void RobotourControl::goToGoal_btn(){
         case QMessageBox::Ok:
             this->readNavigData();
 
-            Ui::ControlWidget::information_label->setText("CALLED INIT ROBOT (gyro calibration)");
+            Ui::ControlWidget::information_wiev->addItem("CALLED INIT ROBOT (gyro calibration)");
             // this service "init_robot" calibrate gyro and gps
             if (init_robot.call(setbool_init) && setbool_init.response.success) {
                 goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
@@ -144,10 +132,10 @@ void RobotourControl::goToGoal_btn(){
                                                                                         goal_target);
                 goalXY.header.stamp = ros::Time::now();
                 goal_pub.publish(goalXY);
-                Ui::ControlWidget::information_label->setText("GOING TO GOAL");
+                Ui::ControlWidget::information_wiev->addItem("GOING TO GOAL");
             } else {
                 ROS_ERROR_STREAM("Problem with robot inicialization and goal setup");
-                Ui::ControlWidget::information_label->setText("ERROR OCCURED WHILE INIT ROBOT");
+                Ui::ControlWidget::information_wiev->addItem("ERROR OCCURED WHILE INIT ROBOT");
             }
         default:
             // should never be reached
@@ -156,10 +144,8 @@ void RobotourControl::goToGoal_btn(){
 }
 
 void RobotourControl::cancelGoal_btn() {
-    QMessageBox msgBox;
-    msgBox.setText(QString("Do you want to cancel robot movement ?"));
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Cancel);
+    QMessageBox msgBox(QMessageBox::Question,"","Do you want to start robot movement ?",QMessageBox::Ok | QMessageBox::Cancel);
+
 
     switch (msgBox.exec()) {
         case QMessageBox::Cancel:
@@ -196,13 +182,13 @@ void RobotourControl::listenResult(const move_base_msgs::MoveBaseActionResult::C
      */
 
     if (msg->status.status == actionlib_msgs::GoalStatus::SUCCEEDED){
-        Ui::ControlWidget::information_label->setText("THE GOAL HAS BEEN REACHED");
+        Ui::ControlWidget::information_wiev->addItem("THE GOAL HAS BEEN REACHED");
 
     } else if (msg->status.status == actionlib_msgs::GoalStatus::ABORTED){
-        Ui::ControlWidget::information_label->setText("THE GOAL HAS BEEN ABORTED");
+        Ui::ControlWidget::information_wiev->addItem("THE GOAL HAS BEEN ABORTED");
 
     } else {
-        Ui::ControlWidget::information_label->setText("ERR: GOAL HASN'T BEED REACHED");
+        Ui::ControlWidget::information_wiev->addItem("ERR: GOAL HASN'T BEED REACHED");
     }
 }
 
@@ -253,7 +239,7 @@ void RobotourControl::listenQrData(const std_msgs::String &msg){
     camera_sub.shutdown();
     qr_data_sub.shutdown();
 
-    Ui::ControlWidget::information_label->setText("QR RECOGNIZED");
+    Ui::ControlWidget::information_wiev->addItem("QR RECOGNIZED");
 }
 
 void RobotourControl::updateGuiGPS(double longitude, double latitude) {
@@ -267,17 +253,17 @@ void RobotourControl::updateGuiGPS(double longitude, double latitude) {
     Ui::ControlWidget::long_minuty->setText("0");
     Ui::ControlWidget::long_sekundy->setText("0");
 
-    Ui::ControlWidget::information_label->setText("GPS FORMS UPDATED");
+    Ui::ControlWidget::information_wiev->addItem("GPS FORMS UPDATED");
 }
 
 void RobotourControl::scanQrStart_btn() {
-    Ui::ControlWidget::information_label->setText("SCANNING QR");
+    Ui::ControlWidget::information_wiev->addItem("SCANNING QR");
     camera_sub = n.subscribe("/usb_cam/image_raw", 1, &RobotourControl::listenCamera,this);
     qr_data_sub = n.subscribe("/qr_detector/qr_codes", 1, &RobotourControl::listenQrData,this);
 }
 
 void RobotourControl::scanQrStop_btn() {
-    Ui::ControlWidget::information_label->setText("SCANNING STOPPED");
+    Ui::ControlWidget::information_wiev->addItem("SCANNING STOPPED");
     // shutdown subscribers
     camera_sub.shutdown();
     qr_data_sub.shutdown();
@@ -294,14 +280,14 @@ void RobotourControl::listenGpsFix(const sensor_msgs::NavSatFixConstPtr &msg) {
     storedPosition.push_back(msg->latitude);
     gps_fix_sub.shutdown();
 
-    Ui::ControlWidget::information_label->setText("POSITION STORED");
+    Ui::ControlWidget::information_wiev->addItem("POSITION STORED");
     ROS_INFO("Longitude = %f", msg->longitude);
     ROS_INFO("Latitude   = %f", msg->latitude);
 }
 
 void RobotourControl::restorePosition_btn() {
     if(storedPosition.empty()) {
-        Ui::ControlWidget::information_label->setText("ANY POSITION STORED");
+        Ui::ControlWidget::information_wiev->addItem("ANY POSITION STORED");
         return;
     }
 
@@ -375,4 +361,32 @@ void RobotourControl::ventilator_cbx() {
     srv_req.config = conf;
 
     ros::service::call("/mrvk_driver/set_parameters", srv_req, srv_resp);
+}
+
+void RobotourControl::autoscroll(int state) {
+    //autoscroll
+    if(state){
+        connect(Ui::ControlWidget::information_wiev->model(), SIGNAL(rowsInserted(QModelIndex,int,int)), Ui::ControlWidget::information_wiev, SLOT(scrollToBottom()));
+    }
+    else{
+        disconnect(Ui::ControlWidget::information_wiev->model(), SIGNAL(rowsInserted(QModelIndex,int,int)), Ui::ControlWidget::information_wiev, SLOT(scrollToBottom()));
+    }
+}
+
+void RobotourControl::setMap(){
+    QString filename =  QFileDialog::getOpenFileName(
+            nullptr,
+            "Open Document",
+            QDir::currentPath(),
+            "Osm map (*.osm) ;; All files (*.*)");
+    Ui::ControlWidget::map_label->setText(filename);
+
+    //get map origin
+    osm_planner::Parser parser;
+    parser.setNewMap(filename.toStdString());
+    std::vector<std::string> way_types;
+    n.getParam("/move_base/Planner/filter_of_ways",way_types);
+    parser.setTypeOfWays(way_types);
+    parser.parse(true);
+    map_origin = parser.getNodeByID(0);
 }

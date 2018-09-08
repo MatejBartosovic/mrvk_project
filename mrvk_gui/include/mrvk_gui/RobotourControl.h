@@ -67,6 +67,8 @@ class RobotourControl : QObject, public Ui::ControlWidget{
         void updateGuiGPS(double latitude, double longitude);
         void updateGuiDiagnostic(QString battery1, QString battery2, QString current);
         void ventilator_cbx();
+        void autoscroll(int state);
+        void setMap();
 };
 
 
