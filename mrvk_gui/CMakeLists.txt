@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
     cv_bridge
 )
 
+#main ui sources
 set(${PROJECT_NAME}_cpp_HDRS
         include/mrvk_gui/MrvkGuiPlugin.h
         )
@@ -21,44 +22,40 @@ set(${PROJECT_NAME}_cpp_SRCS
         )
 
 set(${PROJECT_NAME}_cpp_UIS
-        uis/MainWidget.ui
-        uis/DiagnosticsWidget.ui
-	    uis/ControlWidget.ui
+        uis/MainWindow.ui
         )
 
-set(${PROJECT_NAME}_diagnostics_cpp_HDRS
-        include/mrvk_gui/DiagnosticsWidget.h
-        include/mrvk_gui/DiagnosticItem.h
-        include/mrvk_gui/DiagnosticModel.h
+#robotour sources
+set(${PROJECT_NAME}_robottour_cpp_HDRS
+        include/mrvk_gui/RobotourControl.h
         )
 
-set(${PROJECT_NAME}_diagnostics_cpp_SRCS
-        src/DiagnosticsWidget.cpp
-        src/DiagnosticItem.cpp
-        src/DiagnosticModel.cpp
+set(${PROJECT_NAME}_robottour_cpp_SRCS
+        src/RobotourControl.cpp
         )
 
-set(${PROJECT_NAME}_diagnostics_cpp_UIS
-        uis/DiagnosticsWidget.ui
+set(${PROJECT_NAME}_robotour_cpp_UIS
+        uis/ControlWidget.ui
         )
-
-#find_package(Qt4 COMPONENTS QtCore QtGUi REQUIRED)
-
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
     find_package(Qt5Widgets REQUIRED)
+    # Main ui mocs
     qt5_wrap_cpp(${PROJECT_NAME}_cpp_MOCS ${${PROJECT_NAME}_cpp_HDRS})
     qt5_wrap_ui(${PROJECT_NAME}_cpp_UIS_H ${${PROJECT_NAME}_cpp_UIS})
-    qt5_wrap_cpp(${PROJECT_NAME}_diagnostics_cpp_MOCS ${${PROJECT_NAME}_diagnostics_cpp_HDRS})
-    qt5_wrap_ui(${PROJECT_NAME}_diagnostics_cpp_UIS_H ${${PROJECT_NAME}_diagnostics_cpp_UIS})
+    # RobotourControl mocs
+    qt5_wrap_cpp(${PROJECT_NAME}_robottour_cpp_MOCS ${${PROJECT_NAME}_robottour_cpp_HDRS})
+    qt5_wrap_ui(${PROJECT_NAME}_robotour_cpp_UIS_H ${${PROJECT_NAME}_robotour_cpp_UIS})
     set(qt_LIBRARIES Qt5::Widgets)
 else()
     find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
     include(${QT_USE_FILE})
+    # Main ui mocs
     qt4_wrap_cpp(${PROJECT_NAME}_cpp_MOCS ${${PROJECT_NAME}_cpp_HDRS})
     qt4_wrap_ui(${PROJECT_NAME}_cpp_UIS_H ${${PROJECT_NAME}_cpp_UIS})
-    qt4_wrap_cpp(${PROJECT_NAME}_diagnostics_cpp_MOCS ${${PROJECT_NAME}_diagnostics_cpp_HDRS})
-    qt4_wrap_ui(${PROJECT_NAME}_diagnostics_cpp_UIS_H ${${PROJECT_NAME}_diagnostics_cpp_UIS})
+    # RobotourControl mocs
+    qt4_wrap_cpp(${PROJECT_NAME}_robottour_cpp_MOCS ${${PROJECT_NAME}_robottour_cpp_HDRS})
+    qt4_wrap_ui(${PROJECT_NAME}_robotour_cpp_UIS_H ${${PROJECT_NAME}_robotour_cpp_UIS})
     set(qt_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 endif()
 
@@ -77,16 +74,16 @@ include_directories(
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
 
-add_library(${PROJECT_NAME}_diagnostics
-        ${${PROJECT_NAME}_diagnostics_cpp_HDRS}
-        ${${PROJECT_NAME}_diagnostics_cpp_SRCS}
-        ${${PROJECT_NAME}_diagnostics_cpp_MOCS}
-        ${${PROJECT_NAME}_diagnostics_cpp_UIS_H}
+add_library(${PROJECT_NAME}_robotour_control
+        ${${PROJECT_NAME}_robottour_cpp_HDRS}
+        ${${PROJECT_NAME}_robottour_cpp_SRCS}
+        ${${PROJECT_NAME}_robottour_cpp_MOCS}
+        ${${PROJECT_NAME}_robotour_cpp_UIS_H}
         )
 
-add_dependencies(${PROJECT_NAME}_diagnostics ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_robotour_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(${PROJECT_NAME}_diagnostics
+target_link_libraries(${PROJECT_NAME}_robotour_control
         ${catkin_LIBRARIES}
         ${qt_LIBRARIES}
         )
@@ -98,10 +95,10 @@ add_library(${PROJECT_NAME}
         ${${PROJECT_NAME}_cpp_UIS_H}
         )
 
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_diagnostics)
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_robotour_control)
 
 target_link_libraries(${PROJECT_NAME}
-        ${PROJECT_NAME}_diagnostics
+        ${PROJECT_NAME}_robotour_control
         ${catkin_LIBRARIES}
         ${qt_LIBRARIES}
         )
