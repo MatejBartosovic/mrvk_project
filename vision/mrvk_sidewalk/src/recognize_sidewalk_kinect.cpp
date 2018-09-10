@@ -173,8 +173,8 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
     pcl::PointCloud<pcl::PointXYZRGB> cloud;
 
     long int data_point;
-    if(valid_data == 0) {
-        for (int i = 0; i < sidewalkEdges.left.validPoints.size(); i++) {
+    if(true /*valid_data == 0*/) {
+       /* for (int i = 0; i < sidewalkEdges.left.validPoints.size(); i++) {
             data_point =
                     (PIC_HEIGHT_PIX2 - sidewalkEdges.left.validPoints[i].x) * PIC_HALF_WIDTH_PIX2 + (PIC_HALF_WIDTH_PIX2 - sidewalkEdges.left.validPoints[i].y);
             cloud.push_back(cloudProcessing.returnPoint(0, data_point));
@@ -185,6 +185,13 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
             data_point =
                     (PIC_HEIGHT_PIX2 - sidewalkEdges.right.validPoints[i].x) * PIC_HALF_WIDTH_PIX2 + (PIC_HALF_WIDTH_PIX2 - sidewalkEdges.right.validPoints[i].y);
             cloud.push_back(cloudProcessing.returnPoint(0, data_point));
+
+        }*/
+
+	 for (int i = 0; i < 307200; i++) {
+          /*  data_point =
+                    (PIC_HEIGHT_PIX2 - sidewalkEdges.right.validPoints[i].x) * PIC_HALF_WIDTH_PIX2 + (PIC_HALF_WIDTH_PIX2 - sidewalkEdges.right.validPoints[i].y);*/
+            cloud.push_back(cloudProcessing.returnPoint(0, i));
 
         }
     }
