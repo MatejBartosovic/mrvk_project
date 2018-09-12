@@ -11,7 +11,7 @@ sidewalk_params:
   detect_percent_of_image: 60
 
   undistort_image: true
-  compute_edge_cloud: true
+  compute_edge_cloud: false
 
   display:
     orig: true
