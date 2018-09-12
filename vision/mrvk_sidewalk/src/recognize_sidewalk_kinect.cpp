@@ -260,9 +260,9 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
                 data_point =
                         (PIC_HEIGHT_PIX2 - sidewalkEdges.left.validPoints[i].x) * PIC_HALF_WIDTH_PIX2 + (PIC_HALF_WIDTH_PIX2 - sidewalkEdges.left.validPoints[i].y);
                  test_cloud.push_back(cloudProcessing.returnPoint(0, data_point));
-			ROS_ERROR("LEFT");
+			/*ROS_ERROR("LEFT");
 ROS_ERROR_STREAM(sidewalkEdges.left.validPoints[i].x);
-ROS_ERROR_STREAM(sidewalkEdges.left.validPoints[i].y);
+ROS_ERROR_STREAM(sidewalkEdges.left.validPoints[i].y);*/
             }
 
 
@@ -271,9 +271,9 @@ ROS_ERROR_STREAM(sidewalkEdges.left.validPoints[i].y);
                 data_point =
                         (PIC_HEIGHT_PIX2 - sidewalkEdges.right.validPoints[i].x) * PIC_HALF_WIDTH_PIX2 + (PIC_HALF_WIDTH_PIX2 - sidewalkEdges.right.validPoints[i].y);
                  test_cloud.push_back(cloudProcessing.returnPoint(0, data_point));
-	    ROS_ERROR("RIGHT");
+	    /*ROS_ERROR("RIGHT");
 ROS_ERROR_STREAM(sidewalkEdges.right.validPoints[i].x);
-ROS_ERROR_STREAM(sidewalkEdges.right.validPoints[i].y);
+ROS_ERROR_STREAM(sidewalkEdges.right.validPoints[i].y);*/
             }
 
         }
@@ -292,11 +292,11 @@ ROS_ERROR_STREAM(sidewalkEdges.right.validPoints[i].y);
     final_cloud2.header.stamp = ros::Time::now();
     pub_pav_pointCloud.publish(final_cloud2);
 
-    toROSMsg (test_cloud, test_cloud2);
+    /*toROSMsg (test_cloud, test_cloud2);
     test_cloud2.header.frame_id = "base_stabilized";
     test_cloud2.header.stamp = ros::Time::now();
 
-    pub_test_pointCloud.publish(test_cloud2);
+    pub_test_pointCloud.publish(test_cloud2);*/
 
 #ifdef DEBUG
 
