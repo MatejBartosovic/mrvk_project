@@ -259,7 +259,7 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
             for (int i = 0; i < sidewalkEdges.left.validPoints.size(); i++) {
                 data_point =
                         (PIC_HEIGHT_PIX2 - sidewalkEdges.left.validPoints[i].x) * PIC_HALF_WIDTH_PIX2 + (PIC_HALF_WIDTH_PIX2 - sidewalkEdges.left.validPoints[i].y);
-                 test_cloud.push_back(cloudProcessing.returnPoint(0, data_point));
+                 cloud.push_back(cloudProcessing.returnPoint(0, data_point));
 			/*ROS_ERROR("LEFT");
 ROS_ERROR_STREAM(sidewalkEdges.left.validPoints[i].x);
 ROS_ERROR_STREAM(sidewalkEdges.left.validPoints[i].y);*/
@@ -270,7 +270,7 @@ ROS_ERROR_STREAM(sidewalkEdges.left.validPoints[i].y);*/
 
                 data_point =
                         (PIC_HEIGHT_PIX2 - sidewalkEdges.right.validPoints[i].x) * PIC_HALF_WIDTH_PIX2 + (PIC_HALF_WIDTH_PIX2 - sidewalkEdges.right.validPoints[i].y);
-                 test_cloud.push_back(cloudProcessing.returnPoint(0, data_point));
+                 cloud.push_back(cloudProcessing.returnPoint(0, data_point));
 	    /*ROS_ERROR("RIGHT");
 ROS_ERROR_STREAM(sidewalkEdges.right.validPoints[i].x);
 ROS_ERROR_STREAM(sidewalkEdges.right.validPoints[i].y);*/
