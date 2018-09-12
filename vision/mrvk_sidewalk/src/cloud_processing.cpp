@@ -16,7 +16,7 @@ void CloudProcessing::createVectors(int width, int height) {
 
     tf::StampedTransform kinect_transform;
 
-    int skip = 2;
+    int skip = 1;
 
     for (int x = 0; x < width; x+=skip) {
         for (int y = 0; y < height; y+=skip) {
@@ -79,10 +79,11 @@ pcl::PointXYZRGB CloudProcessing::returnPoint (double z,long int point) {
     double t;
     pcl::PointXYZRGB data;
 
-    t = (z-KINECT_Z)/this->vectors[point].z;
+    t = fabs((z-KINECT_Z)/this->vectors[point].z);
     data.z = z;
     data.x = KINECT_X+this->vectors[point].x*t;
     data.y = KINECT_Y+this->vectors[point].y*t;
+	
     return data;
 }
 

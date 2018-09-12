@@ -12,6 +12,9 @@
 //#define UNDEREXPOSED 30
 #include "SidewalkEdge.h"
 
+#define IMG_WIDTH 640
+#define IMG_HEIGHT 480
+
 using namespace cv;
 using namespace std;
 
@@ -250,7 +253,6 @@ cv::Mat picture_segmentation_frame_HSV(cv::Mat frame, ros::NodeHandle n)
 			 floodFill(imageContFiltered, center[i], Scalar(255)); // unsafe function - please detect hranice chodnika podla krajnych kontur, nie color fill
 		}
 	}
-		
 
     return imageContFiltered;
 }
@@ -807,6 +809,135 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	  			}
 	  		}
 		
+    //fill black islands
+    bool fill_black_islands = false;
+    n.getParam("fill_black_islands", fill_black_islands);
+    if (fill_black_islands)
+    {
+        int black_island_min_pixels = 10000;
+        n.getParam("black_island_min_pixels", black_island_min_pixels);
+        int pixelsBlackIslands[IMG_HEIGHT][IMG_WIDTH];
+        int blackIslandCounter = 0;
+        std::vector<int> blackIslandPixelsCounter;
+        blackIslandPixelsCounter.push_back(0);
+        std::vector<cv::Point> blackIslandPixelsCurrent;
+        std::vector<cv::Point> blackIslandPixelsCurrent2;
+        cv::Point currentPixel;
+        for (int k = 0; k < IMG_HEIGHT; ++k) {
+            for (int l = 0; l < IMG_WIDTH; ++l) {
+                pixelsBlackIslands[k][l] = 0;
+            }
+        }
+        for (int m = 0; m < imageContFiltered.rows; ++m) {
+            for (int k = 0; k < imageContFiltered.cols; ++k) {
+                if (pixelsBlackIslands[m][k] == 0) //pixel not in black island
+                {
+                    if (imageContFiltered.at<cv::Vec3b>(m,k)[0] == 0) //pixel not in sidewalk
+                    {
+                        //found new black island
+                        blackIslandCounter++;
+                        pixelsBlackIslands[m][k] = blackIslandCounter;
+                        blackIslandPixelsCounter.push_back(1);
+                        currentPixel.x = m;
+                        currentPixel.y = k;
+                        blackIslandPixelsCurrent2.push_back(currentPixel);
+                        //spill water
+                        int xx = 0;
+                        int yy = 0;
+                        while (blackIslandPixelsCurrent2.size() > 0)
+                        {
+                            blackIslandPixelsCurrent = blackIslandPixelsCurrent2;
+                            blackIslandPixelsCurrent2.clear();
+                            for (int l = 0; l < blackIslandPixelsCurrent.size(); ++l) {
+                                xx = blackIslandPixelsCurrent.at(l).x;
+                                yy = blackIslandPixelsCurrent.at(l).y;
+                                if (xx > 0)
+                                {
+                                    xx = xx -1;
+                                    if (pixelsBlackIslands[xx][yy] == 0)
+                                    {
+                                        if (imageContFiltered.at<cv::Vec3b>(xx,yy)[0] == 0)
+                                        {
+                                            pixelsBlackIslands[xx][yy] = blackIslandCounter;
+                                            currentPixel.x = xx;
+                                            currentPixel.y = yy;
+                                            blackIslandPixelsCurrent2.push_back(currentPixel);
+                                            blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                        }
+                                    }
+                                }
+                                xx = blackIslandPixelsCurrent.at(l).x;
+                                yy = blackIslandPixelsCurrent.at(l).y;
+                                if (xx < (IMG_HEIGHT - 1))
+                                {
+                                    xx = xx + 1;
+                                    if (pixelsBlackIslands[xx][yy] == 0)
+                                    {
+                                        if (imageContFiltered.at<cv::Vec3b>(xx,yy)[0] == 0)
+                                        {
+                                            pixelsBlackIslands[xx][yy] = blackIslandCounter;
+                                            currentPixel.x = xx;
+                                            currentPixel.y = yy;
+                                            blackIslandPixelsCurrent2.push_back(currentPixel);
+                                            blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                        }
+                                    }
+                                }
+                                xx = blackIslandPixelsCurrent.at(l).x;
+                                yy = blackIslandPixelsCurrent.at(l).y;
+                                if (yy > 0)
+                                {
+                                    yy = yy - 1;
+                                    if (pixelsBlackIslands[xx][yy] == 0)
+                                    {
+                                        if (imageContFiltered.at<cv::Vec3b>(xx,yy)[0] == 0)
+                                        {
+                                            pixelsBlackIslands[xx][yy] = blackIslandCounter;
+                                            currentPixel.x = xx;
+                                            currentPixel.y = yy;
+                                            blackIslandPixelsCurrent2.push_back(currentPixel);
+                                            blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                        }
+                                    }
+                                }
+                                xx = blackIslandPixelsCurrent.at(l).x;
+                                yy = blackIslandPixelsCurrent.at(l).y;
+                                if (yy < (IMG_WIDTH - 1))
+                                {
+                                    yy = yy + 1;
+                                    if (pixelsBlackIslands[xx][yy] == 0)
+                                    {
+                                        if (imageContFiltered.at<cv::Vec3b>(xx,yy)[0] == 0)
+                                        {
+                                            pixelsBlackIslands[xx][yy] = blackIslandCounter;
+                                            currentPixel.x = xx;
+                                            currentPixel.y = yy;
+                                            blackIslandPixelsCurrent2.push_back(currentPixel);
+                                            blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //color black islands
+        for (int i1 = 0; i1 < imageContFiltered.rows; ++i1) {
+            for (int k = 0; k < imageContFiltered.cols; ++k) {
+                if (pixelsBlackIslands[i1][k] > 0)
+                {
+                    if (blackIslandPixelsCounter.at(pixelsBlackIslands[i1][k]) < black_island_min_pixels)
+                    {
+                        imageContFiltered.at<cv::Vec3b>(i1,k)[0]=255;
+                        imageContFiltered.at<cv::Vec3b>(i1,k)[1]=155;
+                        imageContFiltered.at<cv::Vec3b>(i1,k)[2]=155;
+                    }
+                }
+            }
+        }
+    }
 
     return imageContFiltered;
 }

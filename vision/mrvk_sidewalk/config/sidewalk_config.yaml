@@ -10,6 +10,9 @@ sidewalk_params:
   edge_side_offset_promile: 10
   detect_percent_of_image: 60
 
+  undistort_image: true
+  compute_edge_cloud: false
+
   display:
     orig: true
     result: true
