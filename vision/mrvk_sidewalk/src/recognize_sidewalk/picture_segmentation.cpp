@@ -812,6 +812,8 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
     //fill black islands
     bool fill_black_islands = false;
     n.getParam("fill_black_islands", fill_black_islands);
+    int remote_pixel_weight = 3;
+    n.getParam("remote_pixel_weight", remote_pixel_weight);
     if (fill_black_islands)
     {
         int black_island_min_pixels = 10000;
@@ -862,7 +864,18 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
                                             currentPixel.x = xx;
                                             currentPixel.y = yy;
                                             blackIslandPixelsCurrent2.push_back(currentPixel);
-                                            blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                            if (xx > (IMG_HEIGHT/3*2))
+                                            {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                            }
+                                            else if (xx > (IMG_HEIGHT/3))
+                                            {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)+=remote_pixel_weight;
+                                            }
+                                            else
+                                            {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)+=remote_pixel_weight*remote_pixel_weight;
+                                            }
                                         }
                                     }
                                 }
@@ -879,7 +892,18 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
                                             currentPixel.x = xx;
                                             currentPixel.y = yy;
                                             blackIslandPixelsCurrent2.push_back(currentPixel);
-                                            blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                            if (xx > (IMG_HEIGHT/3*2))
+                                            {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                            }
+                                            else if (xx > (IMG_HEIGHT/3))
+                                            {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)+=remote_pixel_weight;
+                                            }
+                                            else
+                                            {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)+=remote_pixel_weight*remote_pixel_weight;
+                                            }
                                         }
                                     }
                                 }
@@ -890,13 +914,20 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
                                     yy = yy - 1;
                                     if (pixelsBlackIslands[xx][yy] == 0)
                                     {
-                                        if (imageContFiltered.at<cv::Vec3b>(xx,yy)[0] == 0)
-                                        {
+                                        if (imageContFiltered.at<cv::Vec3b>(xx,yy)[0] == 0) {
                                             pixelsBlackIslands[xx][yy] = blackIslandCounter;
                                             currentPixel.x = xx;
                                             currentPixel.y = yy;
                                             blackIslandPixelsCurrent2.push_back(currentPixel);
-                                            blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                            blackIslandPixelsCurrent2.push_back(currentPixel);
+                                            if (xx > (IMG_HEIGHT / 3 * 2)) {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                            } else if (xx > (IMG_HEIGHT / 3)) {
+                                                blackIslandPixelsCounter.at(blackIslandCounter) += remote_pixel_weight;
+                                            } else {
+                                                blackIslandPixelsCounter.at(blackIslandCounter) +=
+                                                        remote_pixel_weight * remote_pixel_weight;
+                                            }
                                         }
                                     }
                                 }
@@ -913,7 +944,19 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
                                             currentPixel.x = xx;
                                             currentPixel.y = yy;
                                             blackIslandPixelsCurrent2.push_back(currentPixel);
-                                            blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                            blackIslandPixelsCurrent2.push_back(currentPixel);
+                                            if (xx > (IMG_HEIGHT/3*2))
+                                            {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)++;
+                                            }
+                                            else if (xx > (IMG_HEIGHT/3))
+                                            {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)+=remote_pixel_weight;
+                                            }
+                                            else
+                                            {
+                                                blackIslandPixelsCounter.at(blackIslandCounter)+=remote_pixel_weight*remote_pixel_weight;
+                                            }
                                         }
                                     }
                                 }
