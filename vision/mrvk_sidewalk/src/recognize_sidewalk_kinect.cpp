@@ -233,7 +233,9 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
 
     kinectImage = cv_bridge::toCvCopy(msg,"bgr8")->image;
     cv::Mat rview;
-
+	
+    //save tf base_link_stabilized (compensate for detection delay)
+    imageTime = ros::Time::now();
     //undistort image
     bool undistort_image = true;
     n.getParam("sidewalk_params/undistort_image", undistort_image);
@@ -242,8 +244,6 @@ void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
         remap(kinectImage, kinectImage, map1, map2, INTER_LINEAR);
     }
 
-
-    imageTime = ros::Time::now();
     sidewalkPublish();
 
     sensor_msgs::PointCloud2 final_cloud = cloudProcessing.getCloud();
@@ -289,7 +289,7 @@ ROS_ERROR_STREAM(sidewalkEdges.right.validPoints[i].y);*/
 
     toROSMsg (cloud, final_cloud2);
     final_cloud2.header.frame_id = "base_stabilized";
-    final_cloud2.header.stamp = ros::Time::now();
+    final_cloud2.header.stamp = imageTime;
     pub_pav_pointCloud.publish(final_cloud2);
 
     /*toROSMsg (test_cloud, test_cloud2);
