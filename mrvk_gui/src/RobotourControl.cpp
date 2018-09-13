@@ -232,9 +232,10 @@ void RobotourControl::listenQrData(const std_msgs::String &msg){
 
     double latitude = 0, longitude = 0;
     char delimiter;
-    ss>>longitude;
-    ss>>delimiter;
+
     ss>>latitude;
+    ss>>delimiter;
+    ss>>longitude;
 
     if (latitude == 0 || longitude == 0){
         ROS_ERROR("QR code is damaged: %s", msg.data.c_str());
@@ -402,7 +403,10 @@ void RobotourControl::setMap(){
     double interpolation_max_distance;
     n.param<double>("/move_base/Planner/interpolation_max_distance", interpolation_max_distance, 1000);
     parser.setInterpolationMaxDistance(interpolation_max_distance);
+
     parser.setTypeOfWays(way_types);
-    parser.parse();
+    parser.parse(false);
     map_origin = parser.getNodeByID(0);
+    ROS_ERROR("kok");
+    ROS_ERROR("OSM lat %f, lon %f", map_origin.latitude,map_origin.longitude);
 }
