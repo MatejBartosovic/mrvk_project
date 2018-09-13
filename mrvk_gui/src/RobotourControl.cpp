@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QIntValidator>
 
+#include <ros/console.h>
 
 RobotourControl::RobotourControl(){
 
@@ -58,13 +59,14 @@ void RobotourControl::setupUi(QWidget *parrent){
     n.param<double>("/move_base/Planner/origin_longitude",longitude,0.0);
     n.param<int>("/move_base/Planner/set_origin_pose", settingOrigin,0);
 
-    if (settingOrigin == 3) {
+    //if (settingOrigin == 3) {
         // map_origin = parser.getNodeByID(parser.getNearestPoint(latitude, longitude));
         ROS_INFO("PRVA MOZNOST");
         map_origin.latitude = latitude;
         map_origin.longitude = longitude;
 
-    }
+    //}
+
 
     ROS_INFO("MAP ORIGIN LATITUDE %lf", map_origin.latitude );
     ROS_INFO("MAP ORIGIN LONGITUDE %lf",map_origin.longitude );
@@ -122,7 +124,17 @@ void RobotourControl::goToGoal_btn(){
             break;
         case QMessageBox::Ok:
             this->readNavigData();
-
+            //Ui::ControlWidget::information_wiev->addItem("CALLED INIT ROBOT (gyro calibration)");
+		//ROS_ERROR("Lat %l", goal_target.latitude);
+		//ROS_ERROR("Lon %l", goal_target.longitude);
+		//std::cout << "Goal latitude " << goal_target.latitude << std::endl;
+		//std::cout << "Goal longtitude " << goal_target.longtitude << std::endl;
+		Ui::ControlWidget::information_wiev->addItem("Goal Longtitude Latitude");
+Ui::ControlWidget::information_wiev->addItem(QString::number(goal_target.latitude, 'f', 9));
+            Ui::ControlWidget::information_wiev->addItem(QString::number(goal_target.longitude, 'f', 9));
+		Ui::ControlWidget::information_wiev->addItem("Map origin Longitude Latitude");
+Ui::ControlWidget::information_wiev->addItem(QString::number(map_origin.longitude, 'f', 9));
+Ui::ControlWidget::information_wiev->addItem(QString::number(map_origin.latitude, 'f', 9));
             Ui::ControlWidget::information_wiev->addItem("CALLED INIT ROBOT (gyro calibration)");
             // this service "init_robot" calibrate gyro and gps
             if (init_robot.call(setbool_init) && setbool_init.response.success) {

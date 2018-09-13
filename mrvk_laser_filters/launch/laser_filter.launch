@@ -4,6 +4,7 @@
     <param name="filter_isolated" value="true"/>
     <param name="min_accept_size" value="3"/>
     <param name="filter_transient" value="true"/>
+    <param name="num_prev_frames" value="5" />
     <!-- <param name="shift_tolerance" value="2"/> -->
   </node>
 </launch>
