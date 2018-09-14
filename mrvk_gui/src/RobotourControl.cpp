@@ -115,17 +115,17 @@ void RobotourControl::readNavigData(){
 }
 
 void RobotourControl::goToGoal_btn(){
-    QMessageBox msgBox(QMessageBox::Question,"","Do you want to start robot movement ?",QMessageBox::Ok | QMessageBox::Cancel);
+    //QMessageBox msgBox(QMessageBox::Question,"","Do you want to start robot movement ?",QMessageBox::Ok | QMessageBox::Cancel);
 
     std_srvs::SetBool setbool_init;
 
     setbool_init.request.data = (unsigned char) Ui::ControlWidget::sever->isTristate();
 
-    switch (msgBox.exec()){
-        case QMessageBox::Cancel:
+    //switch (msgBox.exec()){
+        //case QMessageBox::Cancel:
             // Cancel was clicked
-            break;
-        case QMessageBox::Ok:
+           // break;
+       // case QMessageBox::Ok:
             this->readNavigData();
             //Ui::ControlWidget::information_wiev->addItem("CALLED INIT ROBOT (gyro calibration)");
 		    //ROS_ERROR("Lat %l", goal_target.latitude);
@@ -158,10 +158,10 @@ void RobotourControl::goToGoal_btn(){
                                                                                     goal_target);
             goalXY.header.stamp = ros::Time::now();
             goal_pub.publish(goalXY);
-        default:
+        //default:
             // should never be reached
-            break;
-    }
+          //  break;
+    //}
 }
 
 void RobotourControl::cancelGoal_btn() {
@@ -274,6 +274,7 @@ void RobotourControl::listenQrData(const std_msgs::String &msg){
 
    // has_qr = true;
     Ui::ControlWidget::information_wiev->addItem("QR RECOGNIZED");
+sleep(1);
     goToGoal_btn();
 }
 
@@ -436,6 +437,8 @@ void RobotourControl::setMap(){
 void RobotourControl::init_btm(){
     // this service "init_robot" calibrate gyro and gps
     std_srvs::SetBool setbool_init;
+
+	setbool_init.request.data = false;
     Ui::ControlWidget::information_wiev->addItem("Init");
     if (init_robot.call(setbool_init) && setbool_init.response.success) {
         Ui::ControlWidget::information_wiev->addItem("Init succesful");
