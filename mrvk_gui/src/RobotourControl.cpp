@@ -36,6 +36,7 @@ void RobotourControl::setupUi(QWidget *parrent){
     connect(Ui::ControlWidget::storePosition_btn, SIGNAL(clicked()), this, SLOT(storeActualPosition_btn()));
     connect(Ui::ControlWidget::restorePosition_btn, SIGNAL(clicked()), this, SLOT(restorePosition_btn()));
     connect(Ui::ControlWidget::BrowseBtn, SIGNAL(clicked()), this, SLOT(setMap()));
+    connect(Ui::ControlWidget::init_btn, SIGNAL(clicked()), this, SLOT(init_btm()));
 
 
     // slot for update gui data
@@ -87,6 +88,8 @@ void RobotourControl::setupUi(QWidget *parrent){
 
     result_sub = n.subscribe("/move_base/result", 5, &RobotourControl::listenResult,this);
     diagnostic_sub = n.subscribe("/diagnostics",1, &RobotourControl::listenDiagnosticMsg,this);
+
+    has_qr = false;
 }
 void RobotourControl::readNavigData(){
     /*
@@ -125,30 +128,36 @@ void RobotourControl::goToGoal_btn(){
         case QMessageBox::Ok:
             this->readNavigData();
             //Ui::ControlWidget::information_wiev->addItem("CALLED INIT ROBOT (gyro calibration)");
-		//ROS_ERROR("Lat %l", goal_target.latitude);
-		//ROS_ERROR("Lon %l", goal_target.longitude);
-		//std::cout << "Goal latitude " << goal_target.latitude << std::endl;
-		//std::cout << "Goal longtitude " << goal_target.longtitude << std::endl;
-		Ui::ControlWidget::information_wiev->addItem("Goal Longtitude Latitude");
-Ui::ControlWidget::information_wiev->addItem(QString::number(goal_target.latitude, 'f', 9));
+		    //ROS_ERROR("Lat %l", goal_target.latitude);
+		    //ROS_ERROR("Lon %l", goal_target.longitude);
+		    //std::cout << "Goal latitude " << goal_target.latitude << std::endl;
+		    //std::cout << "Goal longtitude " << goal_target.longtitude << std::endl;
+		    Ui::ControlWidget::information_wiev->addItem("Goal Longtitude Latitude");
+            Ui::ControlWidget::information_wiev->addItem(QString::number(goal_target.latitude, 'f', 9));
             Ui::ControlWidget::information_wiev->addItem(QString::number(goal_target.longitude, 'f', 9));
-		Ui::ControlWidget::information_wiev->addItem("Map origin Longitude Latitude");
-Ui::ControlWidget::information_wiev->addItem(QString::number(map_origin.longitude, 'f', 9));
-Ui::ControlWidget::information_wiev->addItem(QString::number(map_origin.latitude, 'f', 9));
+		    Ui::ControlWidget::information_wiev->addItem("Map origin Longitude Latitude");
+		    Ui::ControlWidget::information_wiev->addItem(QString::number(map_origin.longitude, 'f', 9));
+            Ui::ControlWidget::information_wiev->addItem(QString::number(map_origin.latitude, 'f', 9));
             Ui::ControlWidget::information_wiev->addItem("CALLED INIT ROBOT (gyro calibration)");
             // this service "init_robot" calibrate gyro and gps
-            if (init_robot.call(setbool_init) && setbool_init.response.success) {
-                goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
-                                                                                        goal_target);
-                goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,
-                                                                                        goal_target);
-                goalXY.header.stamp = ros::Time::now();
-                goal_pub.publish(goalXY);
-                Ui::ControlWidget::information_wiev->addItem("GOING TO GOAL");
-            } else {
-                ROS_ERROR_STREAM("Problem with robot inicialization and goal setup");
-                Ui::ControlWidget::information_wiev->addItem("ERROR OCCURED WHILE INIT ROBOT");
-            }
+//            if (init_robot.call(setbool_init) && setbool_init.response.success) {
+//                goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
+//                                                                                        goal_target);
+//                goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,
+//                                                                                        goal_target);
+//                goalXY.header.stamp = ros::Time::now();
+//                goal_pub.publish(goalXY);
+//                Ui::ControlWidget::information_wiev->addItem("GOING TO GOAL");
+//            } else {
+//                ROS_ERROR_STREAM("Problem with robot inicialization and goal setup");
+//                Ui::ControlWidget::information_wiev->addItem("ERROR OCCURED WHILE INIT ROBOT");
+//            }
+            goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
+                                                                                    goal_target);
+            goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,
+                                                                                    goal_target);
+            goalXY.header.stamp = ros::Time::now();
+            goal_pub.publish(goalXY);
         default:
             // should never be reached
             break;
@@ -196,12 +205,23 @@ void RobotourControl::listenResult(const move_base_msgs::MoveBaseActionResult::C
     if (msg->status.status == actionlib_msgs::GoalStatus::SUCCEEDED){
         Ui::ControlWidget::information_wiev->addItem("THE GOAL HAS BEEN REACHED");
 
+
+//        scanQrStart_btn();
+//        while (!has_qr){
+//           // sleep(1);
+//            ros::spinOnce();
+//        }
+//        has_qr = false;
+//        goToGoal_btn();
+
     } else if (msg->status.status == actionlib_msgs::GoalStatus::ABORTED){
         Ui::ControlWidget::information_wiev->addItem("THE GOAL HAS BEEN ABORTED");
 
     } else {
         Ui::ControlWidget::information_wiev->addItem("ERR: GOAL HASN'T BEED REACHED");
     }
+
+    scanQrStart_btn();
 }
 
 void RobotourControl::listenCamera(const sensor_msgs::ImageConstPtr& msg){
@@ -252,7 +272,9 @@ void RobotourControl::listenQrData(const std_msgs::String &msg){
     camera_sub.shutdown();
     qr_data_sub.shutdown();
 
+   // has_qr = true;
     Ui::ControlWidget::information_wiev->addItem("QR RECOGNIZED");
+    goToGoal_btn();
 }
 
 void RobotourControl::updateGuiGPS(double longitude, double latitude) {
@@ -409,4 +431,16 @@ void RobotourControl::setMap(){
     map_origin = parser.getNodeByID(0);
     ROS_ERROR("kok");
     ROS_ERROR("OSM lat %f, lon %f", map_origin.latitude,map_origin.longitude);
+}
+
+void RobotourControl::init_btm(){
+    // this service "init_robot" calibrate gyro and gps
+    std_srvs::SetBool setbool_init;
+    Ui::ControlWidget::information_wiev->addItem("Init");
+    if (init_robot.call(setbool_init) && setbool_init.response.success) {
+        Ui::ControlWidget::information_wiev->addItem("Init succesful");
+    } else {
+        ROS_ERROR_STREAM("Problem with robot inicialization and goal setup");
+        Ui::ControlWidget::information_wiev->addItem("ERROR OCCURED WHILE INIT ROBOT");
+    }
 }

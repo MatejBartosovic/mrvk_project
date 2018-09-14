@@ -16,7 +16,7 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="6" column="0">
+     <item row="7" column="0">
       <widget class="QPushButton" name="scanQrStart_btn">
        <property name="text">
         <string>Start scan QR</string>
@@ -64,21 +64,21 @@
        </property>
       </widget>
      </item>
-     <item row="10" column="0">
+     <item row="11" column="0">
       <widget class="QCheckBox" name="ventilator_cbx">
        <property name="text">
         <string>Ventilator</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <widget class="QPushButton" name="cancelGoal_btn">
        <property name="text">
         <string>Cancel GOAL</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="8" column="1">
       <widget class="QLabel" name="battery1_label">
        <property name="text">
         <string>TextLabel</string>
@@ -119,7 +119,7 @@
        </item>
       </layout>
      </item>
-     <item row="4" column="0">
+     <item row="5" column="0">
       <widget class="QPushButton" name="goToGoal_btn">
        <property name="text">
         <string>Go to GOAL</string>
@@ -133,52 +133,45 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="label_11">
        <property name="text">
         <string>Battery#2</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <widget class="QPushButton" name="restorePosition_btn">
        <property name="text">
         <string>Restore saved position</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="0">
+     <item row="10" column="0">
       <widget class="QLabel" name="label_12">
        <property name="text">
         <string>Current</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QPushButton" name="storePosition_btn">
        <property name="text">
         <string>Store actual position</string>
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
+     <item row="11" column="1">
       <widget class="QCheckBox" name="autoScroll">
        <property name="text">
         <string>Auto scrroll</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="7" column="1">
       <widget class="QPushButton" name="scanQrStop_btn">
        <property name="text">
         <string>Stop scan QR</string>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="1">
-      <widget class="QLabel" name="current_label">
-       <property name="text">
-        <string>TextLabel</string>
        </property>
       </widget>
      </item>
@@ -189,14 +182,21 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="10" column="1">
+      <widget class="QLabel" name="current_label">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
       <widget class="QLabel" name="battery2_label">
        <property name="text">
         <string>TextLabel</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="label_10">
        <property name="text">
         <string>Battery#1</string>
@@ -221,6 +221,13 @@
       <widget class="QPushButton" name="BrowseBtn">
        <property name="text">
         <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QPushButton" name="init_btn">
+       <property name="text">
+        <string>Init</string>
        </property>
       </widget>
      </item>

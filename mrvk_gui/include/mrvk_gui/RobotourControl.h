@@ -46,6 +46,7 @@ class RobotourControl : QObject, public Ui::ControlWidget{
         ros::ServiceClient init_robot;
         actionlib_msgs::GoalID cancel_goal_msg;
         std::vector<double> storedPosition;     // memory for start position
+        bool has_qr;
 
         virtual void listenResult(const move_base_msgs::MoveBaseActionResult::ConstPtr &msg);
         void listenCamera(const sensor_msgs::ImageConstPtr &msg);
@@ -58,6 +59,7 @@ class RobotourControl : QObject, public Ui::ControlWidget{
         void gpsValueChanged(double longitude, double latitude);
         void diagnosticDataChanged(QString battery1, QString battery2, QString current);
     private slots:
+        void init_btm();
         void goToGoal_btn();
         void cancelGoal_btn();
         void scanQrStart_btn();
