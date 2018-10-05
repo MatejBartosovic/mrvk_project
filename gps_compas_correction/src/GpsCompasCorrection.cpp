@@ -299,7 +299,8 @@ int GpsCompasCorrection::addPointAndCompute(double *angle) {
     //static bool firstPointAdded = false;
 
     boost::shared_ptr<const sensor_msgs::NavSatFix> gpsData = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gpsTopic, ros::Duration(3));
-    if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_FIX){
+ if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX ){
+//    if(!gpsData || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX || gpsData->status.status == sensor_msgs::NavSatStatus::STATUS_FIX){
         ROS_WARN("No fixed GPS data");
      //   res.message = "No fixed GPS data";
         return -1;

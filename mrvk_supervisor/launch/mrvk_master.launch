@@ -11,7 +11,7 @@
   <arg name="use_user_interface" default="false"/>
   <arg name="use_vision" default="true"/>
   <arg name="use_supervisor" default="true"/>
-  <arg name="osm_map_path" default="$(find osm_planner)/osm_example/fei.osm"/> 
+  <arg name="osm_map_path" default="$(find osm_planner)/osm_example/lednice_testday1.osm"/> 
   <!-- <arg name="osm_map_path" default="$(find osm_planner)/osm_example/park_ludovita_stura_2.osm"/> --> 
 
   <!--Start MRVK Driver, Gmapping, EKF, IMU, Hokuyo-->

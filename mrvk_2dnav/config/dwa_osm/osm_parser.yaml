@@ -1,10 +1,10 @@
 interpolation_max_distance: 2.0 # Max distance between two nodes of orientated graph
-filter_of_ways: ["footway"]         # Filter for parser. Parse only routes, which have value on the list
+filter_of_ways: ["footway", "track"]         # Filter for parser. Parse only routes, which have value on the list
 set_origin_pose: 3          # Set the origin pose on the map for cartesian calculator
                                 # 0 - origin pose from service
                                 # 1 - origin pose from 1. point on the map
                                 # 2 - random origin pose
                                 # 3 - origin pose from param
 
-origin_latitude: 48.1532431 #49.2112037 zilina
-origin_longitude: 17.0743601 #18.7448376 zilina                          # If value is all, then parse all routes
+origin_latitude: 48.8008124383  #49.2112037 zilina
+origin_longitude: 16.805942735 #18.7448376 zilina                          # If value is all, then parse all routes

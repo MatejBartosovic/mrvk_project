@@ -7,7 +7,7 @@ laser_scan_sensor:
   topic: /scan_filtered
   marking: true
   clearing: true
-  observation_persistence: 20 #How long to keep each sensor reading in seconds. A value of 0.0 will only keep the most recent reading.
+  observation_persistence: 5 #How long to keep each sensor reading in seconds. A value of 0.0 will only keep the most recent reading.
   expected_update_rate: 0.5 #How often to expect a reading from a sensor in seconds. A value of 0.0 will allow infinite time between readings. This parameter is used as a failsafe to keep the navigation stack from commanding the robot when a sensor has failed. It should be set to a value that is slightly more permissive than the actual rate of the sensor. For example, if we expect a scan from a laser every 0.05 seconds we might set this parameter to be 0.1 seconds to give a generous buffer and account for some amount of system latency.
   #max_obstacle_height: 2.0
   #min_obstacle_height: 0.0
@@ -21,7 +21,7 @@ point_cloud_sensor:
   marking: true
   clearing: false
   observation_persistence: 20 #How long to keep each sensor reading in seconds. A value of 0.0 will only keep the most recent reading.
-  expected_update_rate: 0.2 #How often to expect a reading from a sensor in seconds. A value of 0.0 will allow infinite time between readings. This parameter is used as a failsafe to keep the navigation stack from commanding the robot when a sensor has failed. It should be set to a value that is slightly more permissive than the actual rate of the sensor. For example, if we expect a scan from a laser every 0.05 seconds we might set this parameter to be 0.1 seconds to give a generous buffer and account for some amount of system latency.
+  expected_update_rate: 1.0 #How often to expect a reading from a sensor in seconds. A value of 0.0 will allow infinite time between readings. This parameter is used as a failsafe to keep the navigation stack from commanding the robot when a sensor has failed. It should be set to a value that is slightly more permissive than the actual rate of the sensor. For example, if we expect a scan from a laser every 0.05 seconds we might set this parameter to be 0.1 seconds to give a generous buffer and account for some amount of system latency.
   #max_obstacle_height: 2.0
   #min_obstacle_height: 0.0
   #obstacle_range: 2.5

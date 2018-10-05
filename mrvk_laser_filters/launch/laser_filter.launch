@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <launch>
-  <node pkg='mrvk_laser_filters' type='mrvk_laser_filter.py' name='mrvk_laser_filter'>
+  <node pkg='mrvk_laser_filters' type='mrvk_laser_filter.py' name='mrvk_laser_filter' output="screen">
     <param name="filter_isolated" value="true"/>
-    <param name="min_accept_size" value="3"/>
+    <param name="min_accept_size" value="5"/>
     <param name="filter_transient" value="true"/>
-    <param name="num_prev_frames" value="5" />
+    <param name="num_prev_frames" value="10" />
+    <param name="min_cutoff_distance" value="0.5"/>
     <!-- <param name="shift_tolerance" value="2"/> -->
   </node>
 </launch>

@@ -17,6 +17,9 @@ class LaserFilter():
         self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_cb)
         self.laser_pub = rospy.Publisher('/scan_filtered', LaserScan, queue_size=10)
         
+        # Dist cutoff
+	self.min_cutoff_distance = rospy.get_param("~min_cutoff_distance", np.inf)
+
         # Isolated point filter
         self.filter_isolated = rospy.get_param('~filter_isolated', False)
         self.min_accept_size = rospy.get_param('~min_accept_size', 3)
@@ -54,6 +57,7 @@ class LaserFilter():
             # print(np.array(data.ranges))
             print ""
         
+        #data = self.min_cutoff(data, self.min_cutoff_distance)
         if self.filter_isolated:
             data = self.remove_isolated_points(data, self.min_accept_size)
         if self.filter_transient:
@@ -66,6 +70,15 @@ class LaserFilter():
             # print("*****************************")
             rospy.loginfo("*****************************")
         self.laser_pub.publish(data)
+    
+    def min_cutoff(self, data, low):
+        ranges = np.array(data.ranges)
+        for i in range(0, len(data.ranges)):
+            if ranges[i] < low:
+                ranges[i] = np.inf
+        data.ranges = ranges
+        #print(ranges)
+        return data
 
     def remove_isolated_points(self, data, min_accept_size):
         count = 0

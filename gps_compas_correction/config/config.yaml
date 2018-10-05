@@ -1,6 +1,6 @@
 tf_rate: 20
 correction_interval: 5
-max_count_of_sbas_fix: 20
+max_count_of_sbas_fix: 30
 parrent_frame: world
 child_frame: map
 target_frame: base_link
@@ -11,7 +11,7 @@ gps_topic: /fix
 
 #Compute bearing params
 cmd_vel_topic: /cmd_vel
-moving_time: 4 #s
+moving_time: 15 #s
 moving_velocity: 0.25
 #auto update
 use_bearing_auto_update: false
