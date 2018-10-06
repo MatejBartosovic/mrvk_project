@@ -40,9 +40,9 @@ namespace vfh_local_planner {
          * @brief  Constructs the local planner
          * @param name The name to give this instance of the local planner
          * @param tf A pointer to a transform listener
-         * @param costmap The cost map to use for assigning costs to local plans
-         */
-        virtual void initialize(std::string name, tf::TransformListener* tf, costmap_2d::Costmap2DROS* costmap_ros);
+         * @param costmap_ros The cost map to use for assigning costs to local plans
+              */
+        virtual void initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d::Costmap2DROS* costmap_ros) = 0;
     };
 }
 
