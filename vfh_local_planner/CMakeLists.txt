@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   pluginlib
+  pcl_conversions
 )
 
 catkin_package(
