@@ -7,7 +7,7 @@
 #include <geometry_msgs/Twist.h>
 #include <tf/transform_datatypes.h>
 
-PLUGINLIB_DECLARE_CLASS(reverse_movement_recovery, ReverseMovementRecovery, reverse_movement_recovery::ReverseMovementRecovery, nav_core::RecoveryBehavior)
+//PLUGINLIB_EXPORT_CLASS(reverse_movement_recovery::ReverseMovementRecovery, nav_core::RecoveryBehavior)
 
 namespace reverse_movement_recovery{
     ReverseMovementRecovery::ReverseMovementRecovery() : initialized_(false), global_costmap_(NULL),
@@ -76,7 +76,7 @@ namespace reverse_movement_recovery{
                 ROS_INFO("Reversed movement recovery finished");
                 return;
             }
-            tf::Stamped<tf::Pose> pose;
+            geometry_msgs::PoseStamped pose;
             std::vector<geometry_msgs::Point> footprint;
             if(!local_costmap_->getRobotPose(pose)) {
                 ROS_WARN("Abborting reverse movement recovery. Failed to get robot pose");
