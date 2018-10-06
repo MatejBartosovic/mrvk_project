@@ -80,15 +80,15 @@ void WaitAndClearCostmapRecovery::runBehavior(){
 void WaitAndClearCostmapRecovery::clear(costmap_2d::Costmap2DROS* costmap){
   std::vector<boost::shared_ptr<costmap_2d::Layer> >* plugins = costmap->getLayeredCostmap()->getPlugins();
 
-  tf::Stamped<tf::Pose> pose;
+    geometry_msgs::PoseStamped pose;
 
   if(!costmap->getRobotPose(pose)){
     ROS_ERROR("Cannot clear map because pose cannot be retrieved");
     return;
   }
 
-  double x = pose.getOrigin().x();
-  double y = pose.getOrigin().y();
+  double x = pose.pose.position.x;
+  double y = pose.pose.position.y;
 
   for (std::vector<boost::shared_ptr<costmap_2d::Layer> >::iterator pluginp = plugins->begin(); pluginp != plugins->end(); ++pluginp) {
     boost::shared_ptr<costmap_2d::Layer> plugin = *pluginp;
@@ -143,15 +143,15 @@ void WaitAndClearCostmapRecovery::clearMap(boost::shared_ptr<costmap_2d::Costmap
   bool WaitAndClearCostmapRecovery::checkForObstacle(costmap_2d::Costmap2DROS* costmap){
     std::vector<boost::shared_ptr<costmap_2d::Layer> >* plugins = costmap->getLayeredCostmap()->getPlugins();
 
-    tf::Stamped<tf::Pose> pose;
+      geometry_msgs::PoseStamped pose;
 
     if(!costmap->getRobotPose(pose)){
       ROS_ERROR("Abborting wait and clear costmap recovery. Pose cannot be retrieved");
       return false;
     }
-
-    double x = pose.getOrigin().x();
-    double y = pose.getOrigin().y();
+    
+    double x = pose.pose.position.x;
+    double y = pose.pose.position.y;
 
     bool status = true;
     for (std::vector<boost::shared_ptr<costmap_2d::Layer> >::iterator pluginp = plugins->begin(); pluginp != plugins->end(); ++pluginp) {
