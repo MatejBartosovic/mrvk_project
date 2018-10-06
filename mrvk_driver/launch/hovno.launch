@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-	<node  name="rqt_gui" pkg="rqt_gui" type="rqt_gui" launch-prefix="gdb">
-	</node>
-</launch>

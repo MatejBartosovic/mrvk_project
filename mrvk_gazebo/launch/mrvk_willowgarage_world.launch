@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-	<include file="$(find gazebo_ros)/launch/willowgarage_world.launch" />
-	<include file="$(find mrvk_gazebo)/launch/spawn_mrvk.launch"/>
-</launch>
