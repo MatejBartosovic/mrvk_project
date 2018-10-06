@@ -32,13 +32,12 @@ bool CommunicationInterface::init(){
 
 	if (active)		//ak vsetko bezi v poriadku nemusi sa znova volat init
 		return true;
-
 	try{
 		for(int i=0;i<ports.size();i++){
 			serialInterface.addBoard(std::shared_ptr<serial::Serial>(new serial::Serial(ports[i], baud, serial::Timeout::simpleTimeout(50))),ports[i]);
 		}
-	}catch (std::exception& e){
-		ROS_ERROR("port sa neotvoril");
+	}catch (serial::IOException& e){
+		ROS_ERROR("Failed to open port: %s",e.what());
 		active = false;
 		return false;
 	}
