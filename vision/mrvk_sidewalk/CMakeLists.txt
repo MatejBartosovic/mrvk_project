@@ -15,7 +15,15 @@ find_package(catkin REQUIRED COMPONENTS
 		tf_conversions
 )
 find_package(PCL REQUIRED QUIET COMPONENTS common sample_consensus io segmentation filters)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3 REQUIRED
+		COMPONENTS
+		opencv_core			#find by cv_bridge but for sure also here
+		videoio
+		video
+		highgui
+		opencv_imgproc		#find by cv_bridge but for sure also here
+		opencv_imgcodecs	#find by cv_bridge but for sure also here
+		)
 
 catkin_package(
 		INCLUDE_DIRS include
@@ -52,11 +60,11 @@ set(LOCAL_INCLUDES 	src/recognize_sidewalk/recognize_sidewalk.cpp
 					)
 
 add_executable(recognize_sidewalk_video src/recognize_sidewalk_video.cpp ${LOCAL_INCLUDES})
-target_link_libraries(recognize_sidewalk_video ${PCL_LIBRARIES} ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(recognize_sidewalk_video ${PCL_LIBRARIES} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 #add_dependencies(recognize_sidewalk recognize_sidewalk_generate_messages_cpp)
 
 add_executable(recognize_sidewalk_kinect src/recognize_sidewalk_kinect.cpp ${LOCAL_INCLUDES})
-target_link_libraries(recognize_sidewalk_kinect ${PCL_LIBRARIES} ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(recognize_sidewalk_kinect ${PCL_LIBRARIES} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 #add_dependencies(recognize_sidewalk_kinect recognize_sidewalk_kinect_generate_messages_cpp)
 
 add_executable(camera_calibration src/camera_calibration.cpp ${LOCAL_INCLUDES} )
