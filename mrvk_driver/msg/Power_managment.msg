@@ -1,7 +1,7 @@
 bool MCBsSB_5V
 bool MCBs_12V
 bool videotransmitter
-bool wifi
+bool fan
 bool laser
 bool gps
 bool arm_5V

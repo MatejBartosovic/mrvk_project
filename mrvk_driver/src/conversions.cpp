@@ -36,7 +36,7 @@ void Conversions::answerMB_40_02(uint8_t *data){
 		statusMB.power_managment.MCBsSB_5V =  ((data[1] & 1) ? true : false);
 		statusMB.power_managment.MCBs_12V =  ((data[1] & 2) ? true : false);
 		statusMB.power_managment.videotransmitter = ((data[1] & 4) ? true : false);
-		statusMB.power_managment.wifi = ((data[1] & 8) ? true : false);
+		statusMB.power_managment.fan = ((data[1] & 8) ? true : false);
 		statusMB.power_managment.laser =  ((data[1] & 16) ? true : false);
 		statusMB.power_managment.gps =  ((data[1] & 32) ? true : false);
 		statusMB.power_managment.arm_5V = ((data[1] & 64) ? true : false);

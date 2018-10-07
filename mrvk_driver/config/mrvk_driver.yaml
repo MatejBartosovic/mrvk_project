@@ -19,7 +19,7 @@ status_period: 5
 
 mcb_5V: True
 mcb_12V: True
-wifi: False
+fan: False
 video_transmitter: True #spustenie kinectu
 laser_scanner: True
 gps: False

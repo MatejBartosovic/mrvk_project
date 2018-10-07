@@ -209,7 +209,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
 		ros::NodeHandle n;
 		n.param<bool>("mcb_5V", config->MCBsSB_5V, true);
 		n.param<bool>("mcb_12V", config->MCBs_12V, true);
-		n.param<bool>("wifi", config->wifi, true);
+		n.param<bool>("fan", config->wifi, true);
 		n.param<bool>("video_transmitter", config->videoTransmitter, false);
 		n.param<bool>("laser_scanner", config->laser, true);
 		n.param<bool>("gps", config->GPS, false);
@@ -273,7 +273,7 @@ void MrvkCallbacks::dynamicReconfigureCallback(mrvk_driver::RobotDynParamConfig 
 
     robot_config.MCBsSB_5V = config.mcb_5V;
     robot_config.MCBs_12V = config.mcb_12V;
-    robot_config.wifi = config.wifi;
+    robot_config.wifi = config.fan;
     robot_config.GPS = config.gps;
     robot_config.laser = config.laser_scanner;
     robot_config.videoTransmitter = config.video_transmitter;
