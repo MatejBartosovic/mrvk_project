@@ -5,7 +5,7 @@ project(mrvk_2dnav)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  hokuyo_node
+  urg_node
   move_base
   mrvk_driver
   robot_pose_ekf
