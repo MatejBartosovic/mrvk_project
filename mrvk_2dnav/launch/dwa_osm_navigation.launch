@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-  <include file="$(find mrvk_driver)/launch/mapping.launch" >
+  <include file="$(find mrvk_sensors)/launch/robot.launch" >
     <arg name="vo_used" default="true"/>
   </include>
   <include file="$(find mrvk_2dnav)/launch/move_base_dwa_osm.launch" />
-  <include file="$(find mrvk_driver)/launch/gps.launch" />
+  <include file="$(find mrvk_sensors)/launch/gps.launch" />
 </launch>
