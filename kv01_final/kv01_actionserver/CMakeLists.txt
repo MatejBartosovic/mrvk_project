@@ -31,7 +31,7 @@ catkin_package(
   INCLUDE_DIRS
   LIBRARIES kv01_interface kv01_actionserver
   CATKIN_DEPENDS actionlib_msgs kv01_driver roscpp sensor_msgs trajectory_msgs
-  DEPENDS system_lib
+  DEPENDS
 )
 include_directories(
   ${catkin_INCLUDE_DIRS}

@@ -38,7 +38,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}_communication_interface
   CATKIN_DEPENDS controller_manager hardware_interface roscpp std_msgs urdf message_runtime
-  DEPENDS system_lib boost
+  DEPENDS
 )
 
 ###########
@@ -59,7 +59,7 @@ add_executable(mrvk_driver src/mrvk_driver.cpp src/hwInterface.cpp)
 add_dependencies(mrvk_driver ${PROJECT_NAME}_communication_interface)
 
 add_executable(robot_control src/robot_control.cpp)
-add_dependencies(robot_control {${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(robot_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}_communication_interface ${catkin_LIBRARIES})
 target_link_libraries(mrvk_driver ${catkin_LIBRARIES} ${PROJECT_NAME}_communication_interface)

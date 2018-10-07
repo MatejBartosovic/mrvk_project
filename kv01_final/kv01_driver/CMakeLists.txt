@@ -28,7 +28,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES kv01_driver
   CATKIN_DEPENDS message_runtime roscpp rospy std_msgs std_srvs
-  DEPENDS system_lib
+  DEPENDS
 )
 
 add_library(kv01_driver src/common_functions.cpp
