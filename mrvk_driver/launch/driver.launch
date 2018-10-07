@@ -6,10 +6,10 @@
 	<arg name="model" default = "$(find mrvk_description)/urdf/robot.urdf.xacro"/>
 
     <!--load urdf-->
-	<param name="robot_description" command="$(arg model)" />
+	<param name="robot_description" command="$(find xacro)/xacro '$(arg model)'" />
 
     <!--robot specific parameters -->
-	<rosparam file="$(find mrvk_driver)/config/mrvk_driver.yaml" command="$(find xacro)/xacro '$(arg model)' --inorder"/>
+	<rosparam file="$(find mrvk_driver)/config/mrvk_driver.yaml" command="load"/>
 
     <!-- run mrvk driver node-->
 	<node  name="mrvk_driver" pkg="mrvk_driver" type="mrvk_driver" output="screen">
