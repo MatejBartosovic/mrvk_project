@@ -14,8 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   serial
   std_msgs
-        std_srvs
-        tf
+  std_srvs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions

@@ -1,12 +1,11 @@
-<?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-    <xacro:macro name = "Adis"
-        <joint name="stabilizer_to_adis16350" type="fixed" params parrent *origin>
+    <xacro:macro name = "Adis" params="parrent *origin">
+        <joint name="adis16350_joint" type="fixed">
             <xacro:insert_block name="origin" />
-            <parent link=${parrent}/>
+            <parent link="${parrent}"/>
             <child link="adis16350"/>
         </joint>
 
         <link name = "adis16350"/>
       </xacro:macro>
-<robot/>
+</robot>
