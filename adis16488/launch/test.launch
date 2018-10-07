@@ -1,9 +1,9 @@
 <?xml version='1.0'?>
 
 <launch>
-    <rosparam command="load" file="$(find adis16488)/config/conf.yaml" />
-    <node pkg="adis16488" name="comADIS" type="comADIS" output="screen"/>
-    <node pkg="adis16488" name="testSerial" type="testSerial"/>
+    <include file="$(find adis16488)/launch/load_urdf.launch"/>
+    <include file="$(find adis16488)/launch/adis_driver.launch"/>
+    <node name="rviz" pkg="rviz" type="rviz"/>
 </launch>
 
 <!-- launch virtual serial port socat -d -d pty,raw,echo=0 pty,raw,echo=0 -->
