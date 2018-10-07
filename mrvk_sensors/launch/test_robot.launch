@@ -1,0 +1,7 @@
+<launch>
+    <arg name="rviz" default="false" />
+    <include file="$(find mrvk_sensors)/launch/load_robot.launch"/>
+    <include file="$(find mrvk_sensors)/launch/robot.launch"/>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    <include file="$(find mrvk_sensors)/launch/rviz_robot.launch" if="$(arg rviz)"/>
+</launch>

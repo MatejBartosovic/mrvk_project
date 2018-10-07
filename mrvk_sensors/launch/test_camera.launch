@@ -1,0 +1,6 @@
+<launch>
+    <arg name="rviz" default="false" />
+    <include file="$(find mrvk_sensors)/launch/load_camera_urdf.launch"/>
+    <include file="$(find mrvk_sensors)/launch/vision.launch"/> TODO turn on vison
+    <include file="$(find mrvk_sensors)/launch/rviz_camera.launch" if="$(arg rviz)"/>
+</launch>

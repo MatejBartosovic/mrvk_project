@@ -1,0 +1,6 @@
+<launch>
+    <arg name="rviz" default="false" />
+    <include file="$(find mrvk_sensors)/launch/load_hokuyo_urdf.launch"/>
+    <include file="$(find mrvk_sensors)/launch/urg_lidar.launch"/>
+    <include file="$(find mrvk_sensors)/launch/rviz_hokuyo.launch" if="$(arg rviz)"/>
+</launch>

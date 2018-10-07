@@ -1,10 +1,10 @@
 <robot name="adis" xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:include filename="$(find adis16488)/urdf/adis_macro.xacro"/> <!--Scanner values-->
+    <xacro:include filename="$(find mrvk_sensors)/urdf/gps_macro.xacro"/> <!--Scanner values-->
 
     <link name = "map"/>
-    <xacro:Adis parent ="map" child="adis16488">
+    <xacro:Gps parent ="map" chld="gps">
         <origin xyz="0 0 0" rpy="0 0 0" /> <!--PhoXi3Dscanner origin-->
-    </xacro:Adis>
+    </xacro:Gps>
 
 </robot>

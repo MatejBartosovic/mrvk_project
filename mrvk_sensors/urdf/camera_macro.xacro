@@ -1,0 +1,11 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:macro name = "Camera" params="parent child *origin">
+        <joint name="camera_joint" type="fixed">
+            <xacro:insert_block name="origin" />
+            <parent link="${parent}"/>
+            <child link="${child}"/>
+        </joint>
+
+        <link name = "${child}"/>
+    </xacro:macro>
+</robot>

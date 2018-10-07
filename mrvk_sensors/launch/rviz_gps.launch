@@ -1,0 +1,3 @@
+<launch>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_sensors)/rviz/tf.rviz" required="true"/>
+</launch>

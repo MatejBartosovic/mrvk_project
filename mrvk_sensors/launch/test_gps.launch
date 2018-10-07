@@ -1,0 +1,6 @@
+<launch>
+    <arg name="rviz" default="false" />
+    <include file="$(find mrvk_sensors)/launch/load_gps_urdf.launch"/>
+    <include file="$(find mrvk_sensors)/launch/gps.launch"/>
+    <include file="$(find mrvk_sensors)/launch/rviz_gps.launch" if="$(arg rviz)"/>
+</launch>
