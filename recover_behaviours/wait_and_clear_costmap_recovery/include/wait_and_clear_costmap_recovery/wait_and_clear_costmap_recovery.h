@@ -64,7 +64,7 @@ namespace wait_and_clear_costmap_recovery{
        * @param global_costmap A pointer to the global_costmap used by the navigation stack 
        * @param local_costmap A pointer to the local_costmap used by the navigation stack 
        */
-      void initialize(std::string name, tf::TransformListener* tf, 
+      void initialize(std::string name, tf2_ros::Buffer* tf,
           costmap_2d::Costmap2DROS* global_costmap, costmap_2d::Costmap2DROS* local_costmap);
 
       /**
@@ -84,7 +84,7 @@ namespace wait_and_clear_costmap_recovery{
       ros::ServiceServer runBehaviorService;
       costmap_2d::Costmap2DROS* global_costmap_, *local_costmap_;
       std::string name_;
-      tf::TransformListener* tf_;
+      tf2_ros::Buffer* tf_;
       bool initialized_;
       double reset_distance_;
       double wait_time_;

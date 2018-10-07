@@ -7,7 +7,7 @@
 #include <geometry_msgs/Twist.h>
 #include <tf/transform_datatypes.h>
 
-//PLUGINLIB_EXPORT_CLASS(reverse_movement_recovery::ReverseMovementRecovery, nav_core::RecoveryBehavior)
+PLUGINLIB_EXPORT_CLASS(reverse_movement_recovery::ReverseMovementRecovery, nav_core::RecoveryBehavior)
 
 namespace reverse_movement_recovery{
     ReverseMovementRecovery::ReverseMovementRecovery() : initialized_(false), global_costmap_(NULL),
@@ -15,8 +15,7 @@ namespace reverse_movement_recovery{
 
     }
 
-    void ReverseMovementRecovery::initialize(std::string name, tf::TransformListener* tf,
-            costmap_2d::Costmap2DROS* global_costmap, costmap_2d::Costmap2DROS* local_costmap){
+    void ReverseMovementRecovery::initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d::Costmap2DROS* global_costmap, costmap_2d::Costmap2DROS* local_costmap){
         if(!initialized_){
             name_ = name;
             tf_ = tf;
@@ -44,7 +43,8 @@ namespace reverse_movement_recovery{
         ROS_WARN("Starting reverse movement");
         tf::StampedTransform transform;
         try{
-            tf_->lookupTransform("/map","/base_link", ros::Time(0), transform);
+            geometry_msgs::TransformStamped  gp = tf_->lookupTransform("/map","/base_link", ros::Time(0));
+            tf::transformMsgToTF(gp.transform,transform);
         }
         catch (tf::TransformException ex){
             ROS_ERROR("Transform exception: %s",ex.what());
@@ -59,7 +59,8 @@ namespace reverse_movement_recovery{
         ros::Rate rate(20);
         while(ros::ok()){
             try{
-                tf_->lookupTransform("/map","/base_link", ros::Time(0), transform);
+                geometry_msgs::TransformStamped  gp = tf_->lookupTransform("/map","/base_link", ros::Time(0));
+                tf::transformMsgToTF(gp.transform,transform);
             }
             catch (tf::TransformException ex){
                 ROS_ERROR("Transform exception: %s",ex.what());

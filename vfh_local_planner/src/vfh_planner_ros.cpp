@@ -6,7 +6,7 @@
 #include <pluginlib/class_list_macros.h>
 
 //register this planner as a BaseLocalPlanner plugin
-//PLUGINLIB_EXPORT_CLASS(vfh_local_planner::VFHPlusPlannerROS, nav_core::BaseLocalPlanner)
+PLUGINLIB_EXPORT_CLASS(vfh_local_planner::VFHPlusPlannerROS, nav_core::BaseLocalPlanner)
 
 namespace vfh_local_planner {
 
@@ -16,5 +16,5 @@ namespace vfh_local_planner {
 
     bool VFHPlusPlannerROS::setPlan(const std::vector<geometry_msgs::PoseStamped>& plan){}
 
-    void VFHPlusPlannerROS::initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d::Costmap2DROS* costmap_ros){}
+    void VFHPlusPlannerROS::initialize(std::string name,  tf2_ros::Buffer* tf, costmap_2d::Costmap2DROS* costmap_ros){}
 }

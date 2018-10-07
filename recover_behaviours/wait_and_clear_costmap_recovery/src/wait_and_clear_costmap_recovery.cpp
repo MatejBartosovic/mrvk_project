@@ -7,14 +7,14 @@
 #include <vector>
 
 //register this planner as a RecoveryBehavior plugin
-//PLUGINLIB_EXPORT_CLASS(wait_and_clear_costmap_recovery::WaitAndClearCostmapRecovery, nav_core::RecoveryBehavior);
+PLUGINLIB_EXPORT_CLASS(wait_and_clear_costmap_recovery::WaitAndClearCostmapRecovery, nav_core::RecoveryBehavior);
 
 
 namespace wait_and_clear_costmap_recovery {
     WaitAndClearCostmapRecovery::WaitAndClearCostmapRecovery(): global_costmap_(NULL), local_costmap_(NULL),
   tf_(NULL), initialized_(false) {} 
 
-void WaitAndClearCostmapRecovery::initialize(std::string name, tf::TransformListener* tf,
+void WaitAndClearCostmapRecovery::initialize(std::string name, tf2_ros::Buffer* tf,
     costmap_2d::Costmap2DROS* global_costmap, costmap_2d::Costmap2DROS* local_costmap){
   if(!initialized_){
     name_ = name;
