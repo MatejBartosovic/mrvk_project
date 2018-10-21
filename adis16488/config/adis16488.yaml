@@ -1,0 +1,30 @@
+page1:
+  plugin: HexItem
+  address: 0x00
+  read: true
+  Registers:
+    PROD_ID:
+      plugin: FloatItem
+      address: 0x7E
+      read: true
+      write: true
+    PROD_ID2:
+      plugin: HexItem
+      address: 0x7E
+      read: true
+      write: false
+page2:
+  plugin: HexItem
+  address: 0x01
+  read: true
+  Registers:
+    PROD_ID:
+      plugin: HexItem
+      address: 0x7E
+      read: true
+      write: false
+    PROD_ID2:
+      plugin: HexItem
+      address: 0x7E
+      read: true
+      write: false

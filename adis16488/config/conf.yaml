@@ -1,5 +1,5 @@
 baud_rate: 115200
-port_name: /dev/ADIS16488 #/dev/pts/18 #/dev/ttyusb0
+port_name: /dev/ttyACM0 #/dev/pts/18 #/dev/ttyusb0
 test_port_name: /dev/pts/19 #/dev/ttyusb1
 enable_print_data: false
 topic_name: imu_data

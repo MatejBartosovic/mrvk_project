@@ -1,0 +1,6 @@
+<library path="lib/libadis16488_WidgetItems">
+    <class type="adis16488::Widget::HexItem" base_class_type="adis16488::Widget::ItemBase">
+    </class>
+    <class type="adis16488::Widget::FloatItem" base_class_type="adis16488::Widget::ItemBase">
+    </class>
+</library>

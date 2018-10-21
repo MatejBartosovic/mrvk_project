@@ -16,7 +16,58 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   std_srvs
   tf
+  rqt_gui_cpp
+  rqt_gui
+  pluginlib
 )
+
+find_package(yaml-cpp REQUIRED)
+
+
+# RegisterWidget
+set(${PROJECT_NAME}_RegisterWidget_HDRS
+        include/adis16488/RegisterWidget.h
+        )
+
+set(${PROJECT_NAME}_RegisterWidget_SRCS
+        src/RegisterWidget.cpp
+        )
+
+set(${PROJECT_NAME}_RegisterWidget_UIS
+        )
+
+# WidgetItems
+set(${PROJECT_NAME}_WidgetItems_HDRS
+        include/adis16488/Items/Items.h
+        )
+set(${PROJECT_NAME}_WidgetItems_SRCS
+        src/Items/Items.cpp
+        )
+
+set(${PROJECT_NAME}_WidgetItems_UIS
+        )
+
+
+if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
+    find_package(Qt5Widgets REQUIRED)
+    # RegisterWidget
+    qt5_wrap_cpp(${PROJECT_NAME}_RegisterWidget_MOCS ${${PROJECT_NAME}_RegisterWidget_HDRS})
+    qt5_wrap_ui(${PROJECT_NAME}_RegisterWidget_UIS_H ${${PROJECT_NAME}_RegisterWidget_UIS})
+    # WidgetItems
+    qt5_wrap_cpp(${PROJECT_NAME}_WidgetItems_MOCS ${${PROJECT_NAME}_WidgetItems_HDRS})
+    qt5_wrap_ui(${PROJECT_NAME}_WidgetItems_UIS_H ${${PROJECT_NAME}_WidgetItems_UIS})
+    set(qt_LIBRARIES Qt5::Widgets)
+else()
+    find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
+    include(${QT_USE_FILE})
+    #RegisterWidget
+    qt4_wrap_cpp(${PROJECT_NAME}_RegisterWidget_MOCS ${${PROJECT_NAME}_RegisterWidget_HDRS})
+    qt4_wrap_ui(${PROJECT_NAME}_RegisterWidget_UIS_H ${${PROJECT_NAME}_RegisterWidget_UIS})
+    # WidgetItems
+    qt4_wrap_cpp(${PROJECT_NAME}_WidgetItems_MOCS ${${PROJECT_NAME}_WidgetItems_HDRS})
+    qt4_wrap_ui(${PROJECT_NAME}_WidgetItems_UIS_H ${${PROJECT_NAME}_WidgetItems_UIS})
+    set(qt_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
+endif()
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -121,8 +172,9 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
+  ${YAML_CPP_INCLUDE_DIR}
 )
 
 ## Declare a C++ library
@@ -155,11 +207,109 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_executable(comADIS src/comADIS.cpp)
-target_link_libraries(comADIS ${catkin_LIBRARIES})
+#
+# Executables
+#
+add_executable(comADIS
+        src/comADIS.cpp)
 
-add_executable(testSerial src/testSerial.cpp)
-target_link_libraries(testSerial ${catkin_LIBRARIES})
+add_executable(testSerial
+        src/testSerial.cpp)
+
+add_executable(${PROJECT_NAME}_node
+        src/adis16488.cpp)
+
+# GUI node
+add_executable(${PROJECT_NAME}_gui_node
+        src/adis_gui.cpp)
+
+#
+# Libraries
+#
+# Serial interface
+add_library(${PROJECT_NAME}_SerialInterface
+        src/SerialCommunicationInterface.cpp)
+
+# SPI interface
+add_library(${PROJECT_NAME}_SpiInterface
+        src/SpiComunicationInterface.cpp)
+
+# RegisterWidget
+add_library(${PROJECT_NAME}_RegisterWidget
+        ${${PROJECT_NAME}_RegisterWidget_SRCS}
+        ${${PROJECT_NAME}_RegisterWidget_MOCS}
+        )
+
+# ItemLoader
+add_library(${PROJECT_NAME}_ItemLoader
+        src/Items/ItemLoader.cpp
+        )
+
+# WidgetItems Item
+add_library(${PROJECT_NAME}_WidgetItems
+        ${${PROJECT_NAME}_WidgetItems_SRCS}
+        ${${PROJECT_NAME}_WidgetItems_MOCS}
+        )
+
+#
+# Linking
+#
+target_link_libraries(comADIS
+        ${catkin_LIBRARIES})
+
+target_link_libraries(testSerial
+        ${catkin_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME}_node
+        ${PROJECT_NAME}_SerialInterface
+        ${catkin_LIBRARIES})
+
+# Serial interface
+target_link_libraries(${PROJECT_NAME}_SerialInterface
+        ${catkin_LIBRARIES})
+
+# SPI interface
+target_link_libraries(${PROJECT_NAME}_SpiInterface
+        #${catkin_LIBRARIES}
+        )
+
+# RegisterWidget
+target_link_libraries(${PROJECT_NAME}_RegisterWidget
+        ${qt_LIBRARIES}
+        ${YAML_CPP_LIBRARIES}
+        ${PROJECT_NAME}_ItemLoader
+        )
+
+# WidgetItems 
+target_link_libraries(${PROJECT_NAME}_WidgetItems
+        ${qt_LIBRARIES}
+        )
+
+# GUI node
+target_link_libraries(${PROJECT_NAME}_gui_node
+        ${PROJECT_NAME}_RegisterWidget
+        ${qt_LIBRARIES}
+        ${catkin_LIBRARIES}
+        )
+
+# ItemLoader
+target_link_libraries(${PROJECT_NAME}_ItemLoader
+        ${qt_LIBRARIES}
+        ${YAML_CPP_LIBRARIES}
+        ${catkin_LIBRARIES}
+        )
+
+#
+# Dependencies
+#
+add_dependencies(${PROJECT_NAME}_gui_node
+        ${PROJECT_NAME}_RegisterWidget
+        )
+add_dependencies(${PROJECT_NAME}_RegisterWidget
+        ${PROJECT_NAME}_ItemLoader
+        )
+
+#message(FATAL_ERROR ${YAML_CPP_LIBRARIES})
 
 #############
 ## Install ##
