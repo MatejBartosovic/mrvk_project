@@ -1,0 +1,33 @@
+tf_rate: 20               # Rate of TF broadcaster
+parent_frame: world       # Parent frame (should be world), global planner should be use this frame
+child_frame: map          # Correction frame, local planner and slam should be use this frame
+target_frame: base_link   # Base link of robot
+imu_topic: /imu           # Imu source. It's useful only if use_compass is true
+gps_topic: /fix           # Gps source
+use_compass: false        # If it is true, then is used Imu orientation for correction of rotation
+
+# Set minimal required GPS status
+# STATUS_NO_FIX =  -1        - unable to fix position
+# STATUS_FIX =      0        - unaugmented fix#
+# STATUS_SBAS_FIX = 1        - with satellite-based augmentation
+# STATUS_GBAS_FIX = 2        - with ground-based augmentation
+min_required_status_update: 0  # This is minimal GPS status for calculating bearing using ROS services
+min_required_status_service: 0 # If is the GPS status GBAS_FIX inaccessible and low_precision_period is reached,
+                               # then is used lower status from this param
+low_precision_period: 30       # Time for TF correction while GPS get lower precision
+
+# Rohot commander params.
+# The class do simple forward movement using cmd_vel publisher
+cmd_vel_topic: /cmd_vel
+moving_time: 4            # Movement duration time [s]
+moving_velocity: 0.25     # Velocity of movement [m/s^2]
+
+# From OSM parser (Set map origin)
+set_origin_pose: 3          # Set the origin pose on the map for cartesian calculator
+                              # 0 - origin pose from service
+                              # 1 - origin pose from 1. point on the map
+                              # 2 - random origin pose
+                              # 3 - origin pose from param
+
+origin_latitude: 48.1531010533
+origin_longitude: 17.0743728117
