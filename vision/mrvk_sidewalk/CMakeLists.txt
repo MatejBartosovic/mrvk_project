@@ -23,6 +23,7 @@ find_package(OpenCV 3 REQUIRED
 		highgui
 		opencv_imgproc		#find by cv_bridge but for sure also here
 		opencv_imgcodecs	#find by cv_bridge but for sure also here
+		calib3d
 		)
 
 catkin_package(
