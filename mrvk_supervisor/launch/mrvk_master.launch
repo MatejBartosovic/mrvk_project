@@ -16,7 +16,7 @@
   <!-- <arg name="osm_map_path" default="$(find osm_planner)/osm_example/park_ludovita_stura_2.osm"/> --> 
 
   <!--Start MRVK Driver, Gmapping, EKF, IMU, Hokuyo-->
-  <include file="$(find mrvk_driver)/launch/mapping.launch" >
+  <include file="$(find mrvk_supervisor)/launch/mapping.launch" >
     <arg name="vo_used" default="false"/>
     <arg name="use_imu" default="$(arg use_imu)"/>
     <arg name="use_gmapping" default="$(arg use_gmapping)"/>
