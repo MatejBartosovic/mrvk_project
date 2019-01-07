@@ -1,6 +1,6 @@
 local_costmap:
-  global_frame: /odom
-  robot_base_frame: /base_link
+  global_frame: odom
+  robot_base_frame: base_link
 
   update_frequency: 5.0 # The frequency in Hz for the map to be updated.
   publish_frequency: 5.0 # The frequency in Hz for the map to publish display information.
