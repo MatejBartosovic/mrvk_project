@@ -8,10 +8,13 @@ project(mrvk_laser_filters)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   rospy
   sensor_msgs
   std_msgs
   tf
+  pluginlib
+  filters
 )
 
 ## System dependencies are found with CMake's conventions
@@ -104,10 +107,12 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES mrvk_laser_filters
-#  CATKIN_DEPENDS rospy sensor_msgs std_msgs tf
+  INCLUDE_DIRS include
+  LIBRARIES mrvk_laser_filters
+  CATKIN_DEPENDS rospy sensor_msgs std_msgs tf
 #  DEPENDS system_lib
+  roscpp
+  pluginlib
 )
 
 ###########
@@ -117,7 +122,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -125,6 +130,9 @@ include_directories(
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/mrvk_laser_filters.cpp
 # )
+
+add_library(isolated_point_filter src/isolated_point_filter.cpp)
+target_link_libraries(isolated_point_filter ${catkin_LIBRARIES})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

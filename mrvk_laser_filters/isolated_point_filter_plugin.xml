@@ -1,0 +1,9 @@
+<library path="lib/libisolated_point_filter">
+    <class name="isolated_point_filter/IsolatedPointFilter"
+           type="isolated_point_filter::IsolatedPointFilter"
+           base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+        <description>
+            A recovery behavior that wait for specified time and reverts the costmap to the static map outside of a user specified window.
+        </description>
+    </class>
+</library>

@@ -18,7 +18,7 @@ class LaserFilter():
         self.laser_pub = rospy.Publisher('/scan_filtered', LaserScan, queue_size=10)
         
         # Dist cutoff
-	self.min_cutoff_distance = rospy.get_param("~min_cutoff_distance", np.inf)
+	    self.min_cutoff_distance = rospy.get_param("~min_cutoff_distance", np.inf)
 
         # Isolated point filter
         self.filter_isolated = rospy.get_param('~filter_isolated', False)
