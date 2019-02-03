@@ -1,203 +1,203 @@
 page1:
-  plugin: HexByteItem
+  plugin: Uint8HexItem
   address: 0x00
   read: true
   Registers:
     SEQ_CNT:
-      plugin: DecimalUint16Item
+      plugin: Uint16DecimalItem
       address: 0x06
       read: true
       description: "Sequence counter. Binary counter: range = 1 to 48/(DEC_RATE+ 1)"
     SYS_E_FLAG:
-      plugin: HexUint16Item
+      plugin: Uint16HexItem
       address: 0x08
       read: true
       description: "Output, system error flags"
       Registers:
         Lower:
-          plugin: DisplayOnlyHexByteItem
+          plugin: ViewOnlyUint8HexItem
           address: 0x00
           read: true
           Registers:
             AlarmStatus:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x01
               read: true
               description: "(1=ALM_STS≠0x0000)"
             SpiCommunicationError:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x08
               read: true
               description: "(1 = error condition, when the number of SCLK pulsesis not equal to a multiple of 16)"
             SensorOverrange:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x10
               read: true
               description: "(1= at least one sensor overranged)"
             InertialSelfTestFailure:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x20
               read: true
               description: "(1= DIAG_STS≠ 0x0000)"
             FlashMemoryUpdate:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x40
               read: true
               description: "result of GLOB_CMD[3]= 1 (1 = failed update, 0 = update successful)"
             ProcessingOverrun:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x80
               read: true
               description: "1 = error"
         Upper:
-          plugin: DisplayOnlyHexByteItem
+          plugin: ViewOnlyUint8HexItem
           address: 0x01
           read: true
           Registers:
             NewDataFlagMagnetometer:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x01
               read: true
               description: "1 = new,  unread data ( This flag restores to zero after reading one x_MAGN_OUT register.)"
             NewDataFlagBarometer:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x02
               read: true
               description: "1 = new,  unread data ( This flag restores to zero after reading  contents on BAROM_OUT.)"
             WatchDogTimerFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x80
               read: true
               description: "1 = timed out"
     DIAG_STS:
-      plugin: HexUint16Item
+      plugin: Uint16HexItem
       address: 0x0A
       read: true
       description: "Output, self-test error flags"
       Registers:
         Lower:
-          plugin: DisplayOnlyHexByteItem
+          plugin: ViewOnlyUint8HexItem
           address: 0x00
           read: true
           Registers:
             SelfTtestFailureXaxisGyroscope:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x01
               read: true
               description: "1 = failure"
             SelfTtestFailureYaxisGyroscope:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x02
               read: true
               description: "1 = failure"
             SelfTtestFailureZaxisGyroscope:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x04
               read: true
               description: "1 = failure"
             SelfTtestFailureXaxisAccelerometer:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x08
               read: true
               description: "1 = failure"
             SelfTtestFailureYaxisAccelerometer:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x10
               read: true
               description: "1 = failure"
         Upper:
-          plugin: DisplayOnlyHexByteItem
+          plugin: ViewOnlyUint8HexItem
           address: 0x00
           read: true
           Registers:
             SelfTtestFailureXaxisMagnetometer:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x01
               read: true
               description: "1 = failure"
             SelfTtestFailureYaxisMagnetometer:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x02
               read: true
               description: "1 = failure"
             SelfTtestFailureZaxisMagnetometer:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x04
               read: true
               description: "1 = failure"
             SelfTtestFailureBarometer:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x08
               read: true
               description: "1 = failure"
     ALM_STS:
-      plugin: HexUint16Item
+      plugin: Uint16HexItem
       address: 0x0C
       read: true
       description: "Output, alarm error flags"
       Registers:
         Lower:
-          plugin: DisplayOnlyHexByteItem
+          plugin: ViewOnlyUint8HexItem
           address: 0x00
           read: true
           Registers:
             X-axisGyroscopeAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x01
               read: true
               description: "1 = alarm is active"
             Y-axisGyroscopeAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x02
               read: true
               description: "1 = alarm is active"
             Z-axisGyroscopeAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x04
               read: true
               description: "1 = alarm is active"
             X-axisAccelerometerAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x08
               read: true
               description: "1 = alarm is active"
             Y-axisAccelerometerAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x10
               read: true
               description: "1 = alarm is active"
             Z-axisAccelerometerAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x20
               read: true
               description: "1 = alarm is active"
         Upper:
-          plugin: DisplayOnlyHexByteItem
+          plugin: ViewOnlyUint8HexItem
           address: 0x00
           read: true
           Registers:
             X-axisMagnetometerAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x01
               read: true
               description: "1 = alarm is active"
             Y-axisMagnetometerAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x02
               read: true
               description: "1 = alarm is active"
             Z-axisMagnetometerAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x04
               read: true
               description: "1 = alarm is active"
             BarometerAlarmFlag:
-              plugin: BitDispayItem
+              plugin: BitItem
               address: 0x08
               read: true
               description: "1 = alarm is active"
     TEMP_OUT:
-      plugin: Int16GainOffsetItem
+      plugin: GainOffsetUint16Item
       address: 0x0E
       read: true
       description: "Output, temperature"
@@ -234,17 +234,17 @@ page1:
       read: true
       description: Output, z-axis accelerometer
     X_MAGN:
-      plugin: HexByteItem
+      plugin: Uint8HexItem
       address: 0x28
       read: true
       description: Output, x-axis magnetometer
     Y_MAGN:
-      plugin: HexByteItem
+      plugin: Uint8HexItem
       address: 0x2A
       read: true
       description: Output, y-axis magnetometer
     Z_MAGN:
-      plugin: HexByteItem
+      plugin: Uint8HexItem
       address: 0x2C
       read: true
       description: Output, z-axis magnetometer
@@ -284,65 +284,65 @@ page1:
       read: true
       description: Output, z-axis delta velocity
     TIME_MS_OUT:
-      plugin: HexUint16Item
+      plugin: Uint16HexItem
       address: 0x78
       read: true
       write: true
       description: "Factory configuration time: minutes/seconds"
       Registers:
         Seconds:
-          plugin: DisplayOnlyDecimalByteItem
+          plugin: ViewOnlyUint8DecimalItem
           address: 0x00
           read: true
           description: "Seconds"
         Minutes:
-          plugin: DisplayOnlyDecimalByteItem
+          plugin: ViewOnlyUint8DecimalItem
           address: 0x01
           read: true
           description: "Minutes"
     TIME_DH_OUT:
-      plugin: HexUint16Item
+      plugin: Uint16HexItem
       address: 0x7A
       read: true
       write: true
       description: "Factory configuration date/time:day/hour"
       Registers:
         Hours:
-          plugin: DisplayOnlyDecimalByteItem
+          plugin: ViewOnlyUint8DecimalItem
           address: 0x00
           read: true
           description: "Hours"
         Days:
-          plugin: DisplayOnlyDecimalByteItem
+          plugin: ViewOnlyUint8DecimalItem
           address: 0x01
           read: true
           description: "Days"
     TIME_YM_OUT:
-      plugin: HexUint16Item
+      plugin: Uint16HexItem
       address: 0x7C
       read: true
       write: true
       description: "Factory configuration date: year/month"
       Registers:
         Months:
-          plugin: DisplayOnlyDecimalByteItem
+          plugin: ViewOnlyUint8DecimalItem
           address: 0x00
           read: true
           description: "Days"
         Years:
-          plugin: DisplayOnlyDecimalByteGainOffsetItem
+          plugin: ViewOnlyUint8DecimalItem
           address: 0x01
           read: true
           description: "Days"
           gain: 1.0
           offset: 2000.0
     PROD_ID:
-      plugin: HexByteItem
+      plugin: Uint8HexItem
       address: 0x00
       read: true
 page2:
-  plugin: HexByteItem
-  address: 0x01
+  plugin: Uint8HexItem
+  address: 0x00
   read: true
   Registers:
     X_GYRO_SCALE:
@@ -351,33 +351,278 @@ page2:
       read: true
       write: true
       description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+      Registers:
+        2scomplement:
+          plugin: ViewOnlyGainOffsetUint16Item
+          address: 0x04
+          read: true
+          description: "1 + value * 0.003052"
+          offset: 1
+          gain: 0.003052
     Y_GYRO_SCALE:
       plugin: SignedInt16Item
       address: 0x06
       read: true
       write: true
       description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+      Registers:
+        2scomplement:
+          plugin: ViewOnlyGainOffsetUint16Item
+          address: 0x06
+          read: true
+          description: "1 + value * 0.003052"
+          offset: 1
+          gain: 0.003052
+
     Z_GYRO_SCALE:
       plugin: SignedInt16Item
       address: 0x08
       read: true
       write: true
       description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+      Registers:
+        2scomplement:
+          plugin: ViewOnlyGainOffsetUint16Item
+          address: 0x08
+          read: true
+          description: "1 + value * 0.003052"
+          offset: 1
+          gain: 0.003052
     X_ACCL_SCALE:
       plugin: SignedInt16Item
       address: 0x0A
       read: true
       write: true
       description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+      Registers:
+        2scomplement:
+          plugin: ViewOnlyGainOffsetUint16Item
+          address: 0x0A
+          read: true
+          description: "1 + value * 0.003052"
+          offset: 1
+          gain: 0.003052
     Y_ACCL_SCALE:
       plugin: SignedInt16Item
       address: 0x0C
       read: true
       write: true
       description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+      Registers:
+        2scomplement:
+          plugin: ViewOnlyGainOffsetUint16Item
+          address: 0x0C
+          read: true
+          description: "1 + value * 0.003052"
+          offset: 1
+          gain: 0.003052
     Z_ACCL_SCALE:
       plugin: SignedInt16Item
       address: 0x0E
       read: true
       write: true
       description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+      Registers:
+        2scomplement:
+          plugin: ViewOnlyGainOffsetUint16Item
+          address: 0x0E
+          read: true
+          description: "1 + value * 0.003052"
+          offset: 1
+          gain: 0.003052
+    XG_BIAS:
+      plugin: GainOffsetUint32Item
+      address: 0x10
+      read: true
+      write: true
+      description: "Calibration, offset, gyroscope, x-axis"
+      offset: 0
+      gain: 0.000000305175781
+      Registers:
+        XG_BIAS_LOW:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x10
+          read: true
+          description: "Lower word. Twos complement, 0°/sec = 0x0000, 1 LSB = 0.02°/sec"
+        XG_BIAS_HIGH:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x12
+          read: true
+          description: "Upper world. Twos complement, 0°/sec = 0x0000, 1 LSB = 0.02°/sec"
+    YG_BIAS:
+      plugin: GainOffsetUint32Item
+      address: 0x14
+      read: true
+      write: true
+      description: "Calibration, offset, gyroscope, y-axis"
+      offset: 0
+      gain: 0.000000305175781
+      Registers:
+        XG_BIAS_LOW:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x14
+          read: true
+          description: "Lower word. Twos complement, 0°/sec = 0x0000, 1 LSB = 0.02°/sec"
+        XG_BIAS_HIGH:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x16
+          read: true
+          description: "Upper world. Twos complement, 0°/sec = 0x0000, 1 LSB = 0.02°/sec"
+    ZG_BIAS:
+      plugin: GainOffsetUint32Item
+      address: 0x18
+      read: true
+      write: true
+      description: "Calibration, offset, gyroscope, z-axis"
+      offset: 0
+      gain: 0.000000305175781
+      Registers:
+        XG_BIAS_LOW:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x18
+          read: true
+          description: "Lower word. Twos complement, 0°/sec = 0x0000, 1 LSB = 0.02°/sec"
+        XG_BIAS_HIGH:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x1A
+          read: true
+          description: "Upper world. Twos complement, 0°/sec = 0x0000, 1 LSB = 0.02°/sec"
+    XA_BIAS:
+      plugin: GainOffsetUint32Item
+      address: 0x1C
+      read: true
+      write: true
+      description: "Calibration, offset, accelerometer, x-axis"
+      offset: 0
+      gain: 0.00001220703
+      Registers:
+        XG_BIAS_LOW:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x1C
+          read: true
+          description: "Lower word.Twos complement, 0g= 0x0000, 1 LSB = 0.8 mg ÷ 2^16 = ~0.0000122 mg"
+        XG_BIAS_HIGH:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x1E
+          read: true
+          description: "Upper world. Twos complement, 0g= 0x0000, 1 LSB = 0.8 mg"
+    YA_BIAS:
+      plugin: GainOffsetUint32Item
+      address: 0x20
+      read: true
+      write: true
+      description: "Calibration, offset, accelerometer, y-axis"
+      offset: 0
+      gain: 0.00001220703
+      Registers:
+        XG_BIAS_LOW:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x20
+          read: true
+          description: "Lower word. Twos complement, 0g= 0x0000, 1 LSB = 0.8 mg ÷ 2^16 = ~0.0000122 mg"
+        XG_BIAS_HIGH:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x22
+          read: true
+          description: "Upper world. Twos complement, 0g= 0x0000, 1 LSB = 0.8 mg"
+    ZA_BIAS:
+      plugin: GainOffsetUint32Item
+      address: 0x24
+      read: true
+      write: true
+      description: "Calibration, offset, accelerometer,z-axis"
+      offset: 0
+      gain: 0.00001220703
+      Registers:
+        XG_BIAS_LOW:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x24
+          read: true
+          description: "Lower word. Twos complement, 0g= 0x0000, 1 LSB = 0.8 mg ÷ 2^16 = ~0.0000122 mg"
+        XG_BIAS_HIGH:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x26
+          read: true
+          description: "Upper world. Twos complement, 0g= 0x0000, 1 LSB = 0.8 mg"
+    HARD_IRON_X:
+      plugin: SignedInt16Item
+      address: 0x28
+      read: true
+      write: true
+      description: "Calibration, hard iron, magnetometer, x-axis"
+      Registers:
+        2scomplement:
+          plugin: ViewOnlyGainOffsetUint16Item
+          address: 0x0E
+          read: true
+          description: "Twos complement, ±3.2767 gauss range,0.1mgauss/LSB,0 gauss = 0x0000"
+          offset: 0
+          gain: 0.1
+    HARD_IRON_Y:
+      plugin: SignedInt16Item
+      address: 0x2A
+      read: true
+      write: true
+      description: "Calibration, hard iron, magnetometer, y-axis"
+      Registers:
+        2scomplement:
+          plugin: ViewOnlyGainOffsetUint16Item
+          address: 0x0E
+          read: true
+          description: "Twos complement, ±3.2767 gauss range,0.1mgauss/LSB,0 gauss = 0x0000"
+          offset: 0
+          gain: 0.1
+    HARD_IRON_Z:
+      plugin: SignedInt16Item
+      address: 0x2C
+      read: true
+      write: true
+      description: "Calibration, hard iron, magnetometer, z-axis"
+      Registers:
+        2scomplement:
+          plugin: ViewOnlyGainOffsetUint16Item
+          address: 0x0E
+          read: true
+          description: "Twos complement, ±3.2767 gauss range,0.1mgauss/LSB,0 gauss = 0x0000"
+          offset: 0
+          gain: 0.1
+    BR_BIAS:
+      plugin: GainOffsetUint32Item
+      address: 0x40
+      read: true
+      write: true
+      description: "Calibration, offset, barometer. ±1.3 bar measurement range"
+      offset: 0
+      gain: 0.00061035156
+      Registers:
+        XG_BIAS_LOW:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x40
+          read: true
+          description: "Lower word. Twos complement, 0 bar = 0x0000, 1 LSB = 40 μbar ÷ 216= ~0.00061 μbar  "
+        XG_BIAS_HIGH:
+          plugin: ViewOnlySignedInt16Item
+          address: 0x42
+          read: true
+          description: "Upper world. Twos complement,0 bar = 0x0000, 1 LSB = 40 μbar."
+    FLSHCNT:
+      plugin: Uint32DecimalItem
+      address: 0x7C
+      read: true
+      write: true
+      Registers:
+        FLSHCNT_LOW:
+          plugin: ViewOnlyUint16DecimalItem
+          address: 0x7C
+          read: true
+          description: "Lower word."
+        FLSHCNT_HIGH:
+          plugin: ViewOnlyUint16DecimalItem
+          address: 0x7E
+          read: true
+          description: "Upper word."
+  page3:
+    plugin: Uint8HexItem
+    address: 0x00
+    read: true
+    Registers:

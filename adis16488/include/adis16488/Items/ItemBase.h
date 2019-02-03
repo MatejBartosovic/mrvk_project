@@ -8,6 +8,8 @@
 #include <QTreeWidgetItem>
 #include <sstream>
 #include <yaml-cpp/yaml.h>
+#include <adis16488/Items/ViewOnly.h>
+#include <adis16488/Items/GainOffsetItem.h>
 
 class ItemLoader;
 
@@ -41,7 +43,7 @@ namespace adis16488{
                 return writeableRegister;
             }
             bool isReadable(){
-                return writeableRegister;
+                return readableRegister;
             }
             std::string getName(){
                 return name;
@@ -56,6 +58,7 @@ namespace adis16488{
             bool readableRegister;
             bool writeableRegister;
             std::string description;
+            ItemBase* parrent;
         };
     }
 }

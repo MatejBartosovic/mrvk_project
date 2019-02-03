@@ -1,18 +1,36 @@
 <library path="lib/libadis16488_WidgetItems">
-    <class type="adis16488::Widget::HexByteItem" base_class_type="adis16488::Widget::ItemBase"/>
-    <class type="adis16488::Widget::DecimalByteItem" base_class_type="adis16488::Widget::ItemBase"/>
-    <class type="adis16488::Widget::DisplayOnlyHexByteItem" base_class_type="adis16488::Widget::ItemBase"/>
-    <class type="adis16488::Widget::DisplayOnlyDecimalByteItem" base_class_type="adis16488::Widget::ItemBase"/>
-    <class type="adis16488::Widget::DecimalByteGainOffsetItem" base_class_type="adis16488::Widget::ItemBase"/>
-    <class type="adis16488::Widget::DisplayOnlyDecimalByteGainOffsetItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <!--1 bit-->
+    <class type="adis16488::Widget::BitItem" base_class_type="adis16488::Widget::ItemBase"/>
 
-    <class type="adis16488::Widget::BitDispayItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <!--8 bit-->
+    <class type="adis16488::Widget::Uint8HexItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <class type="adis16488::Widget::Uint8DecimalItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <class type="adis16488::Widget::ViewOnlyUint8HexItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <class type="adis16488::Widget::ViewOnlyUint8DecimalItem" base_class_type="adis16488::Widget::ItemBase"/>
 
-    <class type="adis16488::Widget::HexUint16Item" base_class_type="adis16488::Widget::ItemBase"/>
-    <class type="adis16488::Widget::DecimalUint16Item" base_class_type="adis16488::Widget::ItemBase"/>
+    <!--16 bit-->
+    <class type="adis16488::Widget::Uint16HexItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <class type="adis16488::Widget::Uint16DecimalItem" base_class_type="adis16488::Widget::ItemBase"/>
     <class type="adis16488::Widget::SignedInt16Item" base_class_type="adis16488::Widget::ItemBase"/>
-    <class type="adis16488::Widget::Int16GainOffsetItem" base_class_type="adis16488::Widget::ItemBase"/>
 
+    <class type="adis16488::Widget::ViewOnlyUint16HexItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <class type="adis16488::Widget::ViewOnlyUint16DecimalItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <class type="adis16488::Widget::ViewOnlySignedInt16Item" base_class_type="adis16488::Widget::ItemBase"/>
+
+    <class type="adis16488::Widget::GainOffsetUint16Item" base_class_type="adis16488::Widget::ItemBase"/>
+
+    <class type="adis16488::Widget::ViewOnlyGainOffsetUint16Item" base_class_type="adis16488::Widget::ItemBase"/>
+
+
+    <!--32 bit-->
     <class type="adis16488::Widget::FloatItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <class type="adis16488::Widget::Uint32DecimalItem" base_class_type="adis16488::Widget::ItemBase"/>
+
+    <class type="adis16488::Widget::ViewOnlyFloatItem" base_class_type="adis16488::Widget::ItemBase"/>
+    <class type="adis16488::Widget::ViewOnlyUint32DecimalItem" base_class_type="adis16488::Widget::ItemBase"/>
+
+    <class type="adis16488::Widget::GainOffsetUint32Item" base_class_type="adis16488::Widget::ItemBase"/>
+
+    <class type="adis16488::Widget::ViewOnlyGainOffsetUint32Item" base_class_type="adis16488::Widget::ItemBase"/>
 
 </library>
