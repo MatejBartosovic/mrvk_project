@@ -60,6 +60,6 @@
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <filters plugin="${prefix}/isolated_point_filter_plugin.xml"/>
+    <filters plugin="${prefix}/mrvk_laser_filters_plugin.xml"/>
   </export>
 </package>

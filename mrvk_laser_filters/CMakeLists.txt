@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -131,8 +131,8 @@ include_directories(
 #   src/${PROJECT_NAME}/mrvk_laser_filters.cpp
 # )
 
-add_library(isolated_point_filter src/isolated_point_filter.cpp)
-target_link_libraries(isolated_point_filter ${catkin_LIBRARIES})
+add_library(mrvk_laser_filters src/mrvk_laser_filters.cpp)
+target_link_libraries(mrvk_laser_filters ${catkin_LIBRARIES})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

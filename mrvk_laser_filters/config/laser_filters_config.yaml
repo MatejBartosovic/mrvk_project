@@ -16,7 +16,11 @@ scan_filter_chain:
     neighbors: 2
     window: 2
 
-- name: isolated_points
-  type: IsolatedPointFilter
+- name: mrvk_laser_filters
+  type: MrvkLaserFilters
   params:
-    min_accept_size: 5
+    isolated_points_filter:
+      enabled: True
+      min_accept_size: 5
+    transient_points_filter:
+      enabled: true
