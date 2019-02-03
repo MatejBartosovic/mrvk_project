@@ -1,30 +1,383 @@
 page1:
-  plugin: HexItem
+  plugin: HexByteItem
   address: 0x00
   read: true
   Registers:
-    PROD_ID:
+    SEQ_CNT:
+      plugin: DecimalUint16Item
+      address: 0x06
+      read: true
+      description: "Sequence counter. Binary counter: range = 1 to 48/(DEC_RATE+ 1)"
+    SYS_E_FLAG:
+      plugin: HexUint16Item
+      address: 0x08
+      read: true
+      description: "Output, system error flags"
+      Registers:
+        Lower:
+          plugin: DisplayOnlyHexByteItem
+          address: 0x00
+          read: true
+          Registers:
+            AlarmStatus:
+              plugin: BitDispayItem
+              address: 0x01
+              read: true
+              description: "(1=ALM_STS≠0x0000)"
+            SpiCommunicationError:
+              plugin: BitDispayItem
+              address: 0x08
+              read: true
+              description: "(1 = error condition, when the number of SCLK pulsesis not equal to a multiple of 16)"
+            SensorOverrange:
+              plugin: BitDispayItem
+              address: 0x10
+              read: true
+              description: "(1= at least one sensor overranged)"
+            InertialSelfTestFailure:
+              plugin: BitDispayItem
+              address: 0x20
+              read: true
+              description: "(1= DIAG_STS≠ 0x0000)"
+            FlashMemoryUpdate:
+              plugin: BitDispayItem
+              address: 0x40
+              read: true
+              description: "result of GLOB_CMD[3]= 1 (1 = failed update, 0 = update successful)"
+            ProcessingOverrun:
+              plugin: BitDispayItem
+              address: 0x80
+              read: true
+              description: "1 = error"
+        Upper:
+          plugin: DisplayOnlyHexByteItem
+          address: 0x01
+          read: true
+          Registers:
+            NewDataFlagMagnetometer:
+              plugin: BitDispayItem
+              address: 0x01
+              read: true
+              description: "1 = new,  unread data ( This flag restores to zero after reading one x_MAGN_OUT register.)"
+            NewDataFlagBarometer:
+              plugin: BitDispayItem
+              address: 0x02
+              read: true
+              description: "1 = new,  unread data ( This flag restores to zero after reading  contents on BAROM_OUT.)"
+            WatchDogTimerFlag:
+              plugin: BitDispayItem
+              address: 0x80
+              read: true
+              description: "1 = timed out"
+    DIAG_STS:
+      plugin: HexUint16Item
+      address: 0x0A
+      read: true
+      description: "Output, self-test error flags"
+      Registers:
+        Lower:
+          plugin: DisplayOnlyHexByteItem
+          address: 0x00
+          read: true
+          Registers:
+            SelfTtestFailureXaxisGyroscope:
+              plugin: BitDispayItem
+              address: 0x01
+              read: true
+              description: "1 = failure"
+            SelfTtestFailureYaxisGyroscope:
+              plugin: BitDispayItem
+              address: 0x02
+              read: true
+              description: "1 = failure"
+            SelfTtestFailureZaxisGyroscope:
+              plugin: BitDispayItem
+              address: 0x04
+              read: true
+              description: "1 = failure"
+            SelfTtestFailureXaxisAccelerometer:
+              plugin: BitDispayItem
+              address: 0x08
+              read: true
+              description: "1 = failure"
+            SelfTtestFailureYaxisAccelerometer:
+              plugin: BitDispayItem
+              address: 0x10
+              read: true
+              description: "1 = failure"
+        Upper:
+          plugin: DisplayOnlyHexByteItem
+          address: 0x00
+          read: true
+          Registers:
+            SelfTtestFailureXaxisMagnetometer:
+              plugin: BitDispayItem
+              address: 0x01
+              read: true
+              description: "1 = failure"
+            SelfTtestFailureYaxisMagnetometer:
+              plugin: BitDispayItem
+              address: 0x02
+              read: true
+              description: "1 = failure"
+            SelfTtestFailureZaxisMagnetometer:
+              plugin: BitDispayItem
+              address: 0x04
+              read: true
+              description: "1 = failure"
+            SelfTtestFailureBarometer:
+              plugin: BitDispayItem
+              address: 0x08
+              read: true
+              description: "1 = failure"
+    ALM_STS:
+      plugin: HexUint16Item
+      address: 0x0C
+      read: true
+      description: "Output, alarm error flags"
+      Registers:
+        Lower:
+          plugin: DisplayOnlyHexByteItem
+          address: 0x00
+          read: true
+          Registers:
+            X-axisGyroscopeAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x01
+              read: true
+              description: "1 = alarm is active"
+            Y-axisGyroscopeAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x02
+              read: true
+              description: "1 = alarm is active"
+            Z-axisGyroscopeAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x04
+              read: true
+              description: "1 = alarm is active"
+            X-axisAccelerometerAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x08
+              read: true
+              description: "1 = alarm is active"
+            Y-axisAccelerometerAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x10
+              read: true
+              description: "1 = alarm is active"
+            Z-axisAccelerometerAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x20
+              read: true
+              description: "1 = alarm is active"
+        Upper:
+          plugin: DisplayOnlyHexByteItem
+          address: 0x00
+          read: true
+          Registers:
+            X-axisMagnetometerAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x01
+              read: true
+              description: "1 = alarm is active"
+            Y-axisMagnetometerAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x02
+              read: true
+              description: "1 = alarm is active"
+            Z-axisMagnetometerAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x04
+              read: true
+              description: "1 = alarm is active"
+            BarometerAlarmFlag:
+              plugin: BitDispayItem
+              address: 0x08
+              read: true
+              description: "1 = alarm is active"
+    TEMP_OUT:
+      plugin: Int16GainOffsetItem
+      address: 0x0E
+      read: true
+      description: "Output, temperature"
+      gain: 0.00565
+      offset: 25.0
+    X_GYRO:
       plugin: FloatItem
-      address: 0x7E
+      address: 0x10
+      read: true
+      description: Output, x-axis gyroscope
+    Y_GYRO:
+      plugin: FloatItem
+      address: 0x14
+      read: true
+      description: Output, y-axis gyroscope
+    Z_GYRO:
+      plugin: FloatItem
+      address: 0x18
+      read: true
+      description: Output, z-axis gyroscope
+    X_ACCL:
+      plugin: FloatItem
+      address: 0x1c
+      read: true
+      description: Output, x-axis accelerometer
+    Y_ACCL:
+      plugin: FloatItem
+      address: 0x20
+      read: true
+      description: Output, y-axis accelerometer
+    Z_ACCL:
+      plugin: FloatItem
+      address: 0x24
+      read: true
+      description: Output, z-axis accelerometer
+    X_MAGN:
+      plugin: HexByteItem
+      address: 0x28
+      read: true
+      description: Output, x-axis magnetometer
+    Y_MAGN:
+      plugin: HexByteItem
+      address: 0x2A
+      read: true
+      description: Output, y-axis magnetometer
+    Z_MAGN:
+      plugin: HexByteItem
+      address: 0x2C
+      read: true
+      description: Output, z-axis magnetometer
+    BAROM:
+      plugin: FloatItem
+      address: 0x2E
+      read: true
+      description: Output, barometer
+    X_DELTANG:
+      plugin: FloatItem
+      address: 0x40
+      read: true
+      description: Output, x-axis delta angle
+    Y_DELTANG:
+      plugin: FloatItem
+      address: 0x44
+      read: true
+      description: Output, y-axis delta angle
+    Z_DELTANG:
+      plugin: FloatItem
+      address: 0x48
+      read: true
+      description: Output, z-axis delta angle
+    X_DELTVEL:
+      plugin: FloatItem
+      address: 0x4C
+      read: true
+      description: Output, x-axis delta velocity
+    Y_DELTVEL:
+      plugin: FloatItem
+      address: 0x50
+      read: true
+      description: Output, y-axis delta velocity
+    Z_DELTVEL:
+      plugin: FloatItem
+      address: 0x54
+      read: true
+      description: Output, z-axis delta velocity
+    TIME_MS_OUT:
+      plugin: HexUint16Item
+      address: 0x78
       read: true
       write: true
-    PROD_ID2:
-      plugin: HexItem
-      address: 0x7E
+      description: "Factory configuration time: minutes/seconds"
+      Registers:
+        Seconds:
+          plugin: DisplayOnlyDecimalByteItem
+          address: 0x00
+          read: true
+          description: "Seconds"
+        Minutes:
+          plugin: DisplayOnlyDecimalByteItem
+          address: 0x01
+          read: true
+          description: "Minutes"
+    TIME_DH_OUT:
+      plugin: HexUint16Item
+      address: 0x7A
       read: true
-      write: false
+      write: true
+      description: "Factory configuration date/time:day/hour"
+      Registers:
+        Hours:
+          plugin: DisplayOnlyDecimalByteItem
+          address: 0x00
+          read: true
+          description: "Hours"
+        Days:
+          plugin: DisplayOnlyDecimalByteItem
+          address: 0x01
+          read: true
+          description: "Days"
+    TIME_YM_OUT:
+      plugin: HexUint16Item
+      address: 0x7C
+      read: true
+      write: true
+      description: "Factory configuration date: year/month"
+      Registers:
+        Months:
+          plugin: DisplayOnlyDecimalByteItem
+          address: 0x00
+          read: true
+          description: "Days"
+        Years:
+          plugin: DisplayOnlyDecimalByteGainOffsetItem
+          address: 0x01
+          read: true
+          description: "Days"
+          gain: 1.0
+          offset: 2000.0
+    PROD_ID:
+      plugin: HexByteItem
+      address: 0x00
+      read: true
 page2:
-  plugin: HexItem
+  plugin: HexByteItem
   address: 0x01
   read: true
   Registers:
-    PROD_ID:
-      plugin: HexItem
-      address: 0x7E
+    X_GYRO_SCALE:
+      plugin: SignedInt16Item
+      address: 0x04
       read: true
-      write: false
-    PROD_ID2:
-      plugin: HexItem
-      address: 0x7E
+      write: true
+      description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+    Y_GYRO_SCALE:
+      plugin: SignedInt16Item
+      address: 0x06
       read: true
-      write: false
+      write: true
+      description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+    Z_GYRO_SCALE:
+      plugin: SignedInt16Item
+      address: 0x08
+      read: true
+      write: true
+      description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+    X_ACCL_SCALE:
+      plugin: SignedInt16Item
+      address: 0x0A
+      read: true
+      write: true
+      description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+    Y_ACCL_SCALE:
+      plugin: SignedInt16Item
+      address: 0x0C
+      read: true
+      write: true
+      description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"
+    Z_ACCL_SCALE:
+      plugin: SignedInt16Item
+      address: 0x0E
+      read: true
+      write: true
+      description: "Calibration, scale, x-axis gyroscope (0x0000 = unity gain, 1 LSB = 1 ÷ 2^(15) = ~0.003052% )"

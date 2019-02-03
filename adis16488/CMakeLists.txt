@@ -283,6 +283,7 @@ target_link_libraries(${PROJECT_NAME}_RegisterWidget
 # WidgetItems 
 target_link_libraries(${PROJECT_NAME}_WidgetItems
         ${qt_LIBRARIES}
+        ${YAML_CPP_LIBRARIES}
         )
 
 # GUI node

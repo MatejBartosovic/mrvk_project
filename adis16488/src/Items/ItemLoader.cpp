@@ -41,7 +41,11 @@ namespace adis16488{
                if(writeNode.IsDefined()){
                    newItem->writeableRegister = writeNode.as<bool>();
                }
-               newItem->setup();
+                YAML::Node descriptionNode = node["description"];
+                if(descriptionNode.IsDefined()){
+                    newItem->description = descriptionNode.as<std::string>();
+                }
+               newItem->setup(node);
 //               uint8_t a[] = {1,0,0,0};
 //               newItem->setValue((void *)a);
             }

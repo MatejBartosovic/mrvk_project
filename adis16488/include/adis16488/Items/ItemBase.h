@@ -7,6 +7,7 @@
 
 #include <QTreeWidgetItem>
 #include <sstream>
+#include <yaml-cpp/yaml.h>
 
 class ItemLoader;
 
@@ -18,17 +19,9 @@ namespace adis16488{
 
             }
             virtual void setValue(void* data) = 0;
-            virtual size_t getSize() = 0;
-            virtual bool isReadable(){
-                return readableRegister;
-            }
-            virtual bool isWritable(){
-                return writeableRegister;
-            }
-            std::string getName(){
-                return name;
-            }
-            virtual void setup(){
+            virtual size_t getReadSize() = 0;
+            virtual size_t getDataSize() = 0;
+            virtual void setup(YAML::Node &config){
                 this->setData(0,0,QString(name.c_str()));
                 char tmp[5];
                 sprintf(tmp,"0x%02x",registerAddres);
@@ -42,6 +35,19 @@ namespace adis16488{
                 }
                 this->setData(2,0,flags.c_str());
                 this->setData(3,0,"Nan");
+                this->setData(4,0,description.c_str());
+            }
+            bool isWritable(){
+                return writeableRegister;
+            }
+            bool isReadable(){
+                return writeableRegister;
+            }
+            std::string getName(){
+                return name;
+            }
+            uint8_t getAddress(){
+                return registerAddres;
             }
             friend class ItemLoader;
         private:
@@ -49,6 +55,7 @@ namespace adis16488{
             uint8_t registerAddres;
             bool readableRegister;
             bool writeableRegister;
+            std::string description;
         };
     }
 }
