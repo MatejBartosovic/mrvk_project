@@ -6,7 +6,7 @@
 #define MRVK_PROJECT_MRVKLASERFILTERS_H
 
 #include <vector>
-#include <cmath>
+#include <limits>
 
 #include <boost/circular_buffer.hpp> // TODO continue here
 
@@ -55,6 +55,7 @@ public:
 private:
     // Common
     ros::Time t_last_message_;
+    sensor_msgs::LaserScan prev_scan_;
 
     // Isolated Points filter
     bool enable_isolated_points_filter_;

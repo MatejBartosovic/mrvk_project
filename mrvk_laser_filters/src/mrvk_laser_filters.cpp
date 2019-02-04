@@ -5,7 +5,6 @@
 #include "mrvk_laser_filters.h"
 
 #include <pluginlib/class_list_macros.h>
-#include <cmath>
 #include <xmlrpcpp/XmlRpcException.h>
 
 PLUGINLIB_EXPORT_CLASS(mrvk_laser_filters::MrvkLaserFilters, filters::FilterBase<sensor_msgs::LaserScan>);
@@ -13,7 +12,7 @@ PLUGINLIB_EXPORT_CLASS(mrvk_laser_filters::MrvkLaserFilters, filters::FilterBase
 namespace mrvk_laser_filters {
 
 MrvkLaserFilters::MrvkLaserFilters():
-        t_last_message_(0),
+        t_last_message_(0), \
         enable_isolated_points_filter_(false), min_accept_size_(1), \
         enable_transient_points_filter_(false), num_prev_frames_(1), transient_scan_buff_(NULL)
 {
@@ -71,6 +70,8 @@ bool MrvkLaserFilters::configure() {
 
     ROS_WARN("IsolatedPointFilter enabled = %d, min_accept_size = %d", enable_isolated_points_filter_, min_accept_size_);
     ROS_WARN("TransientPointFilter enabled = %d, num_prev_frames = %d", enable_transient_points_filter_, num_prev_frames_);
+    if(!enable_transient_points_filter_ && !enable_isolated_points_filter_)
+        ROS_FATAL("NO LASER FILTER ENABLED!!!");
 }
 
 /** \brief Update the filter and get the response
@@ -91,6 +92,7 @@ bool MrvkLaserFilters::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs
 //    printScanHistogram(scan_out);
 //    std::cout << std::endl;
     printScanDiffHistogram(scan_in, scan_out);
+    prev_scan_ = scan_in;
     t_last_message_ = scan_in.header.stamp;
 
     return true;
@@ -131,7 +133,34 @@ bool MrvkLaserFilters::updateIsolatedPointsFilter(const sensor_msgs::LaserScan& 
 
 bool MrvkLaserFilters::updateTransientPointsFilter(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out) {
     scan_out = scan_in;
+    if(!transient_scan_buff_->empty() && transient_scan_buff_->back().ranges.size() != scan_in.ranges.size()){
+        ROS_WARN("Scan size changed from %ld to %ld, rebuilding buffer", transient_scan_buff_->back().ranges.size(), scan_in.ranges.size());
+        transient_scan_buff_->clear();
+    }
+
     transient_scan_buff_->push_back(scan_in);
+    if(!transient_scan_buff_->full()){
+        ROS_DEBUG("Filling scan buff %ld", transient_scan_buff_->size());
+        return true;
+    }
+
+    int scan_size = scan_in.ranges.size();
+    std::vector<bool> validity_mask(scan_size, true); // Starts True for all scan elements
+
+    for (int ib = 0; ib < transient_scan_buff_->size(); ++ib) {
+        for (int is = 0; is < scan_size; ++is) {
+            // Set mask element to False if the element is invalid (is infinity or NaN)
+            float dist = transient_scan_buff_->at(ib).ranges.at(is);
+            validity_mask[is] = validity_mask[is] & !IS_INF(dist);
+        }
+    }
+
+    for (int i = 0; i < scan_size; ++i) {
+        if(!validity_mask[i])
+            scan_out.ranges.at(i) = std::numeric_limits<float>::infinity();
+    }
+
+    return true;
 }
 
 void MrvkLaserFilters::printScanHistogram(const sensor_msgs::LaserScan& scan_in) {
