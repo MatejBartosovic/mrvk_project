@@ -19,6 +19,9 @@ scan_filter_chain:
 - name: mrvk_laser_filters
   type: MrvkLaserFilters
   params:
+    point_speed_filter:
+      enabled: True
+      point_speed_max_: 3.0 # [m/s]
     isolated_points_filter:
       enabled: True
       min_accept_size: 3

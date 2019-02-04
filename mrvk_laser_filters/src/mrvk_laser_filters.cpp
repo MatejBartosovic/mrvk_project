@@ -12,7 +12,8 @@ PLUGINLIB_EXPORT_CLASS(mrvk_laser_filters::MrvkLaserFilters, filters::FilterBase
 namespace mrvk_laser_filters {
 
 MrvkLaserFilters::MrvkLaserFilters():
-        t_last_message_(0), \
+        t_last_message_(0), got_first_scan_(false), \
+        enable_point_speed_filter_(false), point_v_max_(100), \
         enable_isolated_points_filter_(false), min_accept_size_(1), \
         enable_transient_points_filter_(false), num_prev_frames_(1), transient_scan_buff_(NULL)
 {
@@ -26,7 +27,23 @@ MrvkLaserFilters::~MrvkLaserFilters() {
 
 bool MrvkLaserFilters::configure() {
 
-    XmlRpc::XmlRpcValue ip_params, tp_params;
+    XmlRpc::XmlRpcValue ps_params, ip_params, tp_params;
+    if(getParam("point_speed_filter", ps_params)) {
+        for (auto it = ps_params.begin() ;it != ps_params.end();it++) {
+            std::cout << "param " << it->first << " has value " << ps_params[it->first]  << " type " << ps_params[it->first].getType() << std::endl;
+        }
+        try {
+            if (ps_params.hasMember("enabled")) {
+                enable_point_speed_filter_ = ps_params["enabled"];
+                point_v_max_ = ps_params["point_speed_max_"];
+            }
+        }
+        catch (XmlRpc::XmlRpcException exc) {
+            ROS_ERROR("PointSpeedFilter wrong or missing parameters!");
+            std::cout << exc.getMessage() << std::endl;
+        }
+    }
+
     if(getParam("isolated_points_filter", ip_params)) {
         for (auto it = ip_params.begin() ;it != ip_params.end();it++) {
             std::cout << "param " << it->first << " has value " << ip_params[it->first]  << " type " << ip_params[it->first].getType() << std::endl;
@@ -58,19 +75,16 @@ bool MrvkLaserFilters::configure() {
             std::cout << exc.getMessage() << std::endl;
         }
 
+        if(transient_scan_buff_)
+            delete transient_scan_buff_;
         transient_scan_buff_ = new boost::circular_buffer<sensor_msgs::LaserScan>(num_prev_frames_);
     }
 
-//    auto it = ip_params.find
-//    ros::NodeHandle nh("~");
-//    ROS_WARN("%s", nh.getNamespace().c_str());
-//
-//    nh.getParam("scan_filter_chain/mrvk_laser_filters/ip_params/isolated_points_filter/enabled", enable_isolated_points_filter_);
-//    nh.getParam("isolated_points_filter/min_accept_size", min_accept_size_);
-
+    ROS_WARN("PointSpeedFilter enabled = %d, point_speed_max_ = %lf", enable_point_speed_filter_, point_v_max_);
     ROS_WARN("IsolatedPointFilter enabled = %d, min_accept_size = %d", enable_isolated_points_filter_, min_accept_size_);
     ROS_WARN("TransientPointFilter enabled = %d, num_prev_frames = %d", enable_transient_points_filter_, num_prev_frames_);
-    if(!enable_transient_points_filter_ && !enable_isolated_points_filter_)
+
+    if(!enable_point_speed_filter_ && !enable_transient_points_filter_ && !enable_isolated_points_filter_)
         ROS_FATAL("NO LASER FILTER ENABLED!!!");
 }
 
@@ -79,14 +93,27 @@ bool MrvkLaserFilters::configure() {
  * \param scan_out The filtered scan
  */
 bool MrvkLaserFilters::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out) {
+    if(!got_first_scan_){
+        prev_scan_ = scan_in;
+        t_last_message_ = scan_in.header.stamp;
+        got_first_scan_ = true;
+    }
 //    printScanHistogram(scan_in);
+    scan_out = scan_in;
+    sensor_msgs::LaserScan scan_tmp1, scan_tmp2;
+
+    if(enable_point_speed_filter_) {
+        updatePointSpeedFilter(scan_in, scan_tmp1);
+        scan_out = scan_tmp1;
+    }
 
     if(enable_isolated_points_filter_) {
-        updateIsolatedPointsFilter(scan_in, scan_out);
+        updateIsolatedPointsFilter(scan_tmp1, scan_tmp2);
+        scan_out = scan_tmp2;
     }
 
     if(enable_transient_points_filter_) {
-        updateTransientPointsFilter(scan_in, scan_out);
+        updateTransientPointsFilter(scan_tmp2, scan_out);
     }
 
 //    printScanHistogram(scan_out);
@@ -94,6 +121,31 @@ bool MrvkLaserFilters::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs
     printScanDiffHistogram(scan_in, scan_out);
     prev_scan_ = scan_in;
     t_last_message_ = scan_in.header.stamp;
+
+    return true;
+}
+
+bool MrvkLaserFilters::updatePointSpeedFilter(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out) {
+    scan_out = scan_in;
+    if(!got_first_scan_)
+        return true;
+
+    double dt = ros::Duration(scan_in.header.stamp - prev_scan_.header.stamp).toSec();
+//    std::cout << dt << std::endl;
+    if(dt<0.01)
+        dt = 0.01;
+    else if(dt>1.0)
+        dt = 1.0;
+
+    for (int i = 0; i < scan_in.ranges.size(); ++i) {
+        double dp = std::abs(scan_in.ranges.at(i) - prev_scan_.ranges.at(i));
+        double v = std::abs(dp/dt);
+//        std::cout << v << " ";
+        if(v > point_v_max_){
+            scan_out.ranges.at(i) = std::numeric_limits<float>::infinity();
+        }
+    }
+//    std::cout << std::endl;
 
     return true;
 }

@@ -41,6 +41,14 @@ public:
      * @param scan_out
      * @return
      */
+    bool updatePointSpeedFilter(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out);
+
+    /**
+     *
+     * @param scan_in
+     * @param scan_out
+     * @return
+     */
     bool updateIsolatedPointsFilter(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out);
 
     /**
@@ -56,6 +64,11 @@ private:
     // Common
     ros::Time t_last_message_;
     sensor_msgs::LaserScan prev_scan_;
+    bool got_first_scan_;
+
+    // Point Speed filter
+    bool enable_point_speed_filter_;
+    double point_v_max_;
 
     // Isolated Points filter
     bool enable_isolated_points_filter_;
