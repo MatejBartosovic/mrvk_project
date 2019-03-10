@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="top">
+      <item>
+       <widget class="mrvk_gui::TopicFrequency" name="topicFrequency" native="true"/>
+      </item>
+      <item>
+       <widget class="Line" name="line_5">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="mrvk_gui::Odometry" name="odometyr" native="true"/>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="mrvk_gui::Imu" name="imu" native="true"/>
+      </item>
+      <item>
+       <widget class="Line" name="line_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="mrvk_gui::Gps" name="gps" native="true"/>
+      </item>
+      <item>
+       <widget class="Line" name="line_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="mrvk_gui::Camera" name="camera" native="true"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="bottom">
+      <item>
+       <widget class="mrvk_gui::MrvkDriver" name="widget_8" native="true"/>
+      </item>
+      <item>
+       <widget class="mrvk_gui::MoveBase" name="moveBase" native="true"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>mrvk_gui::Camera</class>
+   <extends>QWidget</extends>
+   <header location="global">Widgets/Camera/Camera.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>mrvk_gui::Gps</class>
+   <extends>QWidget</extends>
+   <header location="global">Widgets/Gps/Gps.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>mrvk_gui::Imu</class>
+   <extends>QWidget</extends>
+   <header location="global">Widgets/Imu/Imu.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>mrvk_gui::MoveBase</class>
+   <extends>QWidget</extends>
+   <header location="global">Widgets/MoveBase/MoveBase.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>mrvk_gui::Odometry</class>
+   <extends>QWidget</extends>
+   <header location="global">Widgets/Odometry/Odometry.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>mrvk_gui::TopicFrequency</class>
+   <extends>QWidget</extends>
+   <header location="global">Widgets/TopicFrequency/TopicFrequency.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>mrvk_gui::MrvkDriver</class>
+   <extends>QWidget</extends>
+   <header location="global">Widgets/MrvkDriver/MrvkDriver.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

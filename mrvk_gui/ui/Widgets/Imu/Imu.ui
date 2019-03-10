@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Imu</class>
+ <widget class="QWidget" name="Imu">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <layout class="QVBoxLayout" name="gyroscope">
+     <item>
+      <widget class="QLabel" name="gtitle">
+       <property name="text">
+        <string>Gyroscope</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="gx">
+       <item>
+        <widget class="QLabel" name="gxTitle">
+         <property name="text">
+          <string>X [rad/s]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="gxValue">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="gy">
+       <item>
+        <widget class="QLabel" name="gyTitle">
+         <property name="text">
+          <string>Y [rad/s]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="gyValue">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="gz">
+       <item>
+        <widget class="QLabel" name="gzTitle">
+         <property name="text">
+          <string>Z [rad/s]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="gzValue">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="accelerometer">
+     <item>
+      <widget class="QLabel" name="atitle">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>Accelerometer</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="ax">
+       <item>
+        <widget class="QLabel" name="axTitle">
+         <property name="text">
+          <string>X [m]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="axValue">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="ay">
+       <item>
+        <widget class="QLabel" name="ayTitle">
+         <property name="text">
+          <string>Y [m]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="ayValue">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="az">
+       <item>
+        <widget class="QLabel" name="azTitle">
+         <property name="text">
+          <string>Z [m]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="azValue">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

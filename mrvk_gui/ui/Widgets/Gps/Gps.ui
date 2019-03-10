@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Gps</class>
+ <widget class="QWidget" name="Gps">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="latitude">
+     <item>
+      <widget class="QLabel" name="latitudeTitle">
+       <property name="text">
+        <string>Latitude [deg]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="latitudeValue">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="longitude">
+     <item>
+      <widget class="QLabel" name="longitudeTitle">
+       <property name="text">
+        <string>Longitude [deg]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="longitudeValue">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="quality">
+     <item>
+      <widget class="QLabel" name="qualityTitle">
+       <property name="text">
+        <string>Quality</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="qualityValue">
+       <property name="text">
+        <string>No new message</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
