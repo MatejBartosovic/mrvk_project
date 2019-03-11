@@ -16,7 +16,7 @@ namespace mrvk_gui{
     public:
         Subscriber(std::string topic, ros::NodeHandle& nh){
             boost::bind(&Subscriber::callback,this,_1);
-            nh.subscribe<T>(topic,5,boost::bind(&Subscriber<T>::callback,this,_1));
+            subscriber = nh.subscribe<T>(topic,5,boost::bind(&Subscriber<T>::callback,this,_1));
         }
 
         const T& getData(){
@@ -32,6 +32,7 @@ namespace mrvk_gui{
         }
         std::mutex mutex;
         T msg;
+        ros::Subscriber subscriber;
     };
 }
 

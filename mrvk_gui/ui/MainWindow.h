@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
 
 namespace Ui {
 class MainWindow;
@@ -18,6 +19,10 @@ namespace mrvk_gui {
 
     private:
         Ui::MainWindow* ui;
+        QTimer timer;
+    public slots:
+        void updateGui();
+
     };
 }
 #endif // MAINWINDOW_H

@@ -65,7 +65,7 @@
     <item>
      <layout class="QHBoxLayout" name="bottom">
       <item>
-       <widget class="mrvk_gui::MrvkDriver" name="widget_8" native="true"/>
+       <widget class="mrvk_gui::MrvkDriver" name="mrvkDriver" native="true"/>
       </item>
       <item>
        <widget class="mrvk_gui::MoveBase" name="moveBase" native="true"/>
