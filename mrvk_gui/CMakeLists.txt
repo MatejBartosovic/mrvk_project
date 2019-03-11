@@ -95,3 +95,7 @@ target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
         ${qt_LIBRARIES}
         )
+
+add_executable(buttonTest src/buttonsTest.cpp)
+
+target_link_libraries(buttonTest ${catkin_LIBRARIES})
