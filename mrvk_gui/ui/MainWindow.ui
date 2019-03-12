@@ -28,7 +28,7 @@
        </widget>
       </item>
       <item>
-       <widget class="mrvk_gui::Odometry" name="odometyr" native="true"/>
+       <widget class="mrvk_gui::Odometry" name="odometry" native="true"/>
       </item>
       <item>
        <widget class="Line" name="line">

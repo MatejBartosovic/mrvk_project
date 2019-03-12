@@ -25,7 +25,7 @@
      <item>
       <layout class="QVBoxLayout" name="titles">
        <item>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="titleXvelocity">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -33,12 +33,12 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>X velocity [m]</string>
+          <string>X velocity [m/s]</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="titleYawVelocity">
          <property name="text">
           <string>Yaw velocity [rad/s]</string>
          </property>
@@ -49,14 +49,14 @@
      <item>
       <layout class="QVBoxLayout" name="Values">
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="valueXvelocity">
          <property name="text">
           <string>0</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="valueYawVelocity">
          <property name="text">
           <string>0</string>
          </property>
