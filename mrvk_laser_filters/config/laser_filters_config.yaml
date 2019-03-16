@@ -15,16 +15,15 @@ scan_filter_chain:
 #    max_angle: 165
 #    neighbors: 2
 #    window: 2
-
-- name: mrvk_laser_filters
-  type: MrvkLaserFilters
+- name: PointSpeedFilter
+  type: mrvk_laser_filters/PointSpeedFilter
   params:
-    point_speed_filter:
-      enabled: True
-      point_speed_max_: 3.0 # [m/s]
-    isolated_points_filter:
-      enabled: True
-      min_accept_size: 3
-    transient_points_filter:
-      enabled: True
-      num_prev_frames: 2
+    point_speed_max: 3.0 # [m/s]
+- name: IsolatedPointsFilter
+  type: mrvk_laser_filters/IsolatedPointsFilter
+  params:
+    min_accept_size: 3
+- name: TransientPointsFilter
+  type: mrvk_laser_filters/TransientPointsFilter
+  params:
+    num_prev_frames: 2

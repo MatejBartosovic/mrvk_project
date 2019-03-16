@@ -1,9 +1,14 @@
 <library path="lib/libmrvk_laser_filters">
-    <class name="mrvk_laser_filters/MrvkLaserFilters"
-           type="mrvk_laser_filters::MrvkLaserFilters"
-           base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+    <class name="mrvk_laser_filters/PointSpeedFilter" type="mrvk_laser_filters::PointSpeedFilter" base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
         <description>
-            A recovery behavior that wait for specified time and reverts the costmap to the static map outside of a user specified window.
+        </description>
+    </class>
+    <class name="mrvk_laser_filters/IsolatedPointsFilter" type="mrvk_laser_filters::IsolatedPointsFilter" base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+        <description>
+        </description>
+    </class>
+    <class name="mrvk_laser_filters/TransientPointsFilter" type="mrvk_laser_filters::TransientPointsFilter" base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+        <description>
         </description>
     </class>
 </library>

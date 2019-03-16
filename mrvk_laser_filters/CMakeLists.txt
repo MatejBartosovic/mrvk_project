@@ -131,7 +131,7 @@ include_directories(
 #   src/${PROJECT_NAME}/mrvk_laser_filters.cpp
 # )
 
-add_library(mrvk_laser_filters src/mrvk_laser_filters.cpp)
+add_library(mrvk_laser_filters src/MrvkLaserFilters.cpp)
 target_link_libraries(mrvk_laser_filters ${catkin_LIBRARIES})
 
 ## Add cmake target dependencies of the library
