@@ -16,7 +16,8 @@ namespace mrvk_gui {
 
         ~MoveBaseControl();
 
-    private:
+        void updateData();
+
         Ui::MoveBaseControl* ui;
     };
 }

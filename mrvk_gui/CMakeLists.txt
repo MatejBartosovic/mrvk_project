@@ -5,6 +5,9 @@ find_package(catkin REQUIRED COMPONENTS
         roscpp
         rqt_gui
         rqt_gui_cpp
+        move_base
+        actionlib
+        eigen_conversions
         )
 
 #main ui sources

@@ -11,4 +11,8 @@ namespace mrvk_gui {
     MoveBaseControl::~MoveBaseControl() {
         delete ui;
     }
+
+    void MoveBaseControl::updateData(){
+
+    }
 }
