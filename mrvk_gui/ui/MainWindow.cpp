@@ -22,7 +22,7 @@ namespace mrvk_gui {
         ui->imu->updateData();
         ui->odometry->updateData();
 //        ui->gps->updateData();
-//        ui->camera->updateData();
+        ui->camera->updateData();
 //        ui->mrvkDriver->updateData();
         ui->moveBase->updateData();
     }

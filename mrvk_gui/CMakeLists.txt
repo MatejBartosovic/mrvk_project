@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
         move_base
         actionlib
         eigen_conversions
+        sensor_msgs
         )
 
 #main ui sources
