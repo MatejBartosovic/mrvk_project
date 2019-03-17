@@ -6,6 +6,8 @@
 #include <std_srvs/SetBool.h>
 #include <std_srvs/Empty.h>
 
+#include <osm_planner/coordinates_converters/haversine_formula.h>
+
 GpsCompassCorrection::GpsCompassCorrection() : n_("~"), robot_(n_), corrected_transform_(tf::Quaternion(0,0,0,1), tf::Vector3(0,0,0)){
 
     // Initialize global variables
@@ -32,6 +34,8 @@ GpsCompassCorrection::GpsCompassCorrection() : n_("~"), robot_(n_), corrected_tr
     double tf_rate;
     n_.param<double>("tf_rate", tf_rate, 20);
     tf_broadcaster_thread_ = boost::shared_ptr<boost::thread>(new boost::thread(&GpsCompassCorrection::tfBroadcasterCallback, this, tf_rate));
+
+    coordinatesConverter = std::make_shared<osm_planner::coordinates_converters::HaversineFormula>();
 }
 
 void GpsCompassCorrection::setMapOrigin(ros::NodeHandle &n) {
@@ -178,7 +182,7 @@ bool GpsCompassCorrection::computeBearingCallback(std_srvs::Trigger::Request &re
     if (bearingCalculator.hasFirstPoint()) {
 
        tf::Quaternion quat;
-       quat.setRPY(0, 0, bearingCalculator.calculate(gps_data));
+       quat.setRPY(0, 0, bearingCalculator.calculate(gps_data, coordinatesConverter));
        sendTransform(*gps_data, &quat);
        res.message = "Bearing is calculated";
        res.success = true;
@@ -233,7 +237,7 @@ bool GpsCompassCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request
     }
 
     // Calculate bearing and evaluate result
-    double angle = bearingCalculator.calculate(gps_data);
+    double angle = bearingCalculator.calculate(gps_data, coordinatesConverter);
     //Print result
     if (angle == NAN) {
         res.message = "Computed angle: NaN";
@@ -241,7 +245,7 @@ bool GpsCompassCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request
         return true;
     } else {
         tf::Quaternion quat;
-        quat.setRPY(0, 0, bearingCalculator.calculate(gps_data));
+        quat.setRPY(0, 0, bearingCalculator.calculate(gps_data, coordinatesConverter));
         sendTransform(*gps_data, &quat);
         res.message = "Computed angle: " + std::to_string(angle);
         res.success = true;
