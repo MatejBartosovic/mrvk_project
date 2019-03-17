@@ -18,7 +18,7 @@ namespace mrvk_gui {
 
     void MainWindow::updateGui(){
 //        ui->topicFrequency->updateData();
-//        ui->odometyr->updateData(); //TODO typo
+        ui->odometry->updateData(); //TODO typo
         ui->imu->updateData();
         ui->odometry->updateData();
 //        ui->gps->updateData();
