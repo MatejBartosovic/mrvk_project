@@ -1,0 +1,11 @@
+<launch>
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter" output="screen">
+        <rosparam command="load" file="$(find mrvk_laser_filters)/config/laser_filters_config.yaml" />
+    </node>
+
+    <!-- Fake /laser frame for testing-->
+    <!--<node pkg="tf" type="static_transform_publisher" name="fake_laser_frame" args="0 0 0 0 0 0 base_link laser 100" />-->
+    <!-- When testing, run "rosparam set /use_sim_time true" -->
+    <!--<env name="ROSCONSOLE_CONFIG_FILE" value="$(find mrvk_laser_filters)/launch/custom_rosconsole.conf"/>-->
+    <!-- export ROSCONSOLE_CONFIG_FILE=/home/adam/catkin_ws/src/mrvk_project/mrvk_laser_filters/launch/custom_rosconsole.conf -->
+</launch>

@@ -1,0 +1,29 @@
+scan_filter_chain:
+#- name: range
+#  type: LaserScanRangeFilter
+#  params:
+#    use_message_range_limits: false
+#    lower_threshold: 0.1
+#    upper_threshold: 3.0
+#    lower_replacement_value: -.inf
+#    upper_replacement_value: .inf
+
+#- name: shadows
+#  type: ScanShadowsFilter
+#  params:
+#    min_angle: 15
+#    max_angle: 165
+#    neighbors: 2
+#    window: 2
+- name: PointSpeedFilter
+  type: mrvk_laser_filters/PointSpeedFilter
+  params:
+    point_speed_max: 3.0 # [m/s]
+- name: IsolatedPointsFilter
+  type: mrvk_laser_filters/IsolatedPointsFilter
+  params:
+    min_accept_size: 3
+- name: TransientPointsFilter
+  type: mrvk_laser_filters/TransientPointsFilter
+  params:
+    num_prev_frames: 2

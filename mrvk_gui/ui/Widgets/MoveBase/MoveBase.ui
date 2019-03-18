@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MoveBase</class>
+ <widget class="QWidget" name="MoveBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="mrvk_gui::MoveBaseControl" name="widget" native="true"/>
+   </item>
+   <item>
+    <widget class="mrvk_gui::MoveBaseStatus" name="widget_2" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>mrvk_gui::MoveBaseStatus</class>
+   <extends>QWidget</extends>
+   <header location="global">Widgets/MoveBase/MoveBaseStatus.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>mrvk_gui::MoveBaseControl</class>
+   <extends>QWidget</extends>
+   <header location="global">Widgets/MoveBase/MoveBaseControl.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

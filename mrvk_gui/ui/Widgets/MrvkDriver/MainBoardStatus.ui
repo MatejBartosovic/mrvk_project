@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainBoardStatus</class>
+ <widget class="QWidget" name="MainBoardStatus">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>511</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="centralStopTitle">
+       <property name="text">
+        <string>Central stop</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="hardwareCentralStopTitle">
+       <property name="text">
+        <string>Hardware central stop</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="temperatureTitle">
+       <property name="text">
+        <string>Temperature</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="powerOffSequenceTitle">
+       <property name="text">
+        <string>Power off sequence</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="fullBatteryTitle">
+       <property name="text">
+        <string>Full battery</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="chargeTitle">
+       <property name="text">
+        <string>Charge</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="battery1VoltageTitle">
+       <property name="text">
+        <string>Battery 1 voltage</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="battery2VoltageTitle">
+       <property name="text">
+        <string>Battery 2 voltage</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="currentTitle">
+       <property name="text">
+        <string>Current</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="MCBsSBTitle">
+       <property name="text">
+        <string>MCBsSB 5V</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="MCBs12vTitle">
+       <property name="text">
+        <string>MCBs 12V</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="videoTranspitterTitle">
+       <property name="text">
+        <string>Videotransmitter</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="fanTitle">
+       <property name="text">
+        <string>Fan</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="laserTitle">
+       <property name="text">
+        <string>Laser</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="gpsTitle">
+       <property name="text">
+        <string>Gps</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="arm5vTitle">
+       <property name="text">
+        <string>Arm 5V</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="arm12vTitle">
+       <property name="text">
+        <string>Arm 12V</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="pc2Title">
+       <property name="text">
+        <string>Pc2</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="cameraTitle">
+       <property name="text">
+        <string>Camera</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QLabel" name="centralStopValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="hardwareCentralStopValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="temperatureValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="powerOffsequenceValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="fullBatteryValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="chargeValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="battery1VoltageValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="battery2VoltageValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="currentValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="MCBsSB5vValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="MCBs12vValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="videoTransmitterValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="fanValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="laserValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="gpsValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="arm5vValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="arm12vValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="pc2Value">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="cameraValue">
+       <property name="text">
+        <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
