@@ -6,6 +6,8 @@
 #define PROJECT_BEARING_CALCULATOR_H
 
 #include <osm_planner/osm_parser.h>
+#include <osm_planner/coordinates_converters/coordinates_converter_base.h>
+#include <osm_planner/coordinates_converters/haversine_formula.h>
 
 //!  A BearingCalculator class
 /*!
@@ -32,7 +34,7 @@ public:
      * @return A bearing angle if is both pose are correct
      * If are not correct then return NaN
      */
-    double calculate(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data);
+    double calculate(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data, std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinates_converter);
 
     /**
      * @brief Get information about successfully added first point

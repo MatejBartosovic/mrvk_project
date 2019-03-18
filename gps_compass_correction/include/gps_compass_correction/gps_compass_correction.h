@@ -65,6 +65,8 @@ private:
     std::mutex mutex_;                                       ///< This mutex is used around corrected_transform
 
     osm_planner::Parser::OSM_NODE map_origin_;              ///< Origin - here is [0,0] world
+        //distance and bearing calculator
+    std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinatesConverter;
     RobotCommander robot_;                                  ///< It's used in auto_compute_bearing service
                                                             ///< for auto moving with robot
 
@@ -152,7 +154,7 @@ private:
         }
 
         //construct translation from gps
-        tf::Vector3 gps_translation(osm_planner::Parser::Haversine::getCoordinateX(map_origin_, gps_pose),osm_planner::Parser::Haversine::getCoordinateY(map_origin_, gps_pose),0); //todo misov prepocet dorobit
+        tf::Vector3 gps_translation(coordinatesConverter->getCoordinateX(map_origin_, gps_pose),coordinatesConverter->getCoordinateY(map_origin_, gps_pose),0); //todo misov prepocet dorobit
 
         tf::Transform absolute_transform;
         if (quat == nullptr) {

@@ -138,10 +138,11 @@ Ui::ControlWidget::information_wiev->addItem(QString::number(map_origin.latitude
             Ui::ControlWidget::information_wiev->addItem("CALLED INIT ROBOT (gyro calibration)");
             // this service "init_robot" calibrate gyro and gps
             if (init_robot.call(setbool_init) && setbool_init.response.success) {
-                goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
-                                                                                        goal_target);
-                goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,
-                                                                                        goal_target);
+		// TODO treba vytvorit classu osm_planner::coordinates_converters::HaversineFormula, tak ako je to v osm_parser
+              //  goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,
+              //                                                                          goal_target);
+              //  goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,
+              //                                                                          goal_target);
                 goalXY.header.stamp = ros::Time::now();
                 goal_pub.publish(goalXY);
                 Ui::ControlWidget::information_wiev->addItem("GOING TO GOAL");
