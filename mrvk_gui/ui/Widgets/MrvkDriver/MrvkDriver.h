@@ -16,6 +16,7 @@ namespace mrvk_gui {
         explicit MrvkDriver(QWidget* parent = 0);
 
         ~MrvkDriver();
+        void updateData();
 
     public slots:
         void setCentralStop();

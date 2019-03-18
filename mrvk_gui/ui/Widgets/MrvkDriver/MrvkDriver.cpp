@@ -66,4 +66,8 @@ namespace mrvk_gui {
         QMessageBox msgBox(QMessageBox::Information,"Set central stop",string);
         msgBox.exec();
     }
+
+    void mrvk_gui::MrvkDriver::updateData() {
+        ui->mainBoardStatus->updateData();
+    }
 }

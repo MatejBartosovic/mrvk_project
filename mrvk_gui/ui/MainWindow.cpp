@@ -21,6 +21,8 @@ namespace mrvk_gui {
         ui->odometry->updateData(); //TODO typo
         ui->imu->updateData();
         ui->odometry->updateData();
+        ui->mrvkDriver->updateData();
+
 //        ui->gps->updateData();
         ui->camera->updateData();
 //        ui->mrvkDriver->updateData();
