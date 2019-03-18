@@ -29,23 +29,30 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="setCentralStopButton">
      <property name="text">
       <string>Set centralStop</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="resetCentralStopButton">
      <property name="text">
       <string>Reset central stop</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton_3">
+    <widget class="QPushButton" name="blockMovementButton">
      <property name="text">
       <string>Block movement</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="unblockMovementButton">
+     <property name="text">
+      <string>Unblock movement</string>
      </property>
     </widget>
    </item>

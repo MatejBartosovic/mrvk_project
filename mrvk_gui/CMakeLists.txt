@@ -76,6 +76,7 @@ include_directories(
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
+        src/MrvkControllButtons.cpp
         ui/MainWindow.cpp
         ui/Widgets/Camera/Camera.cpp
         ui/Widgets/Gps/Gps.cpp
@@ -95,7 +96,3 @@ target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
         ${qt_LIBRARIES}
         )
-
-add_executable(buttonTest src/buttonsTest.cpp)
-
-target_link_libraries(buttonTest ${catkin_LIBRARIES})
