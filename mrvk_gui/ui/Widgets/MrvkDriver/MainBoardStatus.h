@@ -6,6 +6,7 @@
 namespace Ui {
 class MainBoardStatus;
 }
+class QLabel;
 
 namespace mrvk_gui {
     class MainBoardStatus : public QWidget {
