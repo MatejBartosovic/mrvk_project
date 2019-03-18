@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(gps_compas_correction)
+project(gps_compass_correction)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
 # add_definitions(-std=c++11)
@@ -16,7 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
         roscpp
         osm_planner
 )
-
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -109,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES gps_compas_correction
+#  LIBRARIES gps_compass_correction
    CATKIN_DEPENDS osm_planner roscpp
 #  DEPENDS system_lib
 )
@@ -130,7 +129,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/gps_compas_correction.cpp
+#   src/${PROJECT_NAME}/gps_compass_correction.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -141,8 +140,12 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
- add_executable(GpsCompasCorrectionNode     src/GpsCompasCorrection.cpp
-                                            src/GpsCompasCorrectionNode.cpp)
+ add_executable(gps_compass_correction_node
+                 src/gps_compass_correction.cpp
+                 src/gps_compass_correction_node.cpp
+                 src/bearing_calculator.cpp
+         src/robot_commander.cpp
+         )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -155,7 +158,7 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(GpsCompasCorrectionNode
+ target_link_libraries(gps_compass_correction_node
    ${catkin_LIBRARIES}
  )
 
@@ -199,7 +202,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_gps_compas_correction.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_gps_compass_correction.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
