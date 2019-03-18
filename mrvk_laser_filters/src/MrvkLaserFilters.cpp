@@ -27,7 +27,7 @@ namespace mrvk_laser_filters {
         }
 
         double dt = ros::Duration(data_in.header.stamp - lastScan.header.stamp).toSec();
-//      std::cout << dt << std::endl;
+//        std::cout << dt << std::endl;
         if(dt<0.01)
             dt = 0.01;
         else if(dt>1.0)
@@ -43,6 +43,7 @@ namespace mrvk_laser_filters {
         }
         lastScan = data_in;
 //    std::cout << std::endl;
+        return true;
     }
 
     IsolatedPointsFilter::IsolatedPointsFilter() : minAcceptSize(3){
@@ -87,7 +88,7 @@ namespace mrvk_laser_filters {
     }
 
     TransientPointsFilter::TransientPointsFilter() : numPrevFrames(2){
-
+        transient_scan_buff_ = new boost::circular_buffer<sensor_msgs::LaserScan>(numPrevFrames);
     }
 
     bool TransientPointsFilter::configure(){
