@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
         actionlib
         eigen_conversions
         sensor_msgs
+        nav_msgs
         osm_planner
         )
 
