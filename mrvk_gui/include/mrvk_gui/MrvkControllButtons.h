@@ -7,16 +7,6 @@
 
 #include <ros/ros.h>
 #include <exception>
-class MrvkControllButtonsException : std::exception{
-public:
-    MrvkControllButtonsException(const std::string& str) : message(str){
-
-    }
-    virtual const char* what(){
-        return message.c_str();
-    }
-    std::string message;
-};
 
 namespace mrvk_gui {
     class MrvkControllButtons {

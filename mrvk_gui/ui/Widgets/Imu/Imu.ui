@@ -80,6 +80,13 @@
        </item>
       </layout>
      </item>
+     <item>
+      <widget class="QPushButton" name="calibrationButton">
+       <property name="text">
+        <string>Calibration</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -157,6 +164,13 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetButton">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

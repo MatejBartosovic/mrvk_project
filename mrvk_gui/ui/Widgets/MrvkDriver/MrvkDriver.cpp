@@ -1,6 +1,7 @@
 #include "MrvkDriver.h"
 #include <ui_MrvkDriver.h>
 #include <QMessageBox>
+#include <mrvk_gui/ButtonException.h>
 
 namespace mrvk_gui {
     MrvkDriver::MrvkDriver(QWidget* parent) :
@@ -24,7 +25,7 @@ namespace mrvk_gui {
             mrvkButtons.setCentralStop();
             string = "Ok";
         }
-        catch (MrvkControllButtonsException& e){
+        catch (ButtonsException& e){
             string = e.what();
         }
         QMessageBox msgBox(QMessageBox::Information,"Set central stop",string);
@@ -36,7 +37,7 @@ namespace mrvk_gui {
             mrvkButtons.resetCentralStop();
             string = "Ok";
         }
-        catch (MrvkControllButtonsException& e){
+        catch (ButtonsException& e){
             string = e.what();
         }
         QMessageBox msgBox(QMessageBox::Information,"Set central stop",string);
@@ -48,7 +49,7 @@ namespace mrvk_gui {
             mrvkButtons.blockMovement();
             string = "Ok";
         }
-        catch (MrvkControllButtonsException& e){
+        catch (ButtonsException& e){
             string = e.what();
         }
         QMessageBox msgBox(QMessageBox::Information,"Set central stop",string);
@@ -60,7 +61,7 @@ namespace mrvk_gui {
             mrvkButtons.unblockMovement();
             string = "Ok";
         }
-        catch (MrvkControllButtonsException& e){
+        catch (ButtonsException& e){
             string = e.what();
         }
         QMessageBox msgBox(QMessageBox::Information,"Set central stop",string);
