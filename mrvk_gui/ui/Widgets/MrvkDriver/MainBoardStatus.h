@@ -7,7 +7,7 @@
 #include <diagnostic_msgs/DiagnosticArray.h>
 #include <map>
 
-#define MAIN_BOARD_STATUS_NAME "main board status"
+#define MAIN_BOARD_STATUS_NAME "mrvk_driver: main board status"
 
 namespace Ui {
 class MainBoardStatus;
