@@ -81,7 +81,6 @@ void GpsCompassCorrection::tfBroadcasterCallback(const double frequence){
             ros::Duration(period).sleep();
         }
     }
-}
 
 void GpsCompassCorrection::gpsCallback(const sensor_msgs::NavSatFixPtr& gps_data){
 
