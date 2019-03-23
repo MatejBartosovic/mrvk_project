@@ -3,6 +3,7 @@
 #include <ui_MoveBaseControl.h>
 #include <eigen_conversions/eigen_msg.h>
 #include <QMessageBox>
+#include <osm_planner/coordinates_converters/haversine_formula.h>
 
 namespace mrvk_gui {
     MoveBase::MoveBase(QWidget* parent) :
@@ -36,8 +37,13 @@ namespace mrvk_gui {
         goal.target_pose.header.stamp = ros::Time::now();
         goal.target_pose.header.frame_id = "map"; //TODO parameter alebo combo box zo vsetkimi framami??
         tf::quaternionEigenToMsg(Eigen::Quaterniond(1,0,0,0),goal.target_pose.pose.orientation);
-        goal.target_pose.pose.position.x = 0; //TODO
-        goal.target_pose.pose.position.y = 0; //TODO
+        
+        osm_planner::coordinates_converters::GeoNode geoNode = {0,0,0,0}; //TODO init
+
+        osm_planner::coordinates_converters::HaversineFormula converter;
+        converter.setOrigin(1,1); //TODO
+        goal.target_pose.pose.position.x = converter.getCoordinateX(geoNode);
+        goal.target_pose.pose.position.y = converter.getCoordinateY(geoNode);
         goal.target_pose.pose.position.z = 0;
 
         actionClient.sendGoal(goal,boost::bind(&MoveBaseStatus::doneCallback, ui->moveBaseStatus, _1, _2),
