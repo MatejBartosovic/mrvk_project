@@ -23,6 +23,7 @@ namespace mrvk_gui {
         void resetCentralStop();
         void blockMovement();
         void unblockMovement();
+        void autoComputeGPS();
 
     private:
         Ui::MrvkDriver* ui;

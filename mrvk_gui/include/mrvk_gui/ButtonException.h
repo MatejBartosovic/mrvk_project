@@ -23,7 +23,7 @@ namespace mrvk_gui{
 }
 #define callService(serviceClient, msg)\
 if(!serviceClient.call(msg)){ \
-    throw ButtonsException("Block movement service is not running"); \
+    throw ButtonsException(serviceClient.getService() + " service is not running"); \
 } \
 if(!msg.response.success){ \
     throw ButtonsException("Service responded with error: " + msg.response.message); \

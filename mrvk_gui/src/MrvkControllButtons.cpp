@@ -9,9 +9,11 @@
 namespace mrvk_gui {
     MrvkControllButtons::MrvkControllButtons() {
         ros::NodeHandle n("/");
-        setCentralStopServiceClient = n.serviceClient<std_srvs::Trigger>("reset_central_stop");
-        resetCentralStopServiceClient =n.serviceClient<std_srvs::Trigger>("setCentralStop");
+        setCentralStopServiceClient = n.serviceClient<std_srvs::Trigger>("set_central_stop");
+        resetCentralStopServiceClient =n.serviceClient<std_srvs::Trigger>("resetCentralStop");
         blockMovementServiceClient = n.serviceClient<std_srvs::SetBool>("block_movement");
+        autoComputeGPSServiceClient = n.serviceClient<std_srvs::Trigger>("auto_compute_bearing");
+
     }
 
     void MrvkControllButtons::setCentralStop() {
@@ -34,6 +36,10 @@ namespace mrvk_gui {
         std_srvs::SetBool msg;
         msg.request.data = false;
         callService(blockMovementServiceClient,msg);
+    }
 
+    void MrvkControllButtons::autoComputeGPS() {
+        std_srvs::Trigger msg;
+        callService(autoComputeGPSServiceClient,msg);
     }
 }

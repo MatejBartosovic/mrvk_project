@@ -12,7 +12,7 @@ namespace mrvk_gui {
         connect(ui->resetCentralStopButton,SIGNAL(released()),this,SLOT(resetCentralStop()));
         connect(ui->blockMovementButton,SIGNAL(released()),this,SLOT(blockMovement()));
         connect(ui->unblockMovementButton,SIGNAL(released()),this,SLOT(unblockMovement()));
-
+        connect(ui->autoComputeGPSButton,SIGNAL(released()),this,SLOT(autoComputeGPS()));
     }
 
     MrvkDriver::~MrvkDriver() {
@@ -40,7 +40,7 @@ namespace mrvk_gui {
         catch (ButtonsException& e){
             string = e.what();
         }
-        QMessageBox msgBox(QMessageBox::Information,"Set central stop",string);
+        QMessageBox msgBox(QMessageBox::Information,"Reset central stop",string);
         msgBox.exec();
     }
     void MrvkDriver::blockMovement(){
@@ -52,7 +52,7 @@ namespace mrvk_gui {
         catch (ButtonsException& e){
             string = e.what();
         }
-        QMessageBox msgBox(QMessageBox::Information,"Set central stop",string);
+        QMessageBox msgBox(QMessageBox::Information,"Block movement",string);
         msgBox.exec();
     }
     void MrvkDriver::unblockMovement(){
@@ -64,10 +64,21 @@ namespace mrvk_gui {
         catch (ButtonsException& e){
             string = e.what();
         }
-        QMessageBox msgBox(QMessageBox::Information,"Set central stop",string);
+        QMessageBox msgBox(QMessageBox::Information,"Unblock movement",string);
         msgBox.exec();
     }
-
+    void MrvkDriver::autoComputeGPS() {
+        QString string;
+        try{
+            mrvkButtons.autoComputeGPS();
+            string = "Ok";
+        }
+        catch(ButtonsException& e){
+            string = e.what();
+        }
+        QMessageBox msgBox(QMessageBox::Information,"Auto compute GPS",string);
+        msgBox.exec();
+    }
     void mrvk_gui::MrvkDriver::updateData() {
         ui->mainBoardStatus->updateData();
     }

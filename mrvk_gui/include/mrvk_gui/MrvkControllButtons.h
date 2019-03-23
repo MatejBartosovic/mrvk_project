@@ -16,12 +16,14 @@ namespace mrvk_gui {
         void resetCentralStop();
         void blockMovement();
         void unblockMovement();
+        void autoComputeGPS();
 
     private:
         ros::ServiceClient setCentralStopServiceClient;
         ros::ServiceClient resetCentralStopServiceClient;
         ros::ServiceClient blockMovementServiceClient;
         ros::ServiceClient unblockMovementServiceClient;
+        ros::ServiceClient autoComputeGPSServiceClient;
     };
 }
 

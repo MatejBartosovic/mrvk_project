@@ -56,6 +56,13 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="autoComputeGPSButton">
+     <property name="text">
+      <string>Auto compute GPS</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
