@@ -15,10 +15,10 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="mrvk_gui::MoveBaseControl" name="widget" native="true"/>
+    <widget class="mrvk_gui::MoveBaseControl" name="moveBaseControl" native="true"/>
    </item>
    <item>
-    <widget class="mrvk_gui::MoveBaseStatus" name="widget_2" native="true"/>
+    <widget class="mrvk_gui::MoveBaseStatus" name="moveBaseStatus" native="true"/>
    </item>
   </layout>
  </widget>

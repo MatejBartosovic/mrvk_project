@@ -12,6 +12,7 @@
 namespace mrvk_gui{
     template <class T>
     class Subscriber {
+    protected:
         typedef boost::shared_ptr<T const> TConstPtr;
     public:
         Subscriber(std::string topic, ros::NodeHandle& nh){
@@ -27,9 +28,17 @@ namespace mrvk_gui{
     private:
         void callback(TConstPtr msg)
         {
+            if(!msgValidityCallback(msg)){
+                return;
+            }
             std::lock_guard<std::mutex> lock(mutex);
             this->msg = *msg;
         }
+
+        virtual bool msgValidityCallback(TConstPtr msg) {
+            return true;
+        };
+
         std::mutex mutex;
         T msg;
         ros::Subscriber subscriber;

@@ -5,6 +5,12 @@ find_package(catkin REQUIRED COMPONENTS
         roscpp
         rqt_gui
         rqt_gui_cpp
+        move_base
+        actionlib
+        eigen_conversions
+        sensor_msgs
+        nav_msgs
+        osm_planner
         )
 
 #main ui sources
@@ -72,6 +78,8 @@ include_directories(
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
+        src/MrvkControllButtons.cpp
+        src/ImuButtons.cpp
         ui/MainWindow.cpp
         ui/Widgets/Camera/Camera.cpp
         ui/Widgets/Gps/Gps.cpp

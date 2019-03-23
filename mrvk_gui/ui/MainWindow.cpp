@@ -17,13 +17,15 @@ namespace mrvk_gui {
     }
 
     void MainWindow::updateGui(){
-//        ui->topicFrequency->updateData();
-//        ui->odometyr->updateData(); //TODO typo
+        ui->topicFrequency->updateData();
+        ui->odometry->updateData(); //TODO typo
         ui->imu->updateData();
         ui->odometry->updateData();
+        ui->mrvkDriver->updateData();
+
 //        ui->gps->updateData();
-//        ui->camera->updateData();
+        ui->camera->updateData();
 //        ui->mrvkDriver->updateData();
-//        ui->moveBase->updateData();
+        ui->moveBase->updateData();
     }
 }

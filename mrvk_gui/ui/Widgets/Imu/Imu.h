@@ -12,6 +12,8 @@ class Imu;
 
 namespace mrvk_gui{
 
+    class ImuButtons;
+
     class Imu : public QWidget
     {
         Q_OBJECT
@@ -24,6 +26,11 @@ namespace mrvk_gui{
     private:
         Ui::Imu *ui;
         mrvk_gui::Subscriber<sensor_msgs::Imu>* subscriber;
+        ImuButtons* imuButtons;
+    private slots:
+        void calibrate();
+
+        void reset();
     };
 }
 

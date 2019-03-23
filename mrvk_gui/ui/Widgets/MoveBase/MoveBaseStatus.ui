@@ -15,30 +15,23 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="goalState">
      <property name="text">
       <string>Nieco 1</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="xLabel">
      <property name="text">
       <string>Nieco 2</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="yLabel">
      <property name="text">
       <string>Nieco 3</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Nieco 4</string>
      </property>
     </widget>
    </item>

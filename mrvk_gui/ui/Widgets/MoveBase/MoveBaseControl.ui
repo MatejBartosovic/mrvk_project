@@ -125,6 +125,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="mapOffsetButton">
+     <property name="text">
+      <string>Edit map offset</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="loadQrCodeButton">
      <property name="text">
       <string>Load qr code</string>

@@ -137,7 +137,7 @@ private:
      * If it is nullptr then is used original rotation
      */
     template<class N>
-    void sendTransform(const N &gps_pose, const tf::Quaternion *quat = nullptr){
+    void sendTransform(const N& gps_pose, const tf::Quaternion *quat = nullptr){
 
         tf::TransformListener listener;
 
@@ -177,9 +177,8 @@ private:
         }
 
         //compute correction
-        mutex_.lock();
+        std::lock_guard<std::mutex> lock(mutex_);
         corrected_transform_ = absolute_transform * relative_transform.inverse();
-        mutex_.unlock();
     }
 
     /**

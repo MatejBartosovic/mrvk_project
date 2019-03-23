@@ -18,8 +18,11 @@ namespace Mrvk{
 					lastStopButtonVal(false) {
 
 			//setup diagnostic
-			diagnostic.add("mrvk_driver Status", this, &Mrvk::Driver::diagnostics);
-			diagnostic.setHardwareID("none");
+			diagnostic.add("main board status", this, &Mrvk::Driver::mainBoardDiagnostics);
+			diagnostic.add("left motor board status", this, &Mrvk::Driver::leftMotorBoardDiagnostics);
+			diagnostic.add("right motor board status", this, &Mrvk::Driver::rightMotorBoardDiagnostics);
+			diagnostic.setHardwareID("");
+
 			double statusPeriod;
 			n.param<double>("status_period", statusPeriod, 5);
 			status_timer = n.createTimer(ros::Duration(statusPeriod), &Mrvk::Driver::statusTimerCallback, this);
@@ -113,17 +116,80 @@ namespace Mrvk{
 		ros::NodeHandle n;
 		bool lastStopButtonVal;
 
-		void diagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat){
+		void mainBoardDiagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat){
+			if (comunication_interface.isActive()){
+				stat.summary(0, "Connected");
+				auto msg = comunication_interface.getStatusMB();
+
+				stat.add<bool>("central_stop", msg.central_stop);
+				stat.add<bool>("hardware_central_stop", msg.hardware_central_stop);
+				stat.add<float>("temperature", msg.temperature);
+				stat.add<bool>("power_off_sequence", msg.power_off_sequence);
+				stat.add<bool>("full_battery", msg.full_battery);
+				// battery
+				stat.add<float>("charge", msg.battery.charge);
+				stat.add<float>("battery1_voltage", msg.battery.battery1_voltage);
+				stat.add<float>("battery2_voltage", msg.battery.battery2_voltage);
+				stat.add<float>("current", msg.battery.current);
+				//power management
+                stat.add<bool>("MCBsSB_5V", msg.power_managment.MCBsSB_5V);
+                stat.add<bool>("MCBs_12V", msg.power_managment.MCBs_12V);
+                stat.add<bool>("videotransmitter", msg.power_managment.videotransmitter);
+                stat.add<bool>("fan", msg.power_managment.fan);
+                stat.add<bool>("laser", msg.power_managment.laser);
+                stat.add<bool>("gps", msg.power_managment.gps);
+                stat.add<bool>("arm_5V", msg.power_managment.arm_5V);
+                stat.add<bool>("arm_12V", msg.power_managment.arm_12V);
+                stat.add<bool>("pc2", msg.power_managment.pc2);
+                stat.add<bool>("camera", msg.power_managment.camera);
+			} else {
+				stat.summary(2, "Disconnected");
+			}
+		}
+
+		void leftMotorBoardDiagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat){
+			if (comunication_interface.isActive()){
+				stat.summary(0, "Connected");
+				auto msg = comunication_interface.getStatusMCB(CommunicationInterface::LEFT_MOTOR_ADRESS);
+
+				stat.add<std::string>("motor_name", msg.motor_name);
+				stat.add<bool>("i2c_communication_error", msg.i2c_communication_error);
+				stat.add<bool>("i2c_error_status", msg.i2c_error_status);
+				stat.add<bool>("rs422_communication_error", msg.rs422_communication_error);
+				stat.add<bool>("shifting", msg.shifting);
+				stat.add<bool>("shifting_error", msg.shifting_error);
+				stat.add<int>("gear_position", msg.gear_position);
+				stat.add<float>("gear_current", msg.gear_current);
+				stat.add<float>("board_voltage", msg.board_voltage);
+				stat.add<float>("motor_voltage", msg.motor_voltage);
+				stat.add<float>("motor_current", msg.motor_current);
+			} else {
+				stat.summary(2, "Disconnected");
+			}
+		}
+
+		void rightMotorBoardDiagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat){
 
 			if (comunication_interface.isActive()){
-
 				stat.summary(0, "Connected");
-				stat.add<mrvk_driver::Mb_status>("main board status",comunication_interface.getStatusMB());
-				stat.add<mrvk_driver::Mcb_status>("left motor board status",comunication_interface.getStatusMCB(CommunicationInterface::LEFT_MOTOR_ADRESS));
-				stat.add<mrvk_driver::Mcb_status>("right board status", comunication_interface.getStatusMCB(CommunicationInterface::RIGHT_MOTOR_ADRESS));
+				auto msg = comunication_interface.getStatusMCB(CommunicationInterface::RIGHT_MOTOR_ADRESS);
 
-			}else stat.summary(2, "Disconnected");
+				stat.add<std::string>("motor_name", msg.motor_name);
+				stat.add<bool>("i2c_communication_error", msg.i2c_communication_error);
+				stat.add<bool>("i2c_error_status", msg.i2c_error_status);
+				stat.add<bool>("rs422_communication_error", msg.rs422_communication_error);
+				stat.add<bool>("shifting", msg.shifting);
+				stat.add<bool>("shifting_error", msg.shifting_error);
+				stat.add<int>("gear_position", msg.gear_position);
+				stat.add<float>("gear_current", msg.gear_current);
+				stat.add<float>("board_voltage", msg.board_voltage);
+				stat.add<float>("motor_voltage", msg.motor_voltage);
+				stat.add<float>("motor_current", msg.motor_current);
+			} else {
+				stat.summary(2, "Disconnected");
+			}
 		}
+
 
 		void statusTimerCallback(const ros::TimerEvent& timer_struct) {
 			bool tmp = comunication_interface.getStatusMB().hardware_central_stop;

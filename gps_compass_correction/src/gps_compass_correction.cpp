@@ -73,11 +73,13 @@ void GpsCompassCorrection::tfBroadcasterCallback(const double frequence){
     const double period = 1/frequence;
 
     while (ros::ok()) {
-        mutex_.lock();
-        tf_broadcaster_.sendTransform(
-                tf::StampedTransform(corrected_transform_, ros::Time::now(), parent_frame_, child_frame_));
-        mutex_.unlock();
-        ros::Duration(period).sleep();
+            { // !!!!!! do not  remove scope (MUTEX!!!!!)
+                std::lock_guard<std::mutex> lock(mutex_);
+                tf_broadcaster_.sendTransform(
+                        tf::StampedTransform(corrected_transform_, ros::Time::now(), parent_frame_, child_frame_));
+            }
+            ros::Duration(period).sleep();
+        }
     }
 }
 
