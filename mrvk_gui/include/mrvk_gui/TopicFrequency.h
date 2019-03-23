@@ -15,31 +15,30 @@ namespace mrvk_gui {
     protected:
         typedef boost::shared_ptr<T const> TConstPtr;
     public:
-        TopicFrequencySubscriber(std::string topic, ros::NodeHandle& nh){
+        TopicFrequencySubscriber(std::string topic, ros::NodeHandle& nh) : counter(0), oldTime(ros::Time::now()){
             boost::bind(&TopicFrequencySubscriber::calback,this,_1);
             sub = nh.subscribe<T>(topic,5,boost::bind(&TopicFrequencySubscriber<T>::calback,this,_1));
         }
 
         double getFrequency() {
+            ros::Time newTime = ros::Time::now();
             std::lock_guard<std::mutex> l(mutex);
+            double frequency = counter / (newTime - oldTime).toSec();
+            oldTime = newTime;
+            counter = 0;
             return frequency;
         }
 
     private:
         void calback(boost::shared_ptr<T const> msg){
-            std::lock_guard<std::mutex> l(mutex);
-
-            newTime = ros::Time::now();
-            frequency = 1 / (newTime - oldTime).toSec();
-            //frequency = round( frequency * 1000.0 ) / 1000.0;
-            oldTime = newTime;
+            std::lock_guard<std::mutex> lock(mutex);
+            counter++;
         }
 
         std::mutex mutex;
-        double frequency = 0;
         ros::Subscriber sub;
         ros::Time oldTime;
-        ros::Time newTime;
+        uint32_t counter;
     };
 }
 
