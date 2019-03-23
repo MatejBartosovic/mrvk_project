@@ -1,0 +1,8 @@
+<launch>
+
+  <node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" output="screen">
+    <!--param name="intensity" value="true"/ URG-04LX does not support intensity-->
+    <param name="port" value="/dev/HOKUYO"/>
+  </node>
+
+</launch>

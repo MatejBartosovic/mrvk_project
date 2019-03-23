@@ -2,6 +2,7 @@
 <launch>
   <include file="$(find mrvk_sensors)/launch/robot.launch" >
     <arg name="vo_used" default="true"/>
+    <arg name="filter_config_path" default="$(find mrvk_laser_filters)/config/laser_filters_osm.yaml"/>
   </include>
   <include file="$(find mrvk_2dnav)/launch/move_base_dwa_osm.launch" />
   <include file="$(find mrvk_sensors)/launch/gps.launch" />

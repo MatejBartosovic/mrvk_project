@@ -6,6 +6,7 @@
     <arg name="use_gmapping" default="true"/>
     <arg name="use_ekf" default="true"/>
     <arg name="use_joint_states_publisher" default="true"/>
+    <arg name="filter_config_path" default="$(find mrvk_laser_filters)/config/laser_filters_default.yaml"/>
 
     <!--run driver-->
     <include file="$(find mrvk_driver)/launch/driver.launch" >
@@ -16,7 +17,9 @@
     </include>
 
     <!--run hokuyo node-->
-    <include file="$(find mrvk_sensors)/launch/urg_lidar.launch"/>
+    <include file="$(find mrvk_laser_filters)/launch/filter_with_lidar.launch">
+	<arg name="filter_config_path" value="$(arg filter_config_path)" />
+    </include>
 
     <!--run adis node-->
     <include file="$(find adis16488)/launch/adis_driver.launch" if="$(arg use_imu)"/>

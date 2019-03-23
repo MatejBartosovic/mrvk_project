@@ -20,7 +20,7 @@ TrajectoryPlannerROS:
   latch_xy_goal_tolerance: true           #default false If goal tollerance is latched, if the robot ever reach the goal xy location it will simply rotate in place, even if it ends up outside the goal tolerance while it is doing so
 
 #Forward Simulation Parameters
-  sim_time: 2.0 
+  sim_time: 1.0
 #Trajectory Scoring Parameters
   meter_scoring: true
 #Oscillation Prevention Parameters

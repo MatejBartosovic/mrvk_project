@@ -34,7 +34,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:mrvk_base>
     <xacro:Adis parent="base_stabilized" child = "adis16488">
-        <origin rpy = "0 0 ${-M_PI/2}" xyz="0.0 0.105 0.099"/>
+        <origin rpy = "0 0 0" xyz="0.0 0.0 0.099"/>
     </xacro:Adis>
     <xacro:Gps parent="base_stabilized" child = "gps">
         <origin rpy="0 0 0" xyz="0 0 2"/>
