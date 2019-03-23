@@ -93,6 +93,7 @@ MrvkCallbacks::MrvkCallbacks(CommunicationInterface &interface) : communicationI
             res.success = false;
             return true;
         }
+        res.success = true;
         return true;
     }
 
