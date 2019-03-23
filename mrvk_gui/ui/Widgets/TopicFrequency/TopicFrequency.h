@@ -6,6 +6,8 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
+#include <sensor_msgs/NavSatFix.h>
+#include <sensor_msgs/LaserScan.h>
 
 namespace Ui {
     class TopicFrequency;
@@ -25,8 +27,8 @@ namespace mrvk_gui {
         Ui::TopicFrequency* ui;
         TopicFrequencySubscriber<nav_msgs::Odometry>* odometryFrequency;
         TopicFrequencySubscriber<sensor_msgs::Imu>* imuFrequency;
-        //TopicFrequencySubscriber<nav_msgs::Odometry>* gpsFrequency;
-        //TopicFrequencySubscriber<nav_msgs::Odometry>* lidarFrequency;
+        TopicFrequencySubscriber<sensor_msgs::NavSatFix>* gpsFrequency;
+        TopicFrequencySubscriber<sensor_msgs::LaserScan>* lidarFrequency;
         TopicFrequencySubscriber<sensor_msgs::Image>* cameraFrequency;
     };
 }
