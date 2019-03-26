@@ -11,7 +11,7 @@ namespace mrvk_gui {
         ros::NodeHandle n("/");
         odometryFrequency = new TopicFrequencySubscriber<nav_msgs::Odometry>("/odom",n);
         imuFrequency = new TopicFrequencySubscriber<sensor_msgs::Imu>("/adis16488/imu_data",n);
-        gpsFrequency = new TopicFrequencySubscriber<sensor_msgs::NavSatFix>("/fix",n);
+        gpsFrequency = new TopicFrequencySubscriber<gps_common::GPSFix>("/fix",n);
         lidarFrequency = new TopicFrequencySubscriber<sensor_msgs::LaserScan>("/scan",n);
         cameraFrequency = new TopicFrequencySubscriber<sensor_msgs::Image>("/mrvk_gui/image",n);
 

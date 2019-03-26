@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
         sensor_msgs
         nav_msgs
         osm_planner
+        gps_common
         )
 
 #main ui sources

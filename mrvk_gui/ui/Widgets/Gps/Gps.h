@@ -2,6 +2,8 @@
 #define GPS_H
 
 #include <QWidget>
+#include <mrvk_gui/Subscriber.h>
+#include <gps_common/GPSFix.h>
 
 namespace Ui {
 class Gps;
@@ -16,8 +18,11 @@ namespace mrvk_gui{
         explicit Gps(QWidget *parent = 0);
         ~Gps();
 
+        void updateData();
+
     private:
         Ui::Gps *ui;
+        Subscriber<gps_common::GPSFix> *subscriber;
     };
 }
 

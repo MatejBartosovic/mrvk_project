@@ -98,7 +98,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QLabel" name="latituteAccuractValue">
+      <widget class="QLabel" name="latituteAccuracyValue">
        <property name="text">
         <string>0</string>
        </property>
