@@ -18,7 +18,24 @@
     <item>
      <layout class="QHBoxLayout" name="top">
       <item>
-       <widget class="mrvk_gui::TopicFrequency" name="topicFrequency" native="true"/>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="mrvk_gui::TopicFrequency" name="topicFrequency" native="true"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="Line" name="line_5">
@@ -28,7 +45,24 @@
        </widget>
       </item>
       <item>
-       <widget class="mrvk_gui::Odometry" name="odometry" native="true"/>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="mrvk_gui::Odometry" name="odometry" native="true"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="Line" name="line">
@@ -38,7 +72,24 @@
        </widget>
       </item>
       <item>
-       <widget class="mrvk_gui::Imu" name="imu" native="true"/>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="mrvk_gui::Imu" name="imu" native="true"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="Line" name="line_2">
@@ -48,7 +99,24 @@
        </widget>
       </item>
       <item>
-       <widget class="mrvk_gui::Gps" name="gps" native="true"/>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="mrvk_gui::Gps" name="gps" native="true"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="Line" name="line_3">
@@ -57,18 +125,52 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="mrvk_gui::Camera" name="camera" native="true"/>
-      </item>
      </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" name="bottom">
       <item>
-       <widget class="mrvk_gui::MrvkDriver" name="mrvkDriver" native="true"/>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <widget class="mrvk_gui::MrvkDriver" name="mrvkDriver" native="true"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="mrvk_gui::MoveBase" name="moveBase" native="true"/>
+       <layout class="QVBoxLayout" name="verticalLayout_8">
+        <item>
+         <widget class="mrvk_gui::MoveBase" name="moveBase" native="true"/>
+        </item>
+        <item>
+         <widget class="mrvk_gui::Camera" name="camera" native="true"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
