@@ -4,6 +4,7 @@
 #include <eigen_conversions/eigen_msg.h>
 #include <QMessageBox>
 #include <osm_planner/coordinates_converters/haversine_formula.h>
+#include <string>
 
 namespace mrvk_gui {
     MoveBase::MoveBase(QWidget* parent) :
@@ -12,10 +13,10 @@ namespace mrvk_gui {
             actionClient("move_base", true){
         ui->setupUi(this);
 
-        QRegExpValidator* latitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:90(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\.[0-9]{1,6})?))$"));
+        QRegExpValidator* latitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:90(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\,[0-9]{1,6})?))$"));
         ui->moveBaseControl->ui->latitudeGoalValue->setValidator(latitudeValidator);
 
-        QRegExpValidator* longitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,6})?))$"));
+        QRegExpValidator* longitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\,[0-9]{1,6})?))$"));
         ui->moveBaseControl->ui->longitudeGoalValue->setValidator(longitudeValidator);
 
         connect(ui->moveBaseControl->ui->goButton,SIGNAL(released()),this,SLOT(goSlot()));
@@ -34,17 +35,19 @@ namespace mrvk_gui {
     }
 
     void MoveBase::goSlot(){
-        if(!actionClient.isServerConnected() &&  !actionClient.waitForServer(ros::Duration(0.5))){
-            QMessageBox box(QMessageBox::Icon::Information,"Action client","Action server is not running. Abborting goal.",QMessageBox::Button::Ok,this);
-            box.exec();
-            return;
-        }
+//        if(!actionClient.isServerConnected() &&  !actionClient.waitForServer(ros::Duration(0.5))){
+//            QMessageBox box(QMessageBox::Icon::Information,"Action client","Action server is not running. Abborting goal.",QMessageBox::Button::Ok,this);
+//            box.exec();
+//            return;
+//        }
         move_base_msgs::MoveBaseGoal goal;
         goal.target_pose.header.stamp = ros::Time::now();
         goal.target_pose.header.frame_id = "map"; //TODO parameter alebo combo box zo vsetkimi framami??
         tf::quaternionEigenToMsg(Eigen::Quaterniond(1,0,0,0),goal.target_pose.pose.orientation);
         
-        osm_planner::coordinates_converters::GeoNode geoNode = {0,0,0,0}; //TODO init
+        osm_planner::coordinates_converters::GeoNode geoNode = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue->text().toStdString()),std::stod(ui->moveBaseControl->ui->longitudeGoalValue->text().toStdString()),0,0}; //TODO init
+
+        std::cout << geoNode.latitude << "  "<<geoNode.longitude << std::endl;
 
         osm_planner::coordinates_converters::HaversineFormula converter;
         converter.setOrigin(1,1); //TODO
