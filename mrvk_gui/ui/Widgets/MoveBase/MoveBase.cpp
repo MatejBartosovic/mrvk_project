@@ -13,16 +13,18 @@ namespace mrvk_gui {
             actionClient("move_base", true){
         ui->setupUi(this);
 
-        QRegExpValidator* latitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:90(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\,[0-9]{1,6})?))$"));
+        std::lconv* lc = std::localeconv();
+        QRegExpValidator* latitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:90(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\" + QString( lc->decimal_point) + "[0-9]{1,6})?))$"));
         ui->moveBaseControl->ui->latitudeGoalValue->setValidator(latitudeValidator);
 
-        QRegExpValidator* longitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\,[0-9]{1,6})?))$"));
+        QRegExpValidator* longitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\"+ QString( lc->decimal_point) + "[0-9]{1,6})?))$"));
         ui->moveBaseControl->ui->longitudeGoalValue->setValidator(longitudeValidator);
 
         connect(ui->moveBaseControl->ui->goButton,SIGNAL(released()),this,SLOT(goSlot()));
         connect(ui->moveBaseControl->ui->cancelButton,SIGNAL(released()),this,SLOT(cancelSlot()));
         connect(ui->moveBaseControl->ui->mapOffsetButton,SIGNAL(released()),this,SLOT(editMapOffsetSlot()));
         connect(ui->moveBaseControl->ui->loadQrCodeButton,SIGNAL(released()),this,SLOT(readQrCodeSlot()));
+
     }
 
     MoveBase::~MoveBase() {
@@ -40,11 +42,14 @@ namespace mrvk_gui {
 //            box.exec();
 //            return;
 //        }
+        if(ui->moveBaseControl->ui->latitudeGoalValue->text().isEmpty() || ui->moveBaseControl->ui->longitudeGoalValue->text().isEmpty()){
+            return;
+        }
         move_base_msgs::MoveBaseGoal goal;
         goal.target_pose.header.stamp = ros::Time::now();
         goal.target_pose.header.frame_id = "map"; //TODO parameter alebo combo box zo vsetkimi framami??
         tf::quaternionEigenToMsg(Eigen::Quaterniond(1,0,0,0),goal.target_pose.pose.orientation);
-        
+
         osm_planner::coordinates_converters::GeoNode geoNode = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue->text().toStdString()),std::stod(ui->moveBaseControl->ui->longitudeGoalValue->text().toStdString()),0,0}; //TODO init
 
         std::cout << geoNode.latitude << "  "<<geoNode.longitude << std::endl;
