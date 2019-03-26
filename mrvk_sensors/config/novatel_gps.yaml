@@ -1,0 +1,59 @@
+
+connection_type: serial # Type of physical connection to the device
+  #One of serial, tcp, udp, or pcap
+  #Default: serial
+device: "/dev/ttyUSB0" #Location of device connection.
+  #For serial connections, the device node; e. g., /dev/ttyUSB0
+  #For tcp or udp connections, a host:port specification.
+  #If the host is omitted, it will listen for connections on the specified port.
+  #If the port is omitted, 3001 will be used as the default for TCP connections and 3002 as the default for UDP connections.
+  #For pcap connections, the location of a .pcap capture file. Note that the node will exit automatically after finishing playback.
+  #Default: Empty
+frame_id: /gps #ROS TF frame to place in the header of published messages.
+#  Default: Empty
+gpgga_gprmc_sync_tol: 0.01 #Tolerance (in seconds) for synchronizing GPGGA and GPRMC logs.
+#  Default: 0.01
+gpgga_position_sync_tol: 0.01 #Tolerance (in seconds) for synchronizing GPGGA and BESTPOS logs.
+#  Default 0.01
+#imu_frame_id: TF frame id to use in IMU messages.
+#  Default: Empty
+#imu_rate: Desired rate in Hz for IMU messages.
+#  This is set as the rate for CORRIMUDATA logs.
+#  Default: 100
+polling_period: 1 Desired period between GPS messages.
+#  This will be set as the period for GPGGA, GPRMC, GPGSA, BESTPOS, and BESTVEL logs.
+#  Default: 0.05 (20 Hz)
+publish_diagnostics: false #true to publish node diagnostics.
+#  Default: false
+publish_gpgsa: false #true to publish novatel_gps_msgs/Gpgsa messages.
+#  Default: false
+publish_gpgsv: false #true to publish novatel_gps_msgs/Gpgsv messages.
+#  Default: false
+publish_imu_messages: false #true to publish novatel_gps_msgs/NovatelCorrectedImuData, novatel_gps_msgs/Inspva, novatel_gps_msgs/Insstdev, and sensor_msgs/Imu messages.
+#  Default: false
+publish_nmea_messages: false #true to publish novatel_gps_msgs/Gpgga and novatel_gps_msgs/Gprmc messages.
+#  Default: false
+publish_novatel_positions: false #true to publish novatel_gps_msgs/NovatelPosition messages.
+#  Default: false
+publish_novatel_utm_positions: false #true to publish novatel_gps_msgs/NovatelUtmPosition messages.
+#  Default: false
+publish_novatel_velocity: true #true to publish novatel_gps_msgs/NovatelVelocity messages.
+#  Default: false
+publish_range_messages: false #true to publish novatel_gps_msgs/Range messages.
+#  Default: false
+publish_sync_diagnostic: true #If true, publish a time Sync diagnostic.
+#  Ignored if publish_diagnostics is false.
+#  Default: true
+publish_time_messages: false #true to publish novatel_gps_msgs/Time messages.
+#  Default: false
+publish_trackstat: false #true to publish novatel_gps_msgs/Trackstat messages.
+#  Default: false
+reconnect_delay_s: 1 #Second delay between reconnection attempts.
+#  Default: 0.5
+serial_baud: 115200 #Select the serial baud rate to be used in a serial connection.
+#  Default: 115200
+use_binary_messages: true #true to request binary NovAtel logs, false to request ASCII.
+#  Binary logs are much more efficient and effectively required for IMU data, but ASCII logs are easier to parse for a human.
+#  Default: false
+wait_for_position: true #true in order to wait for BESTPOS logs before publishing GPSFix messages.
+ # Default: false

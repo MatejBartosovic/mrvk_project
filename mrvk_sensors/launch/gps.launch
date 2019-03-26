@@ -1,14 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <node  name="utm_odometry_node" pkg="gps_common" type="utm_odometry_node">
-    <param name="frame_id" value="base_link"/>
-    <param name="child_frame_id" value="gps"/>
-    <remap from="odom" to="vo"/>
-  </node>
-  <node  name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver">
-    <param name="port" value="/dev/GPS"/>
-    <param name="baud" value="115200"/>
-   <param name="useRMC" value="false"/>
-    <param name="frame_id" value="gps"/>
-  </node>
+    <node name="novatel" pkg="nodelet" type="nodelet" args="standalone novatel_gps_driver/novatel_gps_nodelet">
+      <rosparam command="load" file="$(find mrvk_sensors)/config/novatel_gps.yaml" />
+    </node>
 </launch>
