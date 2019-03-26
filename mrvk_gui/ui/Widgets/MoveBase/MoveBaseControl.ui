@@ -51,18 +51,10 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="latitudeGoalValue">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </widget>
+        <widget class="QLineEdit" name="latitudeGoalValue"/>
        </item>
        <item>
-        <widget class="QLabel" name="longitudeGoalValue">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </widget>
+        <widget class="QLineEdit" name="longitudeGoalValue"/>
        </item>
       </layout>
      </item>
@@ -71,7 +63,7 @@
        <item>
         <widget class="QPushButton" name="coppyrStartToGoalButton">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
