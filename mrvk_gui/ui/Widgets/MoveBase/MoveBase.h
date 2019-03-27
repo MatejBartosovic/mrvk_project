@@ -21,8 +21,12 @@ namespace mrvk_gui {
         void updateData();
 
     private:
+        void loadDefaultMapOffset();
+        void saveDefaultMapOffset();
         Ui::MoveBase* ui;
         actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> actionClient;
+        double latitudeMapOffset;
+        double longitudeMapOffset;
     public slots:
         void goSlot();
         void cancelSlot();

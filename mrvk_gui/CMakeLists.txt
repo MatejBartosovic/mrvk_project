@@ -27,6 +27,7 @@ set(${PROJECT_NAME}_cpp_HDRS
         ui/Widgets/TopicFrequency/TopicFrequency.h
         ui/Widgets/MrvkDriver/MainBoardStatus.h
         ui/Widgets/MrvkDriver/MrvkDriver.h
+        ui/Widgets/MoveBase/GpsCoordinatesInput.h
         )
 
 set(${PROJECT_NAME}_cpp_SRCS
@@ -44,6 +45,7 @@ set(${PROJECT_NAME}_cpp_UIS
         ui/Widgets/TopicFrequency/TopicFrequency.ui
         ui/Widgets/MrvkDriver/MainBoardStatus.ui
         ui/Widgets/MrvkDriver/MrvkDriver.ui
+        ui/Widgets/MoveBase/GpsCoordinatesInput.ui
         )
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
@@ -92,6 +94,7 @@ add_executable(${PROJECT_NAME}
         ui/Widgets/TopicFrequency/TopicFrequency.cpp
         ui/Widgets/MrvkDriver/MainBoardStatus.cpp
         ui/Widgets/MrvkDriver/MrvkDriver.cpp
+        ui/Widgets/MoveBase/GpsCoordinatesInput.cpp
         ${${PROJECT_NAME}_cpp_MOCS}
         ${${PROJECT_NAME}_cpp_UIS_H})
 

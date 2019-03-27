@@ -5,6 +5,8 @@
 #include <QMessageBox>
 #include <osm_planner/coordinates_converters/haversine_formula.h>
 #include <string>
+#include "GpsCoordinatesInput.h"
+#include <fstream>
 
 namespace mrvk_gui {
     MoveBase::MoveBase(QWidget* parent) :
@@ -19,6 +21,8 @@ namespace mrvk_gui {
 
         QRegExpValidator* longitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\"+ QString( lc->decimal_point) + "[0-9]{1,6})?))$"));
         ui->moveBaseControl->ui->longitudeGoalValue->setValidator(longitudeValidator);
+
+        loadDefaultMapOffset();
 
         connect(ui->moveBaseControl->ui->goButton,SIGNAL(released()),this,SLOT(goSlot()));
         connect(ui->moveBaseControl->ui->cancelButton,SIGNAL(released()),this,SLOT(cancelSlot()));
@@ -70,12 +74,39 @@ namespace mrvk_gui {
     }
 
     void MoveBase::editMapOffsetSlot(){
-        QMessageBox box(QMessageBox::Icon::Information,"Feature not implemented","Feature not implemented",QMessageBox::Button::Ok,this);
-        box.exec();
+
+        GpsCoordinatesInput input(latitudeMapOffset, longitudeMapOffset);
+        input.exec();
+        if(input.result() == GpsCoordinatesInput::Rejected){
+            return;
+        }
+        latitudeMapOffset = input.getLatitude();
+        longitudeMapOffset = input.getLongitude();
+        saveDefaultMapOffset();
     }
 
     void MoveBase::readQrCodeSlot(){
         QMessageBox box(QMessageBox::Icon::Information,"Feature not implemented","Feature not implemented",QMessageBox::Button::Ok,this);
         box.exec();
+    }
+
+    void MoveBase::loadDefaultMapOffset(){
+        const char* home = std::getenv("HOME");
+        if(home) {
+            std::ifstream file;
+            file.open(std::string(home) + "/.mrvk_gui.conf");
+            file >> latitudeMapOffset;
+            file >> longitudeMapOffset;
+            file.close();
+        }
+    }
+    void MoveBase::saveDefaultMapOffset(){
+        const char* home = std::getenv("HOME");
+        if(home) {
+            std::ofstream file;
+            file.open(std::string(home) + "/.mrvk_gui.conf");
+            file << std::fixed << std::setprecision(6) << latitudeMapOffset << std::endl <<longitudeMapOffset<<std::endl;
+            file.close();
+        }
     }
 }
