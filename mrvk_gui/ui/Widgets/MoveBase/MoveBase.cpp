@@ -54,7 +54,7 @@ namespace mrvk_gui {
         goal.target_pose.header.frame_id = "map"; //TODO parameter alebo combo box zo vsetkimi framami??
         tf::quaternionEigenToMsg(Eigen::Quaterniond(1,0,0,0),goal.target_pose.pose.orientation);
 
-        osm_planner::coordinates_converters::GeoNode geoNode = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue->text().toStdString()),std::stod(ui->moveBaseControl->ui->longitudeGoalValue->text().toStdString()),0,0}; //TODO init
+        osm_planner::coordinates_converters::GeoNode geoNode = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue->text().toStdString()) - latitudeMapOffset ,std::stod(ui->moveBaseControl->ui->longitudeGoalValue->text().toStdString()) - longitudeMapOffset ,0,0}; //TODO init
 
         std::cout << geoNode.latitude << "  "<<geoNode.longitude << std::endl;
 
@@ -63,6 +63,8 @@ namespace mrvk_gui {
         goal.target_pose.pose.position.x = converter.getCoordinateX(geoNode);
         goal.target_pose.pose.position.y = converter.getCoordinateY(geoNode);
         goal.target_pose.pose.position.z = 0;
+
+        ui->moveBaseStatus->setGoal(goal.target_pose.pose.position.x,goal.target_pose.pose.position.y);
 
         actionClient.sendGoal(goal,boost::bind(&MoveBaseStatus::doneCallback, ui->moveBaseStatus, _1, _2),
                 boost::bind(&MoveBaseStatus::activeCallback, ui->moveBaseStatus),

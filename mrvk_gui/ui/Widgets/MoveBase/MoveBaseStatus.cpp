@@ -5,7 +5,9 @@ namespace mrvk_gui {
     MoveBaseStatus::MoveBaseStatus(QWidget* parent) :
             QWidget(parent),
             ui(new Ui::MoveBaseStatus),
-            x(0),y(0){
+           status("No goal active"),
+           currentPos(0,0,0),
+           goalPos(0,0,0){
         ui->setupUi(this);
     }
 
@@ -18,8 +20,8 @@ namespace mrvk_gui {
     }
 
     void MoveBaseStatus::feedbackCallback(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback){
-        x = feedback->base_position.pose.position.x;
-        y = feedback->base_position.pose.position.y;
+        currentPos[0] = feedback->base_position.pose.position.x;
+        currentPos[1] = feedback->base_position.pose.position.y;
     }
 
     void MoveBaseStatus::doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result){
@@ -27,8 +29,15 @@ namespace mrvk_gui {
     }
 
     void MoveBaseStatus::updateData(){
-        ui->goalState->setText(QString::fromStdString(status));
-        ui->xLabel->setNum(x);
-        ui->yLabel->setNum(y);
+        ui->statusValue->setText(QString::fromStdString(status));
+        ui->currentXvalue->setNum(currentPos[0]);
+        ui->currentYValue->setNum(currentPos[1]);
+        ui->remainingValue->setNum((currentPos - goalPos).norm());
+    }
+    void MoveBaseStatus::setGoal(double x, double y){
+        goalPos[0] = x;
+        goalPos[1] = y;
+        ui->goalXValue->setNum(x);
+        ui->goalYValue->setNum(y);
     }
 }
