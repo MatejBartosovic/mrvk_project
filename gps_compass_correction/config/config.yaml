@@ -3,7 +3,7 @@ parent_frame: world       # Parent frame (should be world), global planner shoul
 child_frame: map          # Correction frame, local planner and slam should be use this frame
 target_frame: base_link   # Base link of robot
 imu_topic: /imu           # Imu source. It's useful only if use_compass is true
-gps_topic: /fix           # Gps source
+gps_topic: /gps           # Gps source
 use_compass: false        # If it is true, then is used Imu orientation for correction of rotation
 
 # Set minimal required GPS status
