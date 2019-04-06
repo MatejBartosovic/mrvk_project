@@ -9,7 +9,7 @@ has_first_point_(false){
 
 }
 
-void BearingCalculator::addPoint(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data){
+void BearingCalculator::addPoint(boost::shared_ptr<const gps_common::GPSFix> gps_data){
 
     first_point_.longitude = gps_data->longitude;
     first_point_.latitude = gps_data->latitude;
@@ -17,7 +17,7 @@ void BearingCalculator::addPoint(boost::shared_ptr<const sensor_msgs::NavSatFix>
 }
 
 
-double BearingCalculator::calculate(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data, std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinates_converter){
+double BearingCalculator::calculate(boost::shared_ptr<const gps_common::GPSFix> gps_data, std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinates_converter){
 
     if (!has_first_point_){
         return NAN;

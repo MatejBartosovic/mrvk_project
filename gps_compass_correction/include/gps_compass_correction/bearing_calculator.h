@@ -8,6 +8,8 @@
 #include <osm_planner/osm_parser.h>
 #include <osm_planner/coordinates_converters/coordinates_converter_base.h>
 #include <osm_planner/coordinates_converters/haversine_formula.h>
+#include <gps_common/GPSFix.h>
+
 
 //!  A BearingCalculator class
 /*!
@@ -24,7 +26,7 @@ public:
      * @param gps_data - corrected gps data
      * @return A true on success, false on error
      */
-    void addPoint(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data);
+    void addPoint(boost::shared_ptr<const gps_common::GPSFix> gps_data);
 
     /**
      * @brief Add secont position from gps and
@@ -34,7 +36,7 @@ public:
      * @return A bearing angle if is both pose are correct
      * If are not correct then return NaN
      */
-    double calculate(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data, std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinates_converter);
+    double calculate(boost::shared_ptr<const gps_common::GPSFix> gps_data, std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinates_converter);
 
     /**
      * @brief Get information about successfully added first point
