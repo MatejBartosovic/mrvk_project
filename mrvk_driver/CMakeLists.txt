@@ -61,6 +61,10 @@ add_dependencies(mrvk_driver ${PROJECT_NAME}_communication_interface)
 add_executable(robot_control src/robot_control.cpp)
 add_dependencies(robot_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_executable(mrvk_init src/mrvk_init.cpp)
+add_dependencies(mrvk_init ${PROJECT_NAME}_communication_interface)
+
 target_link_libraries(${PROJECT_NAME}_communication_interface ${catkin_LIBRARIES})
 target_link_libraries(mrvk_driver ${catkin_LIBRARIES} ${PROJECT_NAME}_communication_interface)
 target_link_libraries(robot_control ${catkin_LIBRARIES})
+target_link_libraries(mrvk_init ${PROJECT_NAME}_communication_interface)
