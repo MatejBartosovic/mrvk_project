@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <launch>
+    <arg name="use_corection" default="false" />
     <node name="novatel" pkg="nodelet" type="nodelet" args="standalone novatel_gps_driver/novatel_gps_nodelet">
       <rosparam command="load" file="$(find mrvk_sensors)/config/novatel_gps.yaml" />
     </node>
+   
 </launch>

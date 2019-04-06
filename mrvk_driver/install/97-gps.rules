@@ -1,1 +1,1 @@
-SUBSYSTEM=="usb", ATTRS{idVendor}=="1d6b", ATTRS{idProduct}=="0002", SYMLINK+="GPS"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="09d7", ATTRS{idProduct}=="0100", ATTRS{serial}=="BMAW14050056S", SYMLINK+="GPS"

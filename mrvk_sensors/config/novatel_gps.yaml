@@ -2,7 +2,7 @@
 connection_type: serial # Type of physical connection to the device
   #One of serial, tcp, udp, or pcap
   #Default: serial
-device: "/dev/ttyUSB0" #Location of device connection.
+device: "/dev/GPS" #Location of device connection.
   #For serial connections, the device node; e. g., /dev/ttyUSB0
   #For tcp or udp connections, a host:port specification.
   #If the host is omitted, it will listen for connections on the specified port.

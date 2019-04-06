@@ -6,14 +6,15 @@
   <include file="$(find mrvk_sensors)/launch/robot.launch" >
     <!--<arg name="vo_used" default="true"/>-->
     <arg name="use_gmapping" value="false"/>
+    <arg name="use_gps" default="true"/>
+    <arg name="use_camera" default="true"/>
   </include>
-  <include file="$(find mrvk_2dnav)/launch/move_base_dwa_osm.launch" >
+
+   <include file="$(find gps_compass_correction)/launch/gps_compass_correction.launch">
     <arg name="osm_map_path" value="$(arg map)"/>
   </include>
 
-  <include file="$(find mrvk_sensors)/launch/gps.launch"/>
-
-   <include file="$(find gps_compass_correction)/launch/gps_compass_correction.launch">
+  <include file="$(find mrvk_2dnav)/launch/move_base_dwa_osm.launch" >
     <arg name="osm_map_path" value="$(arg map)"/>
   </include>
 </launch>
