@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
         std_srvs
         roscpp
         osm_planner
+	gps_common
 )
 
 ## System dependencies are found with CMake's conventions

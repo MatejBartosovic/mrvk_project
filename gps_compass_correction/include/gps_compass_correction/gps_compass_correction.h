@@ -10,6 +10,7 @@
 #include <tf/transform_listener.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <gps_common/GPSFix.h>
 #include <osm_planner/osm_parser.h>
 #include <osm_planner/computeBearing.h>
 #include <std_srvs/Trigger.h>
@@ -37,7 +38,7 @@ public:
      * @param min_fix_status - Minimal required GPS status for correction
      * @return True when is transform successfully calculated
      */
-    bool update(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data, int min_fix_status = sensor_msgs::NavSatStatus::STATUS_GBAS_FIX);
+    bool update(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status = gps_common::GPSStatus::STATUS_GBAS_FIX);
 
 private:
 
@@ -90,7 +91,7 @@ private:
      * @param min_fix_status - Minimal required GPS status for correction
      * @return True if is gps status better then min_fix_status
      */
-    bool verifyGPS(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data, int min_fix_status);
+    bool verifyGPS(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status);
 
     /**
      * @brief Gps subscriber callback. In callback is called method update()
@@ -99,7 +100,7 @@ private:
      * If you mustn't use low precision, then set negative value on ROS param low_precision_period
      * @param gps_data - Some gps data from topic
      */
-    void gpsCallback(const sensor_msgs::NavSatFixPtr& gps_data);
+    void gpsCallback(const gps_common::GPSFixPtr& gps_data);
 
     /**
      * @brief Set bearing from service, If is obtained latitude and longitude then is use pose from service,

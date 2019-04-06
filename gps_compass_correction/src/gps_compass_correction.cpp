@@ -18,8 +18,8 @@ GpsCompassCorrection::GpsCompassCorrection() : n_("~"), robot_(n_), corrected_tr
     n_.param<std::string>("imu_topic",imu_topic_,"/imu");
     n_.param<std::string>("gps_topic",gps_topic_,"/gps");
     n_.param<double>("low_precision_period", low_precision_period_, 30);
-    n_.param<int>("min_required_status_update", min_required_status_update_, sensor_msgs::NavSatStatus::STATUS_FIX);
-    n_.param<int>("min_required_status_service", min_required_status_service_, sensor_msgs::NavSatStatus::STATUS_FIX);
+    n_.param<int>("min_required_status_update", min_required_status_update_, gps_common::GPSStatus::STATUS_FIX);
+    n_.param<int>("min_required_status_service", min_required_status_service_, gps_common::GPSStatus::STATUS_FIX);
 
     // Get map origin
     setMapOrigin(n_);
@@ -81,7 +81,7 @@ void GpsCompassCorrection::tfBroadcasterCallback(const double frequence){
     }
 }
 
-void GpsCompassCorrection::gpsCallback(const sensor_msgs::NavSatFixPtr& gps_data){
+void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
 
     static ros::Time time_last;
     bool was_update;
@@ -97,7 +97,7 @@ void GpsCompassCorrection::gpsCallback(const sensor_msgs::NavSatFixPtr& gps_data
     }
 }
 
-bool GpsCompassCorrection::update(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data, int min_fix_status){
+bool GpsCompassCorrection::update(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status){
 
     if (!verifyGPS(gps_data, min_fix_status)){
         return false;
@@ -121,7 +121,7 @@ bool GpsCompassCorrection::update(boost::shared_ptr<const sensor_msgs::NavSatFix
     }
 }
 
-bool GpsCompassCorrection::verifyGPS(boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data, int min_fix_status){
+bool GpsCompassCorrection::verifyGPS(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status){
 
     if(!gps_data){
         ROS_ERROR("No GPS data for TF correction");
@@ -152,7 +152,7 @@ bool GpsCompassCorrection::setBearingCallback(osm_planner::computeBearing::Reque
 
     } else {
         //Get point from GPS
-        boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(
+        auto gps_data = ros::topic::waitForMessage<gps_common::GPSFix>(
                 gps_topic_, ros::Duration(3));
         if (!verifyGPS(gps_data, min_required_status_service_)){
             res.message = "No fixed GPS data";
@@ -169,7 +169,7 @@ bool GpsCompassCorrection::computeBearingCallback(std_srvs::Trigger::Request &re
     static BearingCalculator bearingCalculator;
 
     //Get point from GPS
-    boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gps_topic_, ros::Duration(3));
+    auto gps_data = ros::topic::waitForMessage<gps_common::GPSFix>(gps_topic_, ros::Duration(3));
 
     // Set minimal required status and verify data
     if(!verifyGPS(gps_data, min_required_status_service_)){
@@ -203,11 +203,11 @@ bool GpsCompassCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request
     const int max_bad_status = 5;
     int count_of_reads = 0;
 
-    boost::shared_ptr<const sensor_msgs::NavSatFix> gps_data = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gps_topic_, ros::Duration(3));
+    auto gps_data = ros::topic::waitForMessage<gps_common::GPSFix>(gps_topic_, ros::Duration(3));
     //Add First point
     while (!verifyGPS(gps_data, min_required_status_service_)){
 
-        gps_data = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gps_topic_, ros::Duration(3));
+        gps_data = ros::topic::waitForMessage<gps_common::GPSFix>(gps_topic_, ros::Duration(3));
 
         if (count_of_reads > max_bad_status) {
             res.success = false;
@@ -223,11 +223,11 @@ bool GpsCompassCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request
     robot_.move();
 
     //Add second point and verify data
-    gps_data = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gps_topic_, ros::Duration(3));
+    gps_data = ros::topic::waitForMessage<gps_common::GPSFix>(gps_topic_, ros::Duration(3));
     count_of_reads = 0;
     while (!verifyGPS(gps_data, min_required_status_service_)){
 
-        gps_data = ros::topic::waitForMessage<sensor_msgs::NavSatFix>(gps_topic_, ros::Duration(3));
+        gps_data = ros::topic::waitForMessage<gps_common::GPSFix>(gps_topic_, ros::Duration(3));
 
         if (count_of_reads > max_bad_status) {
             res.success = false;
