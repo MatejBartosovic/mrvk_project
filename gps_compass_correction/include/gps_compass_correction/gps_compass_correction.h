@@ -174,7 +174,7 @@ private:
 
         } else{
             //absolute orientation
-            tf::Transform absolute_transform(*quat, gps_translation);
+            absolute_transform = tf::Transform(*quat, gps_translation);
         }
 
         //compute correction

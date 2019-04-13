@@ -87,7 +87,7 @@ void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
     static ros::Time time_last;
     bool was_update;
 
-    if (low_precision_period_ < 0.0 && (ros::Time::now() - time_last).toSec() >= low_precision_period_){
+    if ((ros::Time::now() - time_last).toSec() >= low_precision_period_){
         was_update = update(gps_data, min_required_status_update_);
     } else{
         was_update = update(gps_data);
@@ -95,6 +95,7 @@ void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
 
     if (was_update){
         time_last = ros::Time::now();
+	ROS_INFO("gps correction with status %d",gps_data->status.status);
     }
 }
 
@@ -246,7 +247,7 @@ bool GpsCompassCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request
         return true;
     } else {
         tf::Quaternion quat;
-        quat.setRPY(0, 0, bearingCalculator.calculate(gps_data, coordinatesConverter));
+        quat.setRPY(0, 0, angle);
         sendTransform(*gps_data, &quat);
         res.message = "Computed angle: " + std::to_string(angle);
         res.success = true;
