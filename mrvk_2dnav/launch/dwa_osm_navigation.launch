@@ -8,6 +8,7 @@
     <arg name="use_gmapping" value="false"/>
     <arg name="use_gps" default="true"/>
     <arg name="use_camera" default="true"/>
+    <arg name="filter_config_path" value="$(find mrvk_laser_filters)/config/laser_filters_osm.yaml"/>
   </include>
 
    <include file="$(find gps_compass_correction)/launch/gps_compass_correction.launch">

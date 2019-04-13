@@ -22,11 +22,11 @@ scan_filter_chain:
 - name: IsolatedPointsFilter
   type: mrvk_laser_filters/IsolatedPointsFilter
   params:
-    min_accept_size: 3
+    min_accept_size: 5
 - name: TransientPointsFilter
   type: mrvk_laser_filters/TransientPointsFilter
   params:
-    num_prev_frames: 2
+    num_prev_frames: 3
 - name: range
   type: laser_filters/LaserScanRangeFilter
   params:
