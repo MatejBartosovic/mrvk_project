@@ -12,7 +12,7 @@ namespace mrvk_gui {
         setCentralStopServiceClient = n.serviceClient<std_srvs::Trigger>("setCentralStop");
         resetCentralStopServiceClient =n.serviceClient<std_srvs::Trigger>("reset_central_stop");
         blockMovementServiceClient = n.serviceClient<std_srvs::SetBool>("block_movement");
-        autoComputeGPSServiceClient = n.serviceClient<std_srvs::Trigger>("auto_compute_bearing");
+        autoComputeGPSServiceClient = n.serviceClient<std_srvs::Trigger>("/gps_compass_correction_node/auto_compute_bearing");
 
     }
 
