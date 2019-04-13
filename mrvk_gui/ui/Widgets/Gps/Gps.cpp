@@ -8,7 +8,7 @@ namespace mrvk_gui{
     {
         ui->setupUi(this);
         ros::NodeHandle n("/");
-        subscriber = new Subscriber<gps_common::GPSFix>("/fix",n);
+        subscriber = new Subscriber<gps_common::GPSFix>("/gps",n);
     }
 
     Gps::~Gps()
