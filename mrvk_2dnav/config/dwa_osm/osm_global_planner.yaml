@@ -1,6 +1,6 @@
 Planner:
-  global_frame: world
-  robot_base_frame: base_link
+  global_frame: "world"
+  robot_base_frame: "base_link"
 
   #names of topics
   topic_shortest_path: "shortest_path"
