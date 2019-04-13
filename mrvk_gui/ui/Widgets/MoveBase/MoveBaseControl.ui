@@ -22,7 +22,7 @@
    <item>
     <widget class="QCheckBox" name="goalByOffset_cbx">
      <property name="text">
-      <string>Goal by offset</string>
+      <string>Goal by /base_link offset</string>
      </property>
     </widget>
    </item>
@@ -63,7 +63,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="latitudeGoalValue"/>
+        <widget class="QLineEdit" name="latitudeGoalValue">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLineEdit" name="longitudeGoalValue"/>

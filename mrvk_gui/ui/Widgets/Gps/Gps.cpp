@@ -18,8 +18,8 @@ namespace mrvk_gui{
 
     void Gps::updateData(){
         auto data = subscriber->getData();
-        ui->latitudeValue->setText(QString::number(data.latitude, 'f', 4));
-        ui->longitudeValue->setText(QString::number(data.longitude, 'f', 4));
+        ui->latitudeValue->setText(QString::number(data.latitude, 'f', 6));
+        ui->longitudeValue->setText(QString::number(data.longitude, 'f', 6));
         ui->altitudeValue->setText(QString::number(data.altitude, 'f', 4));
         ui->latituteAccuracyValue->setText(QString::number(data.position_covariance[0], 'f', 4));
         ui->logitudeAccuracyValue->setText(QString::number(data.position_covariance[4], 'f', 4));
