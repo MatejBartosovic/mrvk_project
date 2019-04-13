@@ -20,8 +20,8 @@ namespace mrvk_gui {
 
     void mrvk_gui::Odometry::updateData() {
         auto data = odom_subscriber->getData();
-        ui->valueXvelocity->setNum(data.twist.twist.linear.x);
-        ui->valueYawVelocity->setNum(data.twist.twist.angular.z);
+        ui->valueXvelocity->setText(QString::number(data.twist.twist.linear.x, 'f', 4));
+        ui->valueYawVelocity->setText(QString::number(data.twist.twist.angular.z, 'f', 4));
     }
 
 }

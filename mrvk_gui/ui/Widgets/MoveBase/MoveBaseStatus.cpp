@@ -30,14 +30,14 @@ namespace mrvk_gui {
 
     void MoveBaseStatus::updateData(){
         ui->statusValue->setText(QString::fromStdString(status));
-        ui->currentXvalue->setNum(currentPos[0]);
-        ui->currentYValue->setNum(currentPos[1]);
-        ui->remainingValue->setNum((currentPos - goalPos).norm());
+        ui->currentXvalue->setText(QString::number(currentPos[0], 'f', 4));
+        ui->currentYValue->setText(QString::number(currentPos[1], 'f', 4));
+        ui->remainingValue->setText(QString::number((currentPos - goalPos).norm(), 'f', 4));
     }
     void MoveBaseStatus::setGoal(double x, double y){
         goalPos[0] = x;
         goalPos[1] = y;
-        ui->goalXValue->setNum(x);
-        ui->goalYValue->setNum(y);
+        ui->goalXValue->setText(QString::number(x, 'f', 4));
+        ui->goalYValue->setText(QString::number(y, 'f', 4));
     }
 }

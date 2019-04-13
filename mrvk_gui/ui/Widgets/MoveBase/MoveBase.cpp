@@ -129,7 +129,7 @@ namespace mrvk_gui {
 
 void mrvk_gui::MoveBase::goByOffsetCbx(bool value) {
     setGoalByOffset = value;
-    
+
     if (value) {
         ui->moveBaseControl->ui->latitudeTitle->setText("X");
         ui->moveBaseControl->ui->longitudTitle->setText("Y");

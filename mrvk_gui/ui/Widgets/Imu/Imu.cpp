@@ -20,13 +20,13 @@ namespace mrvk_gui{
 
     void Imu::updateData(){
         sensor_msgs::Imu newData = subscriber->getData();
-        ui->axValue->setNum(newData.linear_acceleration.x);
-        ui->ayValue->setNum(newData.linear_acceleration.y);
-        ui->azValue->setNum(newData.linear_acceleration.z);
+        ui->axValue->setText(QString::number(newData.linear_acceleration.x, 'f', 4));
+        ui->ayValue->setText(QString::number(newData.linear_acceleration.y, 'f', 4));
+        ui->azValue->setText(QString::number(newData.linear_acceleration.z, 'f', 4));
 
-        ui->gxValue->setNum(newData.angular_velocity.x);
-        ui->gyValue->setNum(newData.angular_velocity.y);
-        ui->gzValue->setNum(newData.angular_velocity.z);
+        ui->gxValue->setText(QString::number(newData.angular_velocity.x, 'f', 4));
+        ui->gyValue->setText(QString::number(newData.angular_velocity.y, 'f', 4));
+        ui->gzValue->setText(QString::number(newData.angular_velocity.z, 'f', 4));
 
     }
     Imu::~Imu()

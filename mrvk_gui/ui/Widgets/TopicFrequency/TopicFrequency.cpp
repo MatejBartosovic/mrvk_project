@@ -23,13 +23,10 @@ namespace mrvk_gui {
     }
 
     void TopicFrequency::updateData(){
-        //QString s;
-        //s = s.setNum(cameraFrequency->getFrequency(), 'g', 6);
-
-        ui->odometryValue->setNum(odometryFrequency->getFrequency());
-        ui->imuValue->setNum(imuFrequency->getFrequency());
-        ui->gpsValue->setNum(gpsFrequency->getFrequency());
-        ui->lidarValue->setNum(lidarFrequency->getFrequency());
-        ui->cameraValue->setNum(cameraFrequency->getFrequency());
+        ui->odometryValue->setText(QString::number(odometryFrequency->getFrequency(), 'f', 4));
+        ui->imuValue->setText(QString::number(imuFrequency->getFrequency(), 'f', 4));
+        ui->gpsValue->setText(QString::number(gpsFrequency->getFrequency(), 'f', 4));
+        ui->lidarValue->setText(QString::number(lidarFrequency->getFrequency(), 'f', 4));
+        ui->cameraValue->setText(QString::number(cameraFrequency->getFrequency(), 'f', 4));
     }
 }
