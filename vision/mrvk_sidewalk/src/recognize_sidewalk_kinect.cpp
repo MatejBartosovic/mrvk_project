@@ -152,6 +152,7 @@ ROS_ERROR("Sidewalk init7");
         {
             ROS_ERROR("creating vectors");
             cloudProcessing.createVectors(640,480);//(1920,1080);
+            ROS_ERROR("created vectors");
         }
 
 ROS_ERROR("Sidewalk init8");
@@ -215,17 +216,19 @@ void Sidewalk::sidewalkPublish()
 
     imageOrig = kinectImage.clone();
 
+    ROS_ERROR("Publish sidewalk");
     valid_data = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges, n);
 
     //publish processed image
     header.stamp = ros::Time::now();
     img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::RGB8, imageResult);
+    cv::imwrite("/home/smadas/sidewalk_recognition/segmented_edges_img.jpg", imageResult);
     img_bridge.toImageMsg(img_msg);
     pub_img.publish(img_msg);//publish processed image
     img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::RGB8, imageOrig);
     img_bridge.toImageMsg(img_msg_orig);
     pub_img_orig.publish(img_msg_orig);//publish original image
-
+    cv::imwrite("/home/smadas/sidewalk_recognition/orig_edges_img.jpg", imageOrig);
 }
 
 void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)

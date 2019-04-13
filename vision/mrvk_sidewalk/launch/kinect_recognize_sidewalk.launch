@@ -3,6 +3,7 @@
 <launch>
     <include file="$(find mrvk_description)/launch/load_description.launch"/>
     <rosparam command="load" file="$(find mrvk_sidewalk)/config/sidewalk_config.yaml" />
+    <rosparam command="load" file="$(find mrvk_sidewalk)/config/segmentation_config.yaml"/>
     <rosparam command="load" file="$(find mrvk_sidewalk)/calib/sidewalkTransformCalib.yaml" />
 
     <node pkg="mrvk_sidewalk" name="recognize_sidewalk_kinect" type="recognize_sidewalk_kinect"/>

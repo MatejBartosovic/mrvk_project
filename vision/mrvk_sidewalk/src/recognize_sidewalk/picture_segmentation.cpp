@@ -731,7 +731,8 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 
 	//cout<< "ilowH, iHighH, iLowS,iHighS:"<<iLowC1<<" "<<iHighC1<<" "<< iLowC2<<" "<<iHighC2<<" "<< iLowC3 <<" "<< iHighC3<<endl;
 	inRange(image123, Scalar(iLowC1, iLowC2, iLowC3), Scalar(iHighC1, iHighC2, iHighC3), imageThresh); //Threshold the image
-		
+	cv::imwrite("/home/smadas/sidewalk_recognition/6_inrange_img.jpg", imageThresh);
+	ROS_ERROR("6");
 	// Add Adams sidewalk lines
 	cv::Point3_<unsigned char> maskedPix = cv::Vec3b(1,1,1);
 	int i,j;
@@ -745,12 +746,15 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 				}
 			}
 		}
+	cv::imwrite("/home/smadas/sidewalk_recognition/7_inrange_masked_img.jpg", imageThresh);
+	ROS_ERROR("7");
 
-
-	int dilate_size = 10;
+	int dilate_size = 2;
 	n.getParam("dilate_size", dilate_size);
-	int erode_size = 10;
+	ROS_ERROR_STREAM(dilate_size);
+	int erode_size = 2;
 	n.getParam("erode_size", erode_size);
+	ROS_ERROR_STREAM(erode_size);
 
 	//morphological opening (remove small objects from the foreground)
 	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
@@ -759,7 +763,8 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	//morphological closing (fill small holes in the foreground)
 	dilate( imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(dilate_size*5, dilate_size*5)) );
 	erode(imageThresh, imageThresh, getStructuringElement(MORPH_ELLIPSE, Size(erode_size, erode_size)) );
-	
+	cv::imwrite("/home/smadas/sidewalk_recognition/8_close_open_img.jpg", imageThresh);
+	ROS_ERROR("8");
 	//contours
  	vector<vector<Point> > contours;
   	vector<Vec4i> hierarchy;
@@ -768,8 +773,8 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
   	RNG rng(12345);
   	imageCont=imageThresh.clone();
 	findContours( imageCont, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-		
-		
+	//cv::imwrite("/home/smadas/sidewalk_recognition/9_contours_img.jpg", contours);
+		ROS_ERROR("9");
 	// Approximate contours to polygons + get bounding circles
     vector<vector<Point> > contours_poly( contours.size() );
 	vector<Point2f> center( contours.size() );
@@ -786,6 +791,7 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 
 	/// Draw contours*/
 	  Mat imageContFiltered = Mat::zeros( imageCont.size(), CV_8UC3 );
+
 	/*for( int i = 0; i< contours.size(); i++ )
 	{
 		if (radius[i]>180)
@@ -808,7 +814,8 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
 	  				}
 	  			}
 	  		}
-		
+	cv::imwrite("/home/smadas/sidewalk_recognition/10_contours_filled_img.jpg", imageContFiltered);
+	  ROS_ERROR("10");
     //fill black islands
     bool fill_black_islands = false;
     n.getParam("fill_black_islands", fill_black_islands);
@@ -981,6 +988,7 @@ cv::Mat picture_segmentation_frame_c1c2c3_check(cv::Mat frame, short *valid,  Si
             }
         }
     }
-
+	ROS_ERROR("11");
+	cv::imwrite("/home/smadas/sidewalk_recognition/11_black_islands_img.jpg", imageContFiltered);
     return imageContFiltered;
 }

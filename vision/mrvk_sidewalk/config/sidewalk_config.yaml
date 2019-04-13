@@ -8,7 +8,7 @@ sidewalk_params:
   edge_marker_width: 6
   edge_start_offset: 35
   edge_side_offset_promile: 10
-  detect_percent_of_image: 60
+  detect_percent_of_image: 40
 
   undistort_image: true
   compute_edge_cloud: true

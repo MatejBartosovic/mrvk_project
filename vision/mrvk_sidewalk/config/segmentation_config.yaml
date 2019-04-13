@@ -1,14 +1,14 @@
-rangeH123rangeC1: 0.17 #best 0.07 #orig 0.03
-rangeH123rangeC2: 0.17 #best 0.07 #orig 0.03
-rangeH123rangeC3: 0.21 #best 0.11 #orig 0.07
+rangeH123rangeC1: 0.07 #best 0.07 #orig 0.03
+rangeH123rangeC2: 0.07 #best 0.07 #orig 0.03
+rangeH123rangeC3: 0.11 #best 0.11 #orig 0.07
 
 bufferDistanceThreshold: 0.03 #orig 0.03
 bufferCountThreshold: 5 #orig 5
 polyApproxEpsilon: 3 #orig 3
 rndCore: 12345 #orig 12345
 
-dilate_size: 7 #best6 #orig 10
-erode_size: 9 #best 8 #orig 10
+dilate_size: 1 #best6 #orig 10
+erode_size: 1 #best 8 #orig 10
 OVEREXPOSED: 253 #orig 245
 UNDEREXPOSED: 3 #orig 30
 
@@ -22,4 +22,8 @@ iHighV: 255 #orig 255
 fill_black_islands: true
 remote_pixel_weight: 3
 black_island_min_pixels: 40000
+
+canny_down: 30
+canny_up: 100
+kernel_size: 5
 

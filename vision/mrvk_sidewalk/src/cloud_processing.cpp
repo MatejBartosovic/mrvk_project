@@ -15,17 +15,18 @@ pcl::PointXYZRGB CloudProcessing::depthToPointCloudPos(int x, int y, float depth
 void CloudProcessing::createVectors(int width, int height) {
 
     tf::StampedTransform kinect_transform;
-
+    ROS_ERROR("Creating vectors");
     int skip = 1;
-
+    ROS_ERROR("Creating vectors");
     for (int x = 0; x < width; x+=skip) {
         for (int y = 0; y < height; y+=skip) {
             cloud.points.push_back(depthToPointCloudPos(x, y,1));
         }
     }
+    ROS_ERROR("creating vectors");
 
     toROSMsg (cloud, ros_cloud);
-    std::string kinFrame("kinect_ir");
+    std::string kinFrame("camera_frame");//"kinect_ir");
     std::string baseLinkFrame("base_link");
 #ifdef DEBUG
     ROS_ERROR_STREAM(kinFrame);
