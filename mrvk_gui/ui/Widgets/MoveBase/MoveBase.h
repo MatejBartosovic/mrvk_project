@@ -27,11 +27,14 @@ namespace mrvk_gui {
         actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> actionClient;
         double latitudeMapOffset;
         double longitudeMapOffset;
+        bool setGoalByOffset = false;
+
     public slots:
         void goSlot();
         void cancelSlot();
         void editMapOffsetSlot();
         void readQrCodeSlot();
+        void goByOffsetCbx(bool value);
     };
 }
 #endif // MOVEBASE_H

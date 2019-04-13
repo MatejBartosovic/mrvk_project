@@ -28,7 +28,7 @@ namespace mrvk_gui {
         connect(ui->moveBaseControl->ui->cancelButton,SIGNAL(released()),this,SLOT(cancelSlot()));
         connect(ui->moveBaseControl->ui->mapOffsetButton,SIGNAL(released()),this,SLOT(editMapOffsetSlot()));
         connect(ui->moveBaseControl->ui->loadQrCodeButton,SIGNAL(released()),this,SLOT(readQrCodeSlot()));
-
+        connect(ui->moveBaseControl->ui->goalByOffset_cbx, SIGNAL(clicked(bool)), this, SLOT(goByOffsetCbx(bool)));
     }
 
     MoveBase::~MoveBase() {
@@ -46,25 +46,39 @@ namespace mrvk_gui {
 //            box.exec();
 //            return;
 //        }
+
         if(ui->moveBaseControl->ui->latitudeGoalValue->text().isEmpty() || ui->moveBaseControl->ui->longitudeGoalValue->text().isEmpty()){
             return;
         }
         move_base_msgs::MoveBaseGoal goal;
         goal.target_pose.header.stamp = ros::Time::now();
-        goal.target_pose.header.frame_id = "map"; //TODO parameter alebo combo box zo vsetkimi framami??
-        tf::quaternionEigenToMsg(Eigen::Quaterniond(1,0,0,0),goal.target_pose.pose.orientation);
 
-        osm_planner::coordinates_converters::GeoNode geoNode = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue->text().toStdString()) - latitudeMapOffset ,std::stod(ui->moveBaseControl->ui->longitudeGoalValue->text().toStdString()) - longitudeMapOffset ,0,0}; //TODO init
+        if (setGoalByOffset) {
+            // user set goal by local offset in robot space
+            goal.target_pose.header.frame_id = "base_link";
 
-        std::cout << geoNode.latitude << "  "<<geoNode.longitude << std::endl;
+            goal.target_pose.pose.position.x = ui->moveBaseControl->ui->latitudeGoalValue->text().toDouble();
+            goal.target_pose.pose.position.y = ui->moveBaseControl->ui->longitudeGoalValue->text().toDouble();
+            goal.target_pose.pose.position.z = 0;
+        } else {
+            // user set goal by geo space
 
-        osm_planner::coordinates_converters::HaversineFormula converter;
-        converter.setOrigin(1,1); //TODO
-        goal.target_pose.pose.position.x = converter.getCoordinateX(geoNode);
-        goal.target_pose.pose.position.y = converter.getCoordinateY(geoNode);
-        goal.target_pose.pose.position.z = 0;
+            goal.target_pose.header.frame_id = "map";  //TODO parameter alebo combo box zo vsetkimi framami??
 
-        ui->moveBaseStatus->setGoal(goal.target_pose.pose.position.x,goal.target_pose.pose.position.y);
+            tf::quaternionEigenToMsg(Eigen::Quaterniond(1,0,0,0),goal.target_pose.pose.orientation);
+
+            osm_planner::coordinates_converters::GeoNode geoNode = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue->text().toStdString()) - latitudeMapOffset ,std::stod(ui->moveBaseControl->ui->longitudeGoalValue->text().toStdString()) - longitudeMapOffset ,0,0}; //TODO init
+
+            std::cout << geoNode.latitude << "  "<<geoNode.longitude << std::endl;
+
+            osm_planner::coordinates_converters::HaversineFormula converter;
+            converter.setOrigin(1,1); //TODO
+            goal.target_pose.pose.position.x = converter.getCoordinateX(geoNode);
+            goal.target_pose.pose.position.y = converter.getCoordinateY(geoNode);
+            goal.target_pose.pose.position.z = 0;
+        }
+
+        ui->moveBaseStatus->setGoal(goal.target_pose.pose.position.x, goal.target_pose.pose.position.y);
 
         actionClient.sendGoal(goal,boost::bind(&MoveBaseStatus::doneCallback, ui->moveBaseStatus, _1, _2),
                 boost::bind(&MoveBaseStatus::activeCallback, ui->moveBaseStatus),
@@ -110,5 +124,23 @@ namespace mrvk_gui {
             file << std::fixed << std::setprecision(6) << latitudeMapOffset << std::endl <<longitudeMapOffset<<std::endl;
             file.close();
         }
+    }
+}
+
+void mrvk_gui::MoveBase::goByOffsetCbx(bool value) {
+    setGoalByOffset = value;
+    
+    if (value) {
+        ui->moveBaseControl->ui->latitudeTitle->setText("X");
+        ui->moveBaseControl->ui->longitudTitle->setText("Y");
+
+        // disable some items
+        ui->moveBaseControl->ui->coppyrStartToGoalButton->setDisabled(true);
+    } else {
+        ui->moveBaseControl->ui->latitudeTitle->setText("Latitude");
+        ui->moveBaseControl->ui->longitudTitle->setText("Longitude");
+
+        // enable some items
+        ui->moveBaseControl->ui->coppyrStartToGoalButton->setDisabled(false);
     }
 }
