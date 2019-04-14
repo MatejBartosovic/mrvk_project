@@ -15,7 +15,9 @@ namespace mrvk_laser_filters {
 
     bool PointSpeedFilter::configure(){
         getParam("point_speed_max",maxVelocity);
-
+        std::cout << "PointSpeedFilter" << std::endl;
+        std::cout << "point_speed_max: " << maxVelocity << std::endl;
+        return true;
     }
 
     bool PointSpeedFilter::update(const sensor_msgs::LaserScan& data_in, sensor_msgs::LaserScan& data_out){
@@ -52,6 +54,9 @@ namespace mrvk_laser_filters {
 
     bool IsolatedPointsFilter::configure(){
         getParam("min_accept_size",minAcceptSize);
+        std::cout << "IsolatedPointsFilter" << std::endl;
+        std::cout << "min_accept_size: " << minAcceptSize << std::endl;
+        return true;
     }
 
     bool IsolatedPointsFilter::update(const sensor_msgs::LaserScan& data_in, sensor_msgs::LaserScan& data_out){
@@ -64,7 +69,7 @@ namespace mrvk_laser_filters {
         for(int i = 0; i<data_out.ranges.size(); i++){
             float dist = data_out.ranges.at(i);
             if(!std::isinf(dist) && !std::isnan(dist)){
-                count += 1;
+                count ++;
                 if (!is_region) {
                     is_region = true;
                     start_i = i;
@@ -92,7 +97,10 @@ namespace mrvk_laser_filters {
     }
 
     bool TransientPointsFilter::configure(){
-        getParam("min_accept_size",numPrevFrames);
+        getParam("num_prev_frames",numPrevFrames);
+        std::cout << "TransientPointsFilter" << std::endl;
+        std::cout << "num_prev_frames: " << numPrevFrames << std::endl;
+        return true;
     }
 
     bool TransientPointsFilter::update(const sensor_msgs::LaserScan& data_in, sensor_msgs::LaserScan& data_out){

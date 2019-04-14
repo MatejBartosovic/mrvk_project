@@ -15,10 +15,10 @@ scan_filter_chain:
 #    max_angle: 165
 #    neighbors: 2
 #    window: 2
-#- name: PointSpeedFilter
-#  type: mrvk_laser_filters/PointSpeedFilter
-#  params:
-#    point_speed_max: 3.0 # [m/s]
+- name: PointSpeedFilter
+  type: mrvk_laser_filters/PointSpeedFilter
+  params:
+    point_speed_max: 1
 - name: IsolatedPointsFilter
   type: mrvk_laser_filters/IsolatedPointsFilter
   params:
