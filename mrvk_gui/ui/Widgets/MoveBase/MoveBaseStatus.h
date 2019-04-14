@@ -7,6 +7,7 @@
 #include <rosconsole/macros_generated.h>
 #include <actionlib/client/simple_client_goal_state.h>
 #include <Eigen/Core>
+#include <mrvk_gui/GuiDefines.h>
 
 namespace Ui {
 class MoveBaseStatus;
@@ -35,6 +36,7 @@ namespace mrvk_gui {
         Eigen::Vector3d currentPos;
         Eigen::Vector3d goalPos;
         std::string status;
+
     };
 }
 #endif // MOVEBASESTATUS_H

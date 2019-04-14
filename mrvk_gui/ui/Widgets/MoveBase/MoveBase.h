@@ -13,11 +13,7 @@
 #include <ros/ros.h>
 #include <sstream>
 #include <tf/transform_listener.h>
-
-#define ORIGIN_LATITUDE_PARAM_PATH "/move_base/Planner/origin_latitude"
-#define ORIGIN_LONGTITUDE_PARAM_PATH "/move_base/Planner/origin_longitude"
-#define TF_WORLD_FRAME "/world"
-#define TF_BASE_LINK_FRAME "/base_link"
+#include <mrvk_gui/GuiDefines.h>
 
 namespace Ui {
 class MoveBase;

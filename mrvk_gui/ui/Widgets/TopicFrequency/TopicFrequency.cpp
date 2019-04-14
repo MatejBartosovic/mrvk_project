@@ -23,10 +23,23 @@ namespace mrvk_gui {
     }
 
     void TopicFrequency::updateData(){
-        ui->odometryValue->setText(QString::number(odometryFrequency->getFrequency(), 'f', 4));
-        ui->imuValue->setText(QString::number(imuFrequency->getFrequency(), 'f', 4));
-        ui->gpsValue->setText(QString::number(gpsFrequency->getFrequency(), 'f', 4));
-        ui->lidarValue->setText(QString::number(lidarFrequency->getFrequency(), 'f', 4));
-        ui->cameraValue->setText(QString::number(cameraFrequency->getFrequency(), 'f', 4));
+        setLabel(ui->odometryValue, odometryFrequency->getFrequency());
+        setLabel(ui->imuValue, imuFrequency->getFrequency());
+        setLabel(ui->gpsValue, gpsFrequency->getFrequency());
+        setLabel(ui->lidarValue, lidarFrequency->getFrequency());
+        setLabel(ui->cameraValue, cameraFrequency->getFrequency());
+    }
+
+    void TopicFrequency::setLabel(QLabel *label, double value) {
+        if (HZ_OK < value) {
+            label->setStyleSheet(QLABEL_COLOR_OK);
+        } else if (HZ_WARNING < value) {
+            label->setStyleSheet(QLABEL_COLOR_WARNING);
+        } else {
+            label->setStyleSheet(QLABEL_COLOR_ERROR);
+        }
+
+        label->setText(QString::number(value, 'f', 4));
     }
 }
+

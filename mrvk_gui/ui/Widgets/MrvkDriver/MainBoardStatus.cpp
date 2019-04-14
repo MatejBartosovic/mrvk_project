@@ -46,10 +46,30 @@ namespace mrvk_gui {
                 for (const auto &data: status.values) {
                     auto labelElem = labelsMap.find(data.key);
                     labelElem->second->setText(QString::fromStdString(data.value));
+
+                    if (data.key == "central_stop") {
+                        labelElem->second->setStyleSheet((data.value == "True")? QLABEL_COLOR_OK : QLABEL_COLOR_ERROR);
+                    } else if (data.key == "hardware_central_stop") {
+                        labelElem->second->setStyleSheet((data.value == "True")? QLABEL_COLOR_OK : QLABEL_COLOR_ERROR);
+                    } else if (data.key == "battery1_voltage") {
+                        setBatteryValueColor(labelElem->second, data.value);
+                    } else if (data.key == "battery2_voltage") {
+                        setBatteryValueColor(labelElem->second, data.value);
+                    }
                 }
             }
         }
     }
 
+    void MainBoardStatus::setBatteryValueColor(QLabel* label, std::string value) {
+        auto value_d = std::stod(value);
+        if (BATTERY_OK < value_d) {
+            label->setStyleSheet(QLABEL_COLOR_OK);
+        } else if (BATTERY_WARNING < value_d) {
+            label->setStyleSheet(QLABEL_COLOR_WARNING);
+        } else {
+            label->setStyleSheet(QLABEL_COLOR_ERROR);
+        }
+    }
 
 }   // mrvk namespace

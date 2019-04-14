@@ -6,8 +6,11 @@
 #include <mrvk_gui/Subscriber.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
 #include <map>
+#include <mrvk_gui/GuiDefines.h>
 
 #define MAIN_BOARD_STATUS_NAME "mrvk_driver: main board status"
+#define BATTERY_OK 12.6
+#define BATTERY_WARNING 11.9
 
 namespace Ui {
 class MainBoardStatus;
@@ -43,7 +46,7 @@ namespace mrvk_gui {
         Ui::MainBoardStatus* ui;
         my_Subscriber *subscriber;
         std::map<std::string, QLabel*> labelsMap;
-
+        void setBatteryValueColor(QLabel *label, std::string value);
     };
 }
 #endif // MAINBOARDSTATUS_H
