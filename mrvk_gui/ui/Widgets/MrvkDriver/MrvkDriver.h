@@ -24,6 +24,7 @@ namespace mrvk_gui {
         void blockMovement();
         void unblockMovement();
         void autoComputeGPS();
+        void drawRoads();
 
     private:
         Ui::MrvkDriver* ui;

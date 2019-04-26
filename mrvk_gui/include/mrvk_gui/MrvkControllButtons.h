@@ -17,6 +17,7 @@ namespace mrvk_gui {
         void blockMovement();
         void unblockMovement();
         void autoComputeGPS();
+        void drawRoads();
 
     private:
         ros::ServiceClient setCentralStopServiceClient;
@@ -24,6 +25,7 @@ namespace mrvk_gui {
         ros::ServiceClient blockMovementServiceClient;
         ros::ServiceClient unblockMovementServiceClient;
         ros::ServiceClient autoComputeGPSServiceClient;
+        ros::ServiceClient drawRouteService;
     };
 }
 

@@ -13,6 +13,7 @@ namespace mrvk_gui {
         connect(ui->blockMovementButton,SIGNAL(released()),this,SLOT(blockMovement()));
         connect(ui->unblockMovementButton,SIGNAL(released()),this,SLOT(unblockMovement()));
         connect(ui->autoComputeGPSButton,SIGNAL(released()),this,SLOT(autoComputeGPS()));
+        connect(ui->drawRoadsButton,SIGNAL(released()),this,SLOT(drawRoads()));
     }
 
     MrvkDriver::~MrvkDriver() {
@@ -81,5 +82,18 @@ namespace mrvk_gui {
     }
     void mrvk_gui::MrvkDriver::updateData() {
         ui->mainBoardStatus->updateData();
+    }
+
+    void mrvk_gui::MrvkDriver::drawRoads(){
+        QString string;
+        try{
+            mrvkButtons.drawRoads();
+            string = "Ok";
+        }
+        catch(ButtonsException& e){
+            string = e.what();
+        }
+        QMessageBox msgBox(QMessageBox::Information,"Auto compute GPS",string);
+        msgBox.exec();
     }
 }

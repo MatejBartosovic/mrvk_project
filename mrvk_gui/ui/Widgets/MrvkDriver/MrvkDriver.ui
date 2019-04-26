@@ -63,6 +63,13 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="drawRoadsButton">
+     <property name="text">
+      <string>Draw roads</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>

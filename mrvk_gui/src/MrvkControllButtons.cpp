@@ -6,6 +6,8 @@
 #include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
 #include <mrvk_gui/ButtonException.h>
+#include <std_srvs/Empty.h>
+
 namespace mrvk_gui {
     MrvkControllButtons::MrvkControllButtons() {
         ros::NodeHandle n("/");
@@ -13,6 +15,7 @@ namespace mrvk_gui {
         resetCentralStopServiceClient =n.serviceClient<std_srvs::Trigger>("reset_central_stop");
         blockMovementServiceClient = n.serviceClient<std_srvs::SetBool>("block_movement");
         autoComputeGPSServiceClient = n.serviceClient<std_srvs::Trigger>("/gps_compass_correction_node/auto_compute_bearing");
+        drawRouteService = n.serviceClient<std_srvs::Trigger>("/move_base/Planner/draw_route");
 
     }
 
@@ -41,5 +44,12 @@ namespace mrvk_gui {
     void MrvkControllButtons::autoComputeGPS() {
         std_srvs::Trigger msg;
         callService(autoComputeGPSServiceClient,msg);
+    }
+
+        void MrvkControllButtons::drawRoads() {
+        std_srvs::Empty msg;
+        if(!drawRouteService.call(msg)){
+          throw ButtonsException(drawRouteService.getService() + " service is not running");
+        } 
     }
 }
