@@ -2,13 +2,14 @@
 <launch>
   <master auto="start"/>
 
-   <arg name="osm_map_path"/>
+   <arg name="osm_map_config"/>
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
     <param name="controller_frequency" value="10"/>
     <param name="base_global_planner" value="osm_planner/Planner"/>
-    <param name="Planner/osm_map_path" value="$(arg osm_map_path)"/>
+    <param name="Planner/osm_map_path" value="$(arg osm_map_config)"/>
+    <rosparam file="$(arg osm_map_path)" command="load" subst_value="true"/>
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_parser.yaml" command="load" ns="Planner"/>
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_common.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_common.yaml" command="load" ns="local_costmap" />
