@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="rviz" type="rviz" respawn="false" name="rviz" output="screen" args="-d $(find mrvk_2dnav)/rviz/mavigation_kinetic.rviz"/>
+    <node pkg="mrvk_gui" type="mrvk_gui" respawn="false" name="mrvk_gui" output="screen"/>
+</launch>
