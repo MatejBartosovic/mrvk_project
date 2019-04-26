@@ -41,15 +41,15 @@ namespace mrvk_gui {
         callService(blockMovementServiceClient,msg);
     }
 
-    void MrvkControllButtons::autoComputeGPS() {
+    double MrvkControllButtons::autoComputeGPS() {
         std_srvs::Trigger msg;
         callService(autoComputeGPSServiceClient,msg);
     }
 
-        void MrvkControllButtons::drawRoads() {
+    void  MrvkControllButtons::drawRoads() {
         std_srvs::Empty msg;
         if(!drawRouteService.call(msg)){
           throw ButtonsException(drawRouteService.getService() + " service is not running");
-        } 
+        }
     }
 }

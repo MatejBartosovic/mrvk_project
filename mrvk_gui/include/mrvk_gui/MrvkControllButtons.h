@@ -16,7 +16,7 @@ namespace mrvk_gui {
         void resetCentralStop();
         void blockMovement();
         void unblockMovement();
-        void autoComputeGPS();
+        double autoComputeGPS();
         void drawRoads();
 
     private:

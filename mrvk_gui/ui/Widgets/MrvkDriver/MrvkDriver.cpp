@@ -71,8 +71,8 @@ namespace mrvk_gui {
     void MrvkDriver::autoComputeGPS() {
         QString string;
         try{
-            mrvkButtons.autoComputeGPS();
-            string = "Ok";
+            double angle = mrvkButtons.autoComputeGPS();
+            string = QString("Ok. Angle: ") + QString::number(angle);
         }
         catch(ButtonsException& e){
             string = e.what();
