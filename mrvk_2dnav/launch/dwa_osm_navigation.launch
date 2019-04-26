@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="map" default="$(find osm_planner)/osm_example/fei.osm"/>
+  <arg name="map_config" default="$(find mrvk_2dnav)/config/dwa_osm/fei_map_config.yaml"/>
 
   <include file="$(find mrvk_sensors)/launch/robot.launch" >
     <!--<arg name="vo_used" default="true"/>-->
@@ -12,10 +12,10 @@
   </include>
 
    <include file="$(find gps_compass_correction)/launch/gps_compass_correction.launch">
-    <arg name="osm_map_path" value="$(arg map)"/>
+    <arg name="osm_map_config" value="$(arg map_config)"/>
   </include>
 
   <include file="$(find mrvk_2dnav)/launch/move_base_dwa_osm.launch" >
-    <arg name="osm_map_path" value="$(arg map)"/>
+    <arg name="osm_map_config" value="$(arg map_config)"/>
   </include>
 </launch>
