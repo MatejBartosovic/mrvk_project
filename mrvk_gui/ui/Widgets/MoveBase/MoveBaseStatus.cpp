@@ -30,6 +30,7 @@ namespace mrvk_gui {
     void MoveBaseStatus::doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result){
         using namespace actionlib;
 
+
         switch(state.state_) {
             case SimpleClientGoalState::ABORTED:
             case SimpleClientGoalState::REJECTED:

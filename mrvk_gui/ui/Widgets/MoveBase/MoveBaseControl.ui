@@ -40,14 +40,28 @@
        <item>
         <widget class="QLabel" name="latitudeTitle">
          <property name="text">
-          <string>Latitude</string>
+          <string>Latitude 1</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="longitudTitle">
          <property name="text">
-          <string>Longitude</string>
+          <string>Longitude 1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="latitudeTitle2">
+         <property name="text">
+          <string>Latitude 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="longitudTitle2">
+         <property name="text">
+          <string>Longitude 2</string>
          </property>
         </widget>
        </item>
@@ -70,10 +84,31 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="text">
+          <string>48,154231</string>
+         </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="longitudeGoalValue"/>
+        <widget class="QLineEdit" name="longitudeGoalValue">
+         <property name="text">
+          <string>17,072440</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="latitudeGoalValue2">
+         <property name="text">
+          <string>48,153059</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="longitudeGoalValue2">
+         <property name="text">
+          <string>17,072392</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

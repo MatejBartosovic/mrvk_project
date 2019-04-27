@@ -14,6 +14,8 @@
 #include <sstream>
 #include <tf/transform_listener.h>
 #include <mrvk_gui/GuiDefines.h>
+#include <QThread>
+#include <atomic>
 
 namespace Ui {
 class MoveBase;
@@ -38,6 +40,10 @@ namespace mrvk_gui {
         double latitudeMapOffset = 0;
         double longitudeMapOffset = 0;
         bool setGoalByOffset = false;
+        QThread goalThread;
+
+        void doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result);
+        std::atomic<bool> goalDone;
 
     public slots:
         void goSlot();
@@ -45,6 +51,8 @@ namespace mrvk_gui {
         void editMapOffsetSlot();
         void readQrCodeSlot();
         void goByOffsetCbx(bool value);
+        void trackGoals();
+
     };
 }
 #endif // MOVEBASE_H
