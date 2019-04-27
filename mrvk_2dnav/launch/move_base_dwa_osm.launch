@@ -8,7 +8,7 @@
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
     <param name="controller_frequency" value="10"/>
     <param name="base_global_planner" value="osm_planner/Planner"/>
-    <rosparam file="$(arg osm_map_config)" command="load" subst_value="true"/>
+    <rosparam file="$(arg osm_map_config)" command="load" ns="Planner"/>
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_parser.yaml" command="load" ns="Planner"/>
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_common.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find mrvk_2dnav)/config/dwa_osm/costmap_common.yaml" command="load" ns="local_costmap" />

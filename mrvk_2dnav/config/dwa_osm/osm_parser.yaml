@@ -6,5 +6,5 @@ set_origin_pose: 3          # Set the origin pose on the map for cartesian calcu
                                 # 2 - random origin pose
                                 # 3 - origin pose from param
 
-origin_latitude: 48.1531010533  #49.2112037 zilina
-origin_longitude: 17.0743728117 #18.7448376 zilina                          # If value is all, then parse all routes
+#origin_latitude: 48.1531010533  #49.2112037 zilina										!!!!!!!!!!!!!!! bacha teraz su tieto parametre ohladom mapi v samostatnom connfigu
+#origin_longitude: 17.0743728117 #18.7448376 zilina                          # If value is all, then parse all routes

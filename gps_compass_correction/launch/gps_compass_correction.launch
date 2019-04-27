@@ -3,7 +3,7 @@
     <arg name="osm_map_config" default="$(find osm_planner)/osm_example/fei.osm"/>
     <node  name="gps_compass_correction_node" pkg="gps_compass_correction" type="gps_compass_correction_node">
         <rosparam file="$(find gps_compass_correction)/config/config.yaml" command="load"/>
-        <rosparam file="$(arg osm_map_config)" command="load" subst_value="true"/>
+        <rosparam file="$(arg osm_map_config)" command="load"/>
         <!--rosparam file="$(find mrvk_2dnav)/config/dwa_osm/osm_parser.yaml" command="load"/-->
     </node>
 </launch>
