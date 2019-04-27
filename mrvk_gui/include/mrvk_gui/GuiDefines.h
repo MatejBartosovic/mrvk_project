@@ -8,8 +8,8 @@
 #define ORIGIN_LATITUDE_PARAM_PATH "/move_base/Planner/origin_latitude"
 #define ORIGIN_LONGTITUDE_PARAM_PATH "/move_base/Planner/origin_longitude"
 
-#define TF_WORLD_FRAME "/world"
-#define TF_BASE_LINK_FRAME "/base_link"
+#define TF_WORLD_FRAME "world"
+#define TF_BASE_LINK_FRAME "base_link"
 
 #define QLABEL_COLOR_ERROR "QLabel { color : red; }"
 #define QLABEL_COLOR_OK "QLabel { color : green; }"

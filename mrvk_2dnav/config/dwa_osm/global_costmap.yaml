@@ -1,4 +1,18 @@
 global_costmap:
   global_frame: world
   robot_base_frame: base_link
-  static_map: true
+
+  update_frequency: 2.0
+  publish_frequency: 5.0
+  transform_tolerance: 1
+
+  static_map: false
+  #map_topic: default_map_override
+  rolling_window: true
+
+  width: 100
+  height: 100
+  origin_x: -50
+  origin_y: -50
+  resolution: 1.0
+
