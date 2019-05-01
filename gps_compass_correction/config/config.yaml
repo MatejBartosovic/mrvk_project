@@ -11,8 +11,9 @@ use_compass: false        # If it is true, then is used Imu orientation for corr
 # STATUS_FIX =      0        - unaugmented fix#
 # STATUS_SBAS_FIX = 1        - with satellite-based augmentation
 # STATUS_GBAS_FIX = 2        - with ground-based augmentation
-min_required_status_update: 0  # This is minimal GPS status for calculating bearing using ROS services
-min_required_status_service: 0 # If is the GPS status GBAS_FIX inaccessible and low_precision_period is reached,
+min_required_status_service: 0 # This is minimal GPS status for calculating bearing using ROS services
+allways_allowed_status: 2      # Position is allways update if is reached this status
+min_required_status_update: 0  # If is the GPS status GBAS_FIX inaccessible and low_precision_period is reached,
                                # then is used lower status from this param
 low_precision_period: 30       # Time for TF correction while GPS get lower precision
 

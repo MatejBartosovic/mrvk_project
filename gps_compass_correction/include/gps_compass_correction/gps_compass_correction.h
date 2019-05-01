@@ -33,18 +33,29 @@ public:
     GpsCompassCorrection();
 
     /**
-     * @brief Verify GPS data and calculate new transform for correction
+     * @brief In callback is called method updatePosition()
+     * When isn't received status GBAS_FIX during low_precision_period_,
+     * then is used just status FIX for correction
+     * If you mustn't use low precision, then set negative value on ROS param low_precision_period
      * @param gps_data - Some gps data
-     * @param min_fix_status - Minimal required GPS status for correction
      * @return True when is transform successfully calculated
      */
-    bool update(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status = gps_common::GPSStatus::STATUS_GBAS_FIX);
+    bool updateCallback(boost::shared_ptr<const gps_common::GPSFix> gps_data, int required_status = gps_common::GPSStatus::STATUS_GBAS_FIX);
+
+    /**
+ * @brief Verify GPS data and calculate new transform for correction
+ * @param gps_data - Some gps data
+ * @param min_fix_status - Minimal required GPS status for correction
+ * @return True when is transform successfully calculated
+ */
+    bool updatePosition(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status = gps_common::GPSStatus::STATUS_GBAS_FIX);
 
 private:
 
     bool use_compass_;                     ///< It's true, then is used angle from compass for correction
     double low_precision_period_;          ///< Period of correction while is inaccessible GBAS_FIX status
-    int min_required_status_update_;              ///< GPS minimal required status for correction
+    int allways_allowed_status_;           ///< Allways allowed status for uptade position
+    int min_required_status_update_;       ///< GPS minimal required status for correction
     int min_required_status_service_;      ///< GPS minimal required status for correction
 
     // Names
@@ -56,6 +67,7 @@ private:
     ros::ServiceServer set_bearing_service_;
     ros::ServiceServer compute_bearing_service_;
     ros::ServiceServer auto_compute_bearing_service_;
+    ros::ServiceServer force_update_service_;
 
     //tf variables
     tf::TransformBroadcaster tf_broadcaster_;
@@ -94,10 +106,7 @@ private:
     bool verifyGPS(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status);
 
     /**
-     * @brief Gps subscriber callback. In callback is called method update()
-     * When isn't received status GBAS_FIX during low_precision_period_,
-     * then is used just status FIX for correction
-     * If you mustn't use low precision, then set negative value on ROS param low_precision_period
+     * @brief Gps subscriber callback.
      * @param gps_data - Some gps data from topic
      */
     void gpsCallback(const gps_common::GPSFixPtr& gps_data);
@@ -130,6 +139,14 @@ private:
      * @return - always True
      */
     bool autoComputeBearingCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
+
+    /**
+ * @brief - Force update position if gps status is STATUS_FIX
+ * @param req - Empty data
+ * @param res - result message
+ * @return - always True
+ */
+    bool forceUpdateCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
 
     /**
      * @brief A template method for calculating transform

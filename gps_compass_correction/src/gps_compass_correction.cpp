@@ -20,6 +20,7 @@ GpsCompassCorrection::GpsCompassCorrection() : n_("~"), robot_(n_), corrected_tr
     n_.param<double>("low_precision_period", low_precision_period_, 30);
     n_.param<int>("min_required_status_update", min_required_status_update_, gps_common::GPSStatus::STATUS_FIX);
     n_.param<int>("min_required_status_service", min_required_status_service_, gps_common::GPSStatus::STATUS_FIX);
+    n_.param<int>("allways_allowed_status", allways_allowed_status_, gps_common::GPSStatus::STATUS_GBAS_FIX);
 
     // Get map origin
     setMapOrigin(n_);
@@ -29,6 +30,7 @@ GpsCompassCorrection::GpsCompassCorrection() : n_("~"), robot_(n_), corrected_tr
     compute_bearing_service_ = n_.advertiseService("compute_bearing", &GpsCompassCorrection::computeBearingCallback, this);
     set_bearing_service_ = n_.advertiseService("set_bearing", &GpsCompassCorrection::setBearingCallback, this);
     auto_compute_bearing_service_ = n_.advertiseService("auto_compute_bearing", &GpsCompassCorrection::autoComputeBearingCallback, this);
+    force_update_service_ = n_.advertiseService("force_update", &GpsCompassCorrection::forceUpdateCallback, this);
 
     // Create thread for broadcasting tf
     double tf_rate;
@@ -84,23 +86,51 @@ void GpsCompassCorrection::tfBroadcasterCallback(const double frequence){
 
 void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
 
+  updateCallback(gps_data, allways_allowed_status_);
+}
+
+bool GpsCompassCorrection::forceUpdateCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res) {
+    double timeout = 5;
+    auto gps_data = ros::topic::waitForMessage<gps_common::GPSFix>(gps_topic_, ros::Duration(timeout));
+
+    if (!gps_data){
+        res.success = false;
+        res.message = "No gps data received after" + std::to_string(timeout) + " seconds";
+        return true;
+    }
+    if (!updateCallback(gps_data, gps_common::GPSStatus::STATUS_FIX)){
+        res.success = false;
+        res.message = "No fixed gps data received";
+        return true;
+    }
+
+    res.success = true;
+    res.message = "Ok";
+    return true;
+}
+
+bool GpsCompassCorrection::updateCallback(boost::shared_ptr<const gps_common::GPSFix> gps_data, int required_status) {
+
     static ros::Time time_last;
     bool was_update;
     double seconds = (ros::Time::now() - time_last).toSec();
 
     if ( seconds >= low_precision_period_){
-        was_update = update(gps_data, min_required_status_update_);
+        was_update = updatePosition(gps_data, min_required_status_update_);
     } else{
-        was_update = update(gps_data);
+        was_update = updatePosition(gps_data, required_status);
     }
 
     if (was_update){
         ROS_DEBUG("Updated position with gps status %d after %f seconds", gps_data->status.status, seconds);
         time_last = ros::Time::now();
+        return true;
     }
+
+    return false;
 }
 
-bool GpsCompassCorrection::update(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status){
+bool GpsCompassCorrection::updatePosition(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status){
 
     if (!verifyGPS(gps_data, min_fix_status)){
         return false;
