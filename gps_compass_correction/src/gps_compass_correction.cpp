@@ -86,16 +86,17 @@ void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
 
     static ros::Time time_last;
     bool was_update;
+    double seconds = (ros::Time::now() - time_last).toSec();
 
-    if ((ros::Time::now() - time_last).toSec() >= low_precision_period_){
+    if ( seconds >= low_precision_period_){
         was_update = update(gps_data, min_required_status_update_);
     } else{
         was_update = update(gps_data);
     }
 
     if (was_update){
+        ROS_DEBUG("Updated position with gps status %d after %f seconds", gps_data->status.status, seconds);
         time_last = ros::Time::now();
-	ROS_INFO("gps correction with status %d",gps_data->status.status);
     }
 }
 
@@ -131,7 +132,7 @@ bool GpsCompassCorrection::verifyGPS(boost::shared_ptr<const gps_common::GPSFix>
     }
 
     if  (gps_data->status.status < min_fix_status){
-        ROS_INFO("Can not use %d status, Min allowed status is %d", gps_data->status.status, min_fix_status);
+        ROS_DEBUG("Can not use %d status, Min allowed status is %d", gps_data->status.status, min_fix_status);
         return false;
     } else{
         return true;
