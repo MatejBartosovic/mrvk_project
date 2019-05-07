@@ -14,6 +14,7 @@ namespace mrvk_gui{
     Gps::~Gps()
     {
         delete ui;
+        delete subscriber;
     }
 
     void Gps::updateData(){

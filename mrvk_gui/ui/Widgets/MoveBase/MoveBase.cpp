@@ -27,10 +27,10 @@ namespace mrvk_gui {
         }
 
         std::lconv* lc = std::localeconv();
-        QRegExpValidator* latitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:90(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\" + QString( lc->decimal_point) + "[0-9]{1,6})?))$"));
+        QRegExpValidator* latitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:90(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\" + QString( lc->decimal_point) + "[0-9]{1,6})?))$"), this);
         ui->moveBaseControl->ui->latitudeGoalValue->setValidator(latitudeValidator);
 
-        QRegExpValidator* longitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\"+ QString( lc->decimal_point) + "[0-9]{1,6})?))$"));
+        QRegExpValidator* longitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\"+ QString( lc->decimal_point) + "[0-9]{1,6})?))$"), this);
         ui->moveBaseControl->ui->longitudeGoalValue->setValidator(longitudeValidator);
 
 //        loadDefaultMapOffset();

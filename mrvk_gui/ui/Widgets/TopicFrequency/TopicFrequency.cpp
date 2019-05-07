@@ -14,12 +14,15 @@ namespace mrvk_gui {
         gpsFrequency = new TopicFrequencySubscriber<gps_common::GPSFix>("/gps",n);
         lidarFrequency = new TopicFrequencySubscriber<sensor_msgs::LaserScan>("/scan",n);
         cameraFrequency = new TopicFrequencySubscriber<sensor_msgs::Image>("/mrvk_gui/image",n);
-
-
     }
 
     TopicFrequency::~TopicFrequency() {
         delete ui;
+        delete odometryFrequency;
+        delete imuFrequency;
+        delete gpsFrequency;
+        delete lidarFrequency;
+        delete cameraFrequency;
     }
 
     void TopicFrequency::updateData(){
