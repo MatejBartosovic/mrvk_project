@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <mrvk_gui/Subscriber.h>
 #include <sensor_msgs/Imu.h>
-
+#include <mrvk_gui/GuiDefines.h>
 
 namespace Ui {
 class Imu;

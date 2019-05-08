@@ -10,7 +10,7 @@ namespace mrvk_gui {
 
         ui->setupUi(this);
         ros::NodeHandle n("/");
-        odom_subscriber = new Subscriber<nav_msgs::Odometry>("odom",n);
+        odom_subscriber = new Subscriber<nav_msgs::Odometry>(mrvk_gui::topics::odometry, n);
     }
 
     Odometry::~Odometry() {

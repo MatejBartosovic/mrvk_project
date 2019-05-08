@@ -9,7 +9,7 @@ namespace mrvk_gui {
 
         ui->setupUi(this);
         ros::NodeHandle n("/");
-        subscriber = new my_Subscriber("diagnostics", n);
+        subscriber = new my_Subscriber(mrvk_gui::topics::diagnostic, n);
 
         labelsMap.emplace("central_stop", ui->centralStopValue);
         labelsMap.emplace("hardware_central_stop", ui->hardwareCentralStopValue);

@@ -7,8 +7,8 @@ namespace mrvk_gui {
             QWidget(parent),
             ui(new Ui::Camera) {
         ui->setupUi(this);
-        ros::NodeHandle n("~");
-        subscriber = new Subscriber<sensor_msgs::Image>("image",n);
+        ros::NodeHandle n("/");
+        subscriber = new Subscriber<sensor_msgs::Image>(mrvk_gui::topics::camera, n);
     }
 
     Camera::~Camera() {

@@ -11,8 +11,8 @@ namespace mrvk_gui{
         ui(new Ui::Imu)
     {
         ui->setupUi(this);
-        ros::NodeHandle n("/adis16488");
-        subscriber = new Subscriber<sensor_msgs::Imu>("imu_data",n);
+        ros::NodeHandle n("/");
+        subscriber = new Subscriber<sensor_msgs::Imu>(mrvk_gui::topics::imu,n);
         imuButtons = new ImuButtons();
         connect(ui->calibrationButton,SIGNAL(released()),this,SLOT(calibrate()));
         connect(ui->resetButton,SIGNAL(released()),this,SLOT(reset()));

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <mrvk_gui/Subscriber.h>
 #include <sensor_msgs/Image.h>
+#include <mrvk_gui/GuiDefines.h>
 
 namespace Ui {
 class Camera;
