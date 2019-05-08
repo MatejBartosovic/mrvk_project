@@ -5,6 +5,7 @@
 #ifndef PROJECT_GUIDEFINES_H
 #define PROJECT_GUIDEFINES_H
 
+#include <QDir>
 #include <string>
 
 #define ORIGIN_LATITUDE_PARAM_PATH "/move_base/Planner/origin_latitude"
@@ -29,5 +30,6 @@ namespace mrvk_gui {
     namespace namespaces {}
 }
 
+#define WAYPOINTS_TABLE_CONFIG_FILE (QString(QDir::homePath() + "/.mrvk_waypoints"))
 
 #endif //PROJECT_GUIDEFINES_H

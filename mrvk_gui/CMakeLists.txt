@@ -28,6 +28,8 @@ set(${PROJECT_NAME}_cpp_HDRS
         ui/Widgets/MrvkDriver/MainBoardStatus.h
         ui/Widgets/MrvkDriver/MrvkDriver.h
         ui/Widgets/MoveBase/GpsCoordinatesInput.h
+        ui/Widgets/MoveBase/WaypointsTableWidget.h
+        ui/Widgets/MoveBase/AddWaypointDialog.h
         )
 
 set(${PROJECT_NAME}_cpp_SRCS
@@ -46,6 +48,8 @@ set(${PROJECT_NAME}_cpp_UIS
         ui/Widgets/MrvkDriver/MainBoardStatus.ui
         ui/Widgets/MrvkDriver/MrvkDriver.ui
         ui/Widgets/MoveBase/GpsCoordinatesInput.ui
+        ui/Widgets/MoveBase/WaypointsTableWidget.ui
+        ui/Widgets/MoveBase/AddWaypointDialog.ui
         )
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
@@ -95,6 +99,8 @@ add_executable(${PROJECT_NAME}
         ui/Widgets/MrvkDriver/MainBoardStatus.cpp
         ui/Widgets/MrvkDriver/MrvkDriver.cpp
         ui/Widgets/MoveBase/GpsCoordinatesInput.cpp
+        ui/Widgets/MoveBase/WaypointsTableWidget.cpp
+        ui/Widgets/MoveBase/AddWaypointDialog.cpp
         ${${PROJECT_NAME}_cpp_MOCS}
         ${${PROJECT_NAME}_cpp_UIS_H})
 
