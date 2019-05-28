@@ -7,6 +7,10 @@
 
 #include <QDialog>
 #include <QMessageBox>
+#include <mrvk_gui/GuiDefines.h>
+#include <osm_planner/coordinates_converters/haversine_formula.h>
+#include <tf/tf.h>
+#include <tf/transform_listener.h>
 //#include <osm_planner/coordinates_converters/haversine_formula.h>
 
 namespace Ui {
@@ -14,11 +18,20 @@ namespace Ui {
 }
 
 namespace mrvk_gui {
-    typedef struct {
+    typedef struct _QGeoPose{
         QString latitude;
         QString longitude;
     } QGeoPose;
 
+    typedef struct {
+        double x;
+        double y;
+    } MapPose;
+
+    typedef struct {
+        double latitude;
+        double longitude;
+    } GpsPose;
 
     class AddWaypointDialog : public QDialog {
     Q_OBJECT
@@ -42,12 +55,16 @@ namespace mrvk_gui {
         void on_btnCancel_clicked();
 
     private:
-//        GeoPose myresult();
 
+        MapPose gps2mapPose(GpsPose geoPose);
+        GpsPose map2gpsPose(MapPose mapPose);
+
+        osm_planner::coordinates_converters::HaversineFormula converter;
+        bool gpsSpaceSelection = true;
         QString latitudeGoalValue;
         QString longitudeGoalValue;
 
-        QString result;
+//        QString result;
         Ui::AddWaypointDialog* ui;
     };
 }

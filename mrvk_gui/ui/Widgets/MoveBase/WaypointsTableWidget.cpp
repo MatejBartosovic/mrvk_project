@@ -145,6 +145,9 @@ namespace mrvk_gui {
         int dialogCode = addNew.execInitGeoPose(latitude, longitude);
         if (dialogCode == 0) {
             mrvk_gui::QGeoPose geoPose = addNew.getGeoPose();
+            if (geoPose.latitude.isEmpty() || geoPose.longitude.isEmpty()) {
+                return;
+            }
             editWaypoint(row, geoPose.latitude, geoPose.longitude);
             saveWaypointsToFile(WAYPOINTS_TABLE_CONFIG_FILE);
         } else {
