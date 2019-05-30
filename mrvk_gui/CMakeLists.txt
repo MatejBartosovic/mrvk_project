@@ -33,6 +33,22 @@ set(${PROJECT_NAME}_cpp_HDRS
         )
 
 set(${PROJECT_NAME}_cpp_SRCS
+        src/MrvkControllButtons.cpp
+        src/ImuButtons.cpp
+        ui/MainWindow.cpp
+        ui/Widgets/Camera/Camera.cpp
+        ui/Widgets/Gps/Gps.cpp
+        ui/Widgets/Imu/Imu.cpp
+        ui/Widgets/MoveBase/MoveBase.cpp
+        ui/Widgets/MoveBase/MoveBaseControl.cpp
+        ui/Widgets/MoveBase/MoveBaseStatus.cpp
+        ui/Widgets/Odometry/Odometry.cpp
+        ui/Widgets/TopicFrequency/TopicFrequency.cpp
+        ui/Widgets/MrvkDriver/MainBoardStatus.cpp
+        ui/Widgets/MrvkDriver/MrvkDriver.cpp
+        ui/Widgets/MoveBase/GpsCoordinatesInput.cpp
+        ui/Widgets/MoveBase/WaypointsTableWidget.cpp
+        ui/Widgets/MoveBase/AddWaypointDialog.cpp
         )
 
 set(${PROJECT_NAME}_cpp_UIS
@@ -85,22 +101,7 @@ include_directories(
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
-        src/MrvkControllButtons.cpp
-        src/ImuButtons.cpp
-        ui/MainWindow.cpp
-        ui/Widgets/Camera/Camera.cpp
-        ui/Widgets/Gps/Gps.cpp
-        ui/Widgets/Imu/Imu.cpp
-        ui/Widgets/MoveBase/MoveBase.cpp
-        ui/Widgets/MoveBase/MoveBaseControl.cpp
-        ui/Widgets/MoveBase/MoveBaseStatus.cpp
-        ui/Widgets/Odometry/Odometry.cpp
-        ui/Widgets/TopicFrequency/TopicFrequency.cpp
-        ui/Widgets/MrvkDriver/MainBoardStatus.cpp
-        ui/Widgets/MrvkDriver/MrvkDriver.cpp
-        ui/Widgets/MoveBase/GpsCoordinatesInput.cpp
-        ui/Widgets/MoveBase/WaypointsTableWidget.cpp
-        ui/Widgets/MoveBase/AddWaypointDialog.cpp
+        ${${PROJECT_NAME}_cpp_SRCS}
         ${${PROJECT_NAME}_cpp_MOCS}
         ${${PROJECT_NAME}_cpp_UIS_H})
 
