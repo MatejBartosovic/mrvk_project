@@ -1,0 +1,13 @@
+# goal
+#int32 nic
+---
+# result
+bool success
+string message
+---
+# feedback
+geometry_msgs/PoseStamped base_position
+geometry_msgs/PoseArray poses
+float64 remaining_distance
+int32 waypoints_count
+int32 performing_waypoint

@@ -1,0 +1,4 @@
+GeoPoint[] waypoints
+---
+bool success
+string message

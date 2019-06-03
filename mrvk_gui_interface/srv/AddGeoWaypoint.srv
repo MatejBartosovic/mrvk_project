@@ -1,0 +1,4 @@
+GeoPoint waypoint
+---
+bool success
+string message
