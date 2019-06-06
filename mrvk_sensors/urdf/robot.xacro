@@ -40,7 +40,7 @@
         <origin rpy="0 0 0" xyz="0 0 2"/>
     </xacro:Gps>
     <xacro:Camera parent="base_stabilized" child = "camera_frame">
-        <origin rpy="1.57 0 1.57" xyz="0.1 -0.070 0.489"/>
+        <origin rpy="1.80 0 1.57" xyz="0.1 -0.070 0.489"/> <!-- 1.57 0 1.57 -->
     </xacro:Camera>
     <!--<xacro:Hokuyo parent="base_stabilized" child = "laser">-->
         <!--<origin rpy="0 0 0" xyz="0.181 0.0 0.099"/>-->

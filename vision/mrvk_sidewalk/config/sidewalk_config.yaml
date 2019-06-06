@@ -3,12 +3,15 @@ sidewalk_params:
   spin_freq: 6
   image_topic: /usb_cam/image_raw #/kinect2/qhd/image_color#/usb_cam/image_raw#
   depth_image_topic: /kinect2/qhd/image_depth_rect
+  pav_map_topic: pav_map
+  cloud_topic: pav_pointCloud
+  pav_map_cloud_topic: pav_map_cloud
 
   edge_side_offset: 50
   edge_marker_width: 6
   edge_start_offset: 35
   edge_side_offset_promile: 10
-  detect_percent_of_image: 40
+  detect_percent_of_image: 60
 
   undistort_image: true
   compute_edge_cloud: true
@@ -34,6 +37,11 @@ sidewalk_params:
 
   edge_points_distribution:
     edge_points_dist: 20
+
+  pav_map:
+    height: 10000
+    width: 10000
+    cell_size: 0.25
 
 camera_capture_params:
   frame_rate: 10

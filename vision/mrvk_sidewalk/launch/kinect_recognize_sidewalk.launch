@@ -1,12 +1,14 @@
 <?xml version='1.0'?>
 
 <launch>
-    <include file="$(find mrvk_description)/launch/load_description.launch"/>
+    <include file="$(find mrvk_sensors)/launch/load_robot.launch"/>
     <rosparam command="load" file="$(find mrvk_sidewalk)/config/sidewalk_config.yaml" />
     <rosparam command="load" file="$(find mrvk_sidewalk)/config/segmentation_config.yaml"/>
     <rosparam command="load" file="$(find mrvk_sidewalk)/calib/sidewalkTransformCalib.yaml" />
 
     <node pkg="mrvk_sidewalk" name="recognize_sidewalk_kinect" type="recognize_sidewalk_kinect"/>
+
+    <node pkg="mrvk_sidewalk" name="filter_cloud" type="filter_cloud"/>
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrvk_sidewalk)/launch/pavement_config.rviz" />
 

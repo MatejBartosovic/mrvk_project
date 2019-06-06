@@ -125,7 +125,6 @@ public:
         n.getParam("sidewalk_params/compute_edge_cloud", compute_edge_cloud);
         //ROS_ERROR_STREAM("SIDEWALKINIT");
         //START get parameters
-ROS_ERROR("Sidewalk init");
         params.getParametersFromServer(n);
         valid_data = 0;
         //END get parameters
@@ -133,8 +132,6 @@ ROS_ERROR("Sidewalk init");
         //init subscribers
 //char autobusChar[30];
 //autobusChar = params.image_topic.c_str();
-ROS_ERROR("Sidewalk topic %s", params.image_topic.c_str());
-ROS_INFO("Sidewalk topic %s", params.image_topic.c_str());
         sub = n.subscribe(params.image_topic.c_str(), 1, &Sidewalk::kinectImageCallback,this);
 //        subDepth = n.subscribe(params.depth_image_topic, 1, &Sidewalk::kinectDepthImageCallback,this);
 
@@ -147,15 +144,11 @@ ROS_INFO("Sidewalk topic %s", params.image_topic.c_str());
 	pub_test_pointCloud = n.advertise<sensor_msgs::PointCloud2> ("test_pointCloud", 1);//publisher for pavement point cloud
         //point cloud header
 
-ROS_ERROR("Sidewalk init7");
         if(compute_edge_cloud)
         {
-            ROS_ERROR("creating vectors");
             cloudProcessing.createVectors(640,480);//(1920,1080);
-            ROS_ERROR("created vectors");
         }
 
-ROS_ERROR("Sidewalk init8");
 
         //init undistort
 //        cameraMatrix = cv::Mat1d(3, 3); //5.1307518547336940e+02 0. 320. 0. 5.1307518547336940e+02 240. 0. 0. 1.
@@ -187,22 +180,18 @@ ROS_ERROR("Sidewalk init8");
 
 
         //distCoeffs = cv::Mat1d(1, 5); //-3.6925125110658569e-01 1.9369148295711350e-01 0. 0. -6.6219869873459750e-02
-        ROS_ERROR("Sidewalk init8.3");
         /*distCoeffs.at<cv::Mat1d>(0, 0) = -0.36925125110658569;
         distCoeffs.at<cv::Mat1d>(0, 1) = 0.19369148295711350;
         distCoeffs.at<cv::Mat1d>(0, 2) = 0.0;
         distCoeffs.at<cv::Mat1d>(0, 3) = 0.0;
         distCoeffs.at<cv::Mat1d>(0, 4) = -0.066219869873459750;*/
-        ROS_ERROR("Sidewalk init8.14");
         imageSize.width = IMG_WIDTH;
         imageSize.height = IMG_HEIGHT;
-        ROS_ERROR("Sidewalk init8.1");
         cameraMatrix2 = cameraMatrix;
         distCoeffs2 = distCoeffs;
         initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(),
                                 getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0),
                                 imageSize, CV_16SC2, map1, map2);
-        ROS_ERROR("Sidewalk init9");
     }
     ~Sidewalk(){
 
@@ -216,19 +205,18 @@ void Sidewalk::sidewalkPublish()
 
     imageOrig = kinectImage.clone();
 
-    ROS_ERROR("Publish sidewalk");
     valid_data = recognize_sidewalk_frame(&imageOrig, &imageResult, &params, &sidewalkEdges, n);
 
     //publish processed image
     header.stamp = ros::Time::now();
     img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::RGB8, imageResult);
-    cv::imwrite("/home/smadas/sidewalk_recognition/segmented_edges_img.jpg", imageResult);
+    //cv::imwrite("/home/smadas/sidewalk_recognition/segmented_edges_img.jpg", imageResult);
     img_bridge.toImageMsg(img_msg);
     pub_img.publish(img_msg);//publish processed image
     img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::RGB8, imageOrig);
     img_bridge.toImageMsg(img_msg_orig);
     pub_img_orig.publish(img_msg_orig);//publish original image
-    cv::imwrite("/home/smadas/sidewalk_recognition/orig_edges_img.jpg", imageOrig);
+    //cv::imwrite("/home/smadas/sidewalk_recognition/orig_edges_img.jpg", imageOrig);
 }
 
 void Sidewalk::kinectImageCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -323,9 +311,7 @@ int main(int argc, char **argv) {
 
     //START ros init
     ros::init(argc, argv, "recognize_sidewalk_kinect");
-    ROS_ERROR("Initialized node recognize_sidewalk_kinect.");
     Sidewalk sidewalk;
-    ROS_ERROR("Initialized sidewalk class.");
     ros::spin();
 
     return 0;
