@@ -8,7 +8,7 @@
 
 #include <osm_planner/coordinates_converters/haversine_formula.h>
 
-GpsCompassCorrection::GpsCompassCorrection() : n_("~"), robot_(n_), corrected_transform_(tf::Quaternion(0,0,0,1), tf::Vector3(0,0,0)){
+GpsCompassCorrection::GpsCompassCorrection() : map_(), n_("~"), robot_(n_), corrected_transform_(tf::Quaternion(0,0,0,1), tf::Vector3(0,0,0)){
 
     // Initialize global variables
     n_.param<bool>("use_compass", use_compass_, false);
@@ -37,7 +37,19 @@ GpsCompassCorrection::GpsCompassCorrection() : n_("~"), robot_(n_), corrected_tr
     n_.param<double>("tf_rate", tf_rate, 20);
     tf_broadcaster_thread_ = boost::shared_ptr<boost::thread>(new boost::thread(&GpsCompassCorrection::tfBroadcasterCallback, this, tf_rate));
 
-    coordinatesConverter = std::make_shared<osm_planner::coordinates_converters::HaversineFormula>();
+  //  coordinatesConverter = std::make_shared<osm_planner::coordinates_converters::HaversineFormula>();
+
+    // Create map
+    std::string map;
+    std::vector<std::string> types_of_ways;
+    double interpolation_max_distance;
+    n_.param<std::string>("osm_map_path",map,"");
+    n_.getParam("filter_of_ways",types_of_ways);
+    n_.param<double>("interpolation_max_distance", interpolation_max_distance, 1000);
+    map_.setInterpolationMaxDistance(interpolation_max_distance);
+    map_.setNewMap(map);
+    map_.setTypeOfWays(types_of_ways);
+    map_.parse();
 }
 
 void GpsCompassCorrection::setMapOrigin(ros::NodeHandle &n) {
@@ -50,24 +62,15 @@ void GpsCompassCorrection::setMapOrigin(ros::NodeHandle &n) {
         double latitude, longitude;
         n.param<double>("origin_latitude", latitude,0);
         n.param<double>("origin_longitude",longitude,0);
-        map_origin_.latitude = latitude;
-        map_origin_.longitude = longitude;
+        map_.getCalculator()->setOrigin(latitude, longitude);
+     //   map_origin_.latitude = latitude;
+     //   map_origin_.longitude = longitude;
     }else{
-
-        // Create map and get origin
-        std::string map;
-        std::vector<std::string> types_of_ways;
-        n.param<std::string>("osm_map_path",map,"");
-        n.getParam("filter_of_ways",types_of_ways);
-
-        osm_planner::Parser parser;
-        parser.setNewMap(map);
-        parser.setTypeOfWays(types_of_ways);
-        parser.parse(true);
-        map_origin_ = parser.getNodeByID(0);
+     //   map_origin_ = map_.getNodeByID(0);
+        map_.setStartPoint(0);
     }
 
-    ROS_INFO("map origin type: %d [%f, %f]",origin_type, map_origin_.latitude, map_origin_.longitude);
+  //  ROS_INFO("map origin type: %d [%f, %f]",origin_type, map_origin_.latitude, map_origin_.longitude);
 }
 
 void GpsCompassCorrection::tfBroadcasterCallback(const double frequence){
@@ -215,7 +218,7 @@ bool GpsCompassCorrection::computeBearingCallback(std_srvs::Trigger::Request &re
     if (bearingCalculator.hasFirstPoint()) {
 
        tf::Quaternion quat;
-       quat.setRPY(0, 0, bearingCalculator.calculate(gps_data, coordinatesConverter));
+       quat.setRPY(0, 0, bearingCalculator.calculate(gps_data, map_.getCalculator()));
        sendTransform(*gps_data, &quat);
        res.message = "Bearing is calculated";
        res.success = true;
@@ -270,7 +273,7 @@ bool GpsCompassCorrection::autoComputeBearingCallback(std_srvs::Trigger::Request
     }
 
     // Calculate bearing and evaluate result
-    double angle = bearingCalculator.calculate(gps_data, coordinatesConverter);
+    double angle = bearingCalculator.calculate(gps_data, map_.getCalculator());
     //Print result
     if (angle == NAN) {
         res.message = "Computed angle: NaN";

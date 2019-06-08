@@ -52,6 +52,8 @@ public:
 
 private:
 
+    osm_planner::Parser map_;
+
     bool use_compass_;                     ///< It's true, then is used angle from compass for correction
     double low_precision_period_;          ///< Period of correction while is inaccessible GBAS_FIX status
     int allways_allowed_status_;           ///< Allways allowed status for uptade position
@@ -79,7 +81,7 @@ private:
 
     osm_planner::Parser::OSM_NODE map_origin_;              ///< Origin - here is [0,0] world
         //distance and bearing calculator
-    std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinatesConverter;
+   // std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinatesConverter;
     RobotCommander robot_;                                  ///< It's used in auto_compute_bearing service
                                                             ///< for auto moving with robot
 
@@ -171,8 +173,9 @@ private:
             return;
         }
 
+        ROS_ERROR("pred1");
         //construct translation from gps
-        tf::Vector3 gps_translation(coordinatesConverter->getCoordinateX(map_origin_, gps_pose),coordinatesConverter->getCoordinateY(map_origin_, gps_pose),0); //todo misov prepocet dorobit
+        tf::Vector3 gps_translation(map_.getCalculator()->getCoordinateX(gps_pose),map_.getCalculator()->getCoordinateY(gps_pose),0); //todo misov prepocet dorobit
 
         tf::Transform absolute_transform;
         if (quat == nullptr) {
@@ -185,6 +188,12 @@ private:
             catch (tf::TransformException ex) {
                 ROS_WARN("Can't find transform between parent [%s] and robot base_link frame [%s]. Exception: %s",parent_frame_, target_frame_,ex.what());
                 return;
+            }
+            ROS_ERROR("pred2");
+            auto points = map_.getNearestPoints(base_link_transform.getOrigin().getX(), base_link_transform.getOrigin().getY(), 5);
+            ROS_WARN("base link [%f %f]", base_link_transform.getOrigin().getX(), base_link_transform.getOrigin().getY());
+            for (auto point : points){
+                ROS_ERROR("point %d with distance %f", point.first, point.second);
             }
             //absolute orientation
             absolute_transform = tf::Transform(base_link_transform.getRotation(), gps_translation);
