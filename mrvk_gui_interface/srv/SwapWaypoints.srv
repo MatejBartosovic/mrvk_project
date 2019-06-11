@@ -1,3 +1,5 @@
+int32 index1
+int32 index2
 ---
 GeoPoint[] waypoints
 bool success

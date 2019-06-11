@@ -11,7 +11,7 @@
 namespace mrvk {
     GuiInterface::GuiInterface() : nh("~"),
                                    waypointsAs(nh, "process_waypoints",
-                                                         boost::bind(&GuiInterface::waypointsAsGoal, this, _1), false),
+                                                         boost::bind(&GuiInterface::waypointsASGoal, this, _1), false),
                                    moveBaseActionClient("move_base", true) {
 
         // read required param from server
@@ -31,27 +31,28 @@ namespace mrvk {
         waypointsAs.registerPreemptCallback(boost::bind(&GuiInterface::stopMovement, this));
         waypointsAs.start();
 
-        addWaypointSrv = nh.advertiseService("add_waypoint_to_queue", &GuiInterface::addWaypoint, this);
-        addWaypointsSrv = nh.advertiseService("add_waypoints_to_queue", &GuiInterface::addWaypoints, this);
-        eraseWaypointsQueueSrv = nh.advertiseService("erase_waypoints_queue", &GuiInterface::eraseWaypointsQueue, this);
-        getWaypointsSrv = nh.advertiseService("get_waypoints_queue", &GuiInterface::getWaypointsQueue, this);
+        // advertise services
+        addWaypointSrv = nh.advertiseService("add_waypoint", &GuiInterface::addWaypoint, this);
+        editWaypointSrv = nh.advertiseService("edit_waypoint", &GuiInterface::editWaypoint, this);
+        eraseWaypointsQueueSrv = nh.advertiseService("erase_waypoints", &GuiInterface::eraseWaypointsQueue, this);
+        getWaypointsSrv = nh.advertiseService("get_waypoints", &GuiInterface::getWaypointsQueue, this);
+        swapWaypointsSrv = nh.advertiseService("swap_waypoints", &GuiInterface::swapWaypoints, this);
     }
 
     bool GuiInterface::addWaypoint(mrvk_gui_interface::AddGeoWaypointRequest& req,
                                    mrvk_gui_interface::AddGeoWaypointResponse& res) {
 
-        pushBackWaypoint(req.waypoint);
-        SET_SUCCESS_RESPONSE(res);
-        return true;
-    }
-
-    bool GuiInterface::addWaypoints(mrvk_gui_interface::AddGeoWaypointsRequest& req,
-                                    mrvk_gui_interface::AddGeoWaypointsResponse& res) {
-
-        for (auto point: req.waypoints) {
-            pushBackWaypoint(point);
+        if (req.index == -1) {
+            // add waypoint to the end of queue
+            waypoints.push_back(req.waypoint);
+        } else if (req.index <= waypoints.size()) {
+            waypoints.insert(waypoints.begin() + req.index, req.waypoint);
+        } else {
+            res.waypoints = waypoints;
+            res.message = "Wrong argument: index. Out of range";
+            return false;
         }
-
+        res.waypoints = waypoints;
         SET_SUCCESS_RESPONSE(res);
         return true;
     }
@@ -59,7 +60,7 @@ namespace mrvk {
     bool GuiInterface::eraseWaypointsQueue(mrvk_gui_interface::EraseWaypointsQueueRequest& req,
                                            mrvk_gui_interface::EraseWaypointsQueueResponse& res) {
 
-        waypointsQueue.clear();
+        waypoints.clear();
         SET_SUCCESS_RESPONSE(res);
         return true;
     }
@@ -83,15 +84,45 @@ namespace mrvk {
     bool GuiInterface::getWaypointsQueue(mrvk_gui_interface::GetWaypointsQueueRequest& req,
                                          mrvk_gui_interface::GetWaypointsQueueResponse& res) {
 
-//        for (auto point: waypointsQueue) {
-//            res.waypoint;
-//        }
-//        res.waypoints_count = waypointsQueue.size();
-//        SET_SUCCESS_RESPONSE(res);
+        res.waypoints = waypoints;
+        SET_SUCCESS_RESPONSE(res);
         return true;
     }
 
-    void GuiInterface::waypointsAsGoal(const mrvk_gui_interface::PerformWaypointsGoalConstPtr& actionGoal) {
+    bool GuiInterface::editWaypoint(mrvk_gui_interface::EditWaypointRequest& req,
+                                    mrvk_gui_interface::EditWaypointResponse& res) {
+        if (req.index < waypoints.size()) {
+            waypoints[req.index] = req.waypoint;
+        } else {
+            res.waypoints = waypoints;
+            res.message = "Wrong argument: index. Out of range";
+            res.success = false;
+            return false;
+        }
+
+        res.waypoints = waypoints;
+        SET_SUCCESS_RESPONSE(res);
+        return true;
+    }
+
+    bool GuiInterface::swapWaypoints(mrvk_gui_interface::SwapWaypointsRequest& req,
+                                     mrvk_gui_interface::SwapWaypointsResponse& res) {
+
+        if (req.index1 < 0 ||  waypoints.size() <= req.index1
+                || req.index2 < 0 ||  waypoints.size() <= req.index2) {
+
+            res.waypoints = waypoints;
+            res.message = "Wrong argument: index. Out of range";
+            res.success = false;
+            return false;
+        }
+        std::iter_swap(waypoints.begin() + req.index1, waypoints.begin() + req.index2);
+        res.waypoints = waypoints;
+        SET_SUCCESS_RESPONSE(res);
+        return true;
+    }
+
+    void GuiInterface::waypointsASGoal(const mrvk_gui_interface::PerformWaypointsGoalConstPtr& actionGoal) {
         waypointsCount = waypointsQueue.size();
         performingWaypoint = 0;
 
@@ -169,30 +200,6 @@ namespace mrvk {
                     + pow(p1.position.y - p2.position.y, 2)
                     + pow(p1.position.z - p2.position.z, 2));
     }
+
+
 }
-
-//auto goalTimestamp = ros::Time::now();
-//        move_base_msgs::MoveBaseGoal goal;
-//        goal.target_pose.header.stamp = goalTimestamp;
-//        goal.target_pose.header.frame_id = TF_WORLD_FRAME;
-
-// user set goal by geo space
-//
-//            tf::quaternionEigenToMsg(Eigen::Quaterniond(1,0,0,0), goal.target_pose.pose.orientation);
-//
-//            osm_planner::coordinates_converters::GeoNode geoNode = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue->text().toStdString()) ,
-//                                                                    std::stod(ui->moveBaseControl->ui->longitudeGoalValue->text().toStdString()) ,0,0};
-//
-//            std::cout << geoNode.latitude << "  "<<geoNode.longitude << std::endl;
-//
-//            osm_planner::coordinates_converters::HaversineFormula converter;
-//
-//            goal.target_pose.pose.position.x = converter.getCoordinateX(geoNode);
-//            goal.target_pose.pose.position.y = converter.getCoordinateY(geoNode);
-//            goal.target_pose.pose.position.z = 0;
-//        }
-//
-//        ui->moveBaseStatus->setGoal(goal.target_pose.pose.position.x, goal.target_pose.pose.position.y);
-//        actionClient.sendGoal(goal,boost::bind(&MoveBaseStatus::doneCallback, ui->moveBaseStatus, _1, _2),
-//                boost::bind(&MoveBaseStatus::activeCallback, ui->moveBaseStatus),
-//                boost::bind(&MoveBaseStatus::feedbackCallback, ui->moveBaseStatus, _1));

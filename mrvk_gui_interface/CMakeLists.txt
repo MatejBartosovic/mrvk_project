@@ -23,8 +23,10 @@ add_service_files(
         FILES
         AddGeoWaypoint.srv
         AddGeoWaypoints.srv
+        EditWaypoint.srv
         EraseWaypointsQueue.srv
-        #GetWaypointsQueue.srv
+        GetWaypointsQueue.srv
+        SwapWaypoints.srv
 )
 
 add_action_files(

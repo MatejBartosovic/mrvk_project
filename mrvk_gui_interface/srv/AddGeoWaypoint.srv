@@ -1,4 +1,7 @@
 GeoPoint waypoint
+int32 index         # -1: add waypoint to the end of queue
+                    # another number: add waypoint to the target index, waypoints behind this index will be moved
 ---
+GeoPoint[] waypoints
 bool success
 string message
