@@ -34,9 +34,13 @@ namespace mrvk {
         // advertise services
         addWaypointSrv = nh.advertiseService("add_waypoint", &GuiInterface::addWaypoint, this);
         editWaypointSrv = nh.advertiseService("edit_waypoint", &GuiInterface::editWaypoint, this);
-        eraseWaypointsQueueSrv = nh.advertiseService("erase_waypoints", &GuiInterface::eraseWaypointsQueue, this);
+        eraseWaypointsQueueSrv = nh.advertiseService("clear_waypoints", &GuiInterface::clearWaypointsQueue, this);
         getWaypointsSrv = nh.advertiseService("get_waypoints", &GuiInterface::getWaypointsQueue, this);
         swapWaypointsSrv = nh.advertiseService("swap_waypoints", &GuiInterface::swapWaypoints, this);
+
+        waypointsBackupFile = std::getenv("HOME");
+        waypointsBackupFile.append("/.ros/mrvk_waypoints");
+        loadWaypointsFromFile();
     }
 
     bool GuiInterface::addWaypoint(mrvk_gui_interface::AddGeoWaypointRequest& req,
@@ -48,19 +52,25 @@ namespace mrvk {
         } else if (req.index <= waypoints.size()) {
             waypoints.insert(waypoints.begin() + req.index, req.waypoint);
         } else {
+            std::string msg = "Wrong argument: index = " + std::to_string(req.index) + ". Out of range";
+            ROS_ERROR("%s", msg.c_str());
             res.waypoints = waypoints;
-            res.message = "Wrong argument: index. Out of range";
+            res.message = msg;
             return false;
         }
+
+        saveWaypointsToFile();
+
         res.waypoints = waypoints;
         SET_SUCCESS_RESPONSE(res);
         return true;
     }
 
-    bool GuiInterface::eraseWaypointsQueue(mrvk_gui_interface::EraseWaypointsQueueRequest& req,
-                                           mrvk_gui_interface::EraseWaypointsQueueResponse& res) {
+    bool GuiInterface::clearWaypointsQueue(mrvk_gui_interface::ClearWaypointsQueueRequest& req,
+                                           mrvk_gui_interface::ClearWaypointsQueueResponse& res) {
 
         waypoints.clear();
+        saveWaypointsToFile();
         SET_SUCCESS_RESPONSE(res);
         return true;
     }
@@ -94,12 +104,15 @@ namespace mrvk {
         if (req.index < waypoints.size()) {
             waypoints[req.index] = req.waypoint;
         } else {
+            std::string msg = "Wrong argument: index = " + std::to_string(req.index) + ". Out of range";
+            ROS_ERROR("%s", msg.c_str());
             res.waypoints = waypoints;
-            res.message = "Wrong argument: index. Out of range";
+            res.message = msg;
             res.success = false;
             return false;
         }
 
+        saveWaypointsToFile();
         res.waypoints = waypoints;
         SET_SUCCESS_RESPONSE(res);
         return true;
@@ -111,12 +124,18 @@ namespace mrvk {
         if (req.index1 < 0 ||  waypoints.size() <= req.index1
                 || req.index2 < 0 ||  waypoints.size() <= req.index2) {
 
+            std::string msg = "Wrong argument: index1 = " + std::to_string(req.index1)
+                    + " index2 = " + std::to_string(req.index2) + ". Out of range";
+            ROS_ERROR("%s", msg.c_str());
             res.waypoints = waypoints;
-            res.message = "Wrong argument: index. Out of range";
+            res.message = msg;
             res.success = false;
             return false;
         }
         std::iter_swap(waypoints.begin() + req.index1, waypoints.begin() + req.index2);
+
+        saveWaypointsToFile();
+
         res.waypoints = waypoints;
         SET_SUCCESS_RESPONSE(res);
         return true;
@@ -199,6 +218,47 @@ namespace mrvk {
         return sqrt(pow(p1.position.x - p2.position.x, 2)
                     + pow(p1.position.y - p2.position.y, 2)
                     + pow(p1.position.z - p2.position.z, 2));
+    }
+
+    void GuiInterface::saveWaypointsToFile() {
+        std::ofstream ofs(waypointsBackupFile, std::fstream::out);
+        if (!ofs) {
+            ROS_ERROR("mrvk_gui_interface: cannot open file for save waypoints");
+            return;
+        }
+
+        ofs<<"Active;Latitude;Longitude;" << std::endl;
+
+        for (auto const& point: waypoints) {
+            ofs<<point.active<<';'<<point.latitude<<';'<<point.longitude<<';'<<std::endl;
+        }
+
+        ofs.close();
+    }
+
+    void GuiInterface::loadWaypointsFromFile() {
+        std::ifstream ifs(waypointsBackupFile);
+
+        if (!ifs) {
+            ROS_ERROR("mrvk_gui_interface: cannot open file for load waypoints");
+            return;
+        }
+
+        std::string line;
+        std::getline(ifs, line); // first line is columns names
+
+        while (std::getline(ifs, line)) {
+
+            std::istringstream iss(line);
+            mrvk_gui_interface::GeoPoint point;
+
+            char mess;
+            iss >> point.active >> mess >> point.latitude >> mess >> point.longitude >> mess;
+
+            waypoints.push_back(point);
+        }
+
+        ifs.close();
     }
 
 

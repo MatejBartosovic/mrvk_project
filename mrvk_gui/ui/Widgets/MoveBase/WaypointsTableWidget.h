@@ -14,6 +14,8 @@
 #include <mrvk_gui/Subscriber.h>
 #include "AddWaypointDialog.h"
 #include <list>
+#include <mrvk_gui_interface/GetWaypointsQueue.h>
+#include <mrvk_gui_interface/AddGeoWaypoint.h>
 
 namespace Ui {
     class WaypointsTableWidget;
@@ -42,15 +44,19 @@ namespace mrvk_gui {
         void on_btnAddCurrent_clicked();
 
     private:
-        void addWaypoint(bool active, const QString& latitude, const QString& longitude);
+        void addWaypoint(bool active, const double& latitude, const double& longitude);
         void editWaypoint(int row, const QString& latitude, const QString& longitude);
-        void saveWaypointsToFile(const QString& filepath);
-        void loadWaypointsFromFile(const QString& filepath);
+
+        void updateWaypoints();
         void showErrorMessage(const QString& message);
 
         QWidget* parent;
         Ui::WaypointsTableWidget* ui;
         Subscriber<gps_common::GPSFix> *subscriber;
+
+        ros::ServiceClient getWaypointsSrv;
+        ros::ServiceClient addWaypointSrv;
+        ros::ServiceClient editWaypointSrv;
     };
 }
 

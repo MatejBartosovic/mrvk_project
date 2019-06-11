@@ -15,14 +15,15 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>diagnostic_msgs</build_depend>
   <build_depend>osm_planner</build_depend>
+  <build_depend>mrvk_gui_interface</build_depend>
 
   <run_depend>osm_planner</run_depend>
-
   <run_depend>roscpp</run_depend>
   <run_depend>rqt_gui</run_depend>
   <run_depend>rqt_gui_cpp</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>diagnostic_msgs</run_depend>
+  <run_depend>mrvk_gui_interface</run_depend>
 
   <export>
     <rqt_gui plugin="${prefix}/mrvk_gui_plugin.xml"/>

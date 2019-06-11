@@ -11,6 +11,8 @@
 #include <osm_planner/coordinates_converters/haversine_formula.h>
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
+#include <mrvk_gui_interface/AddGeoWaypoint.h>
+#include <mrvk_gui_interface/EditWaypoint.h>
 //#include <osm_planner/coordinates_converters/haversine_formula.h>
 
 namespace Ui {
@@ -18,11 +20,6 @@ namespace Ui {
 }
 
 namespace mrvk_gui {
-    typedef struct _QGeoPose{
-        QString latitude;
-        QString longitude;
-    } QGeoPose;
-
     typedef struct {
         double x;
         double y;
@@ -36,13 +33,13 @@ namespace mrvk_gui {
     class AddWaypointDialog : public QDialog {
     Q_OBJECT
     public:
-        AddWaypointDialog(QWidget* parent = 0);
+        explicit AddWaypointDialog(QWidget* parent = 0);
 
         ~AddWaypointDialog() override;
 
         int execInitGeoPose(const QString& latitude, const QString& longitude);
 
-        QGeoPose getGeoPose();
+        GpsPose getGpsPose();
 
 //        void initGeoPose(GeoPose pose);
 
@@ -56,15 +53,17 @@ namespace mrvk_gui {
 
     private:
 
+        ros::ServiceClient addWaypointSrv;
+        ros::ServiceClient editWaypointSrv;
+
         MapPose gps2mapPose(GpsPose geoPose);
         GpsPose map2gpsPose(MapPose mapPose);
 
         osm_planner::coordinates_converters::HaversineFormula converter;
         bool gpsSpaceSelection = true;
-        QString latitudeGoalValue;
-        QString longitudeGoalValue;
+        double latitudeGoalValue;
+        double longitudeGoalValue;
 
-//        QString result;
         Ui::AddWaypointDialog* ui;
     };
 }

@@ -23,6 +23,11 @@ namespace mrvk_gui {
         n.param<double>(ORIGIN_LATITUDE_PARAM_PATH, latOffset, 0);
         n.param<double>(ORIGIN_LONGTITUDE_PARAM_PATH, longOffset, 0);
         converter.setOrigin(latOffset, longOffset);
+
+        // services
+        ros::NodeHandle nh;
+        addWaypointSrv = nh.serviceClient<mrvk_gui_interface::AddGeoWaypoint>("mrvk_gui_interface/add_waypoint");
+        editWaypointSrv = nh.serviceClient<mrvk_gui_interface::EditWaypoint>("mrvk_gui_interface/edit_waypoint");
     }
 
     AddWaypointDialog::~AddWaypointDialog() {
@@ -77,9 +82,14 @@ namespace mrvk_gui {
             return;
         }
 
+//        double latitude;
+//        double longitude;
+
+
+
         if (gpsSpaceSelection) {
-            latitudeGoalValue = ui->input1->text();
-            longitudeGoalValue = ui->input2->text();
+            latitudeGoalValue = ui->input1->text().toDouble();
+            longitudeGoalValue = ui->input2->text().toDouble();
         } else {
             double x = ui->input1->text().toDouble();
             double y = ui->input2->text().toDouble();
@@ -91,9 +101,25 @@ namespace mrvk_gui {
                 close();
                 return;
             }
-            latitudeGoalValue = QString::number(gpsPose.latitude, 'f', 12);
-            longitudeGoalValue = QString::number(gpsPose.longitude, 'f', 12);
+            latitudeGoalValue = gpsPose.latitude;
+            longitudeGoalValue = gpsPose.longitude;
         }
+
+//        if (editWaypoint) {
+//            mrvk_gui_interface::EditWaypoint srv;
+//            srv.request.waypoint.latitude = latitude;
+//            srv.request.waypoint.longitude = longitude;
+//            srv.request.waypoint.active = true;
+//            srv.request.index = waypointId;
+//            editWaypointSrv.call(srv);
+//        } else {
+//            mrvk_gui_interface::AddGeoWaypoint srv;
+//            srv.request.waypoint.latitude = latitude;
+//            srv.request.waypoint.longitude = longitude;
+//            srv.request.waypoint.active = true;
+//            srv.request.index = -1;
+//            addWaypointSrv.call(srv);
+//        }
         close();
     }
 
@@ -101,11 +127,11 @@ namespace mrvk_gui {
         done(-1);
     }
 
-    QGeoPose AddWaypointDialog::getGeoPose() {
-        QGeoPose geoPose;
-        geoPose.latitude = latitudeGoalValue;
-        geoPose.longitude = longitudeGoalValue;
-        return geoPose;
+    GpsPose AddWaypointDialog::getGpsPose() {
+        GpsPose gpsPose;
+        gpsPose.latitude = latitudeGoalValue;
+        gpsPose.longitude = longitudeGoalValue;
+        return gpsPose;
     }
 
     int AddWaypointDialog::execInitGeoPose(const QString& latitude, const QString& longitude) {
@@ -131,7 +157,7 @@ namespace mrvk_gui {
             std::ostringstream oss;
             oss << "Can't find transform between child [" << TF_BASE_LINK_FRAME <<"] and robot base_link frame ["
                 << TF_WORLD_FRAME << "]. Exception:" << ex.what();
-            ROS_ERROR(oss.str().c_str());
+            ROS_ERROR("%s", oss.str().c_str());
             QMessageBox box(QMessageBox::Critical, "Tf", oss.str().c_str());
             box.exec();
             throw std::runtime_error("Can not transform map to gps pose");

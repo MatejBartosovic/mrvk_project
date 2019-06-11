@@ -5,6 +5,8 @@
 #include "WaypointsTableWidget.h"
 #include <ui_WaypointsTableWidget.h>
 
+//TODO ked pride error respones otvor msgbox
+//TODO update waypoints musi urobit clear waypointov v UI
 
 namespace mrvk_gui {
     WaypointsTableWidget::WaypointsTableWidget(QWidget* parent) :
@@ -27,15 +29,22 @@ namespace mrvk_gui {
         ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->tableWidget->setHorizontalHeaderLabels(QStringList({"", "Latitude", "Longitude"}));
         ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-        loadWaypointsFromFile(WAYPOINTS_TABLE_CONFIG_FILE);
+
+
+        addWaypointSrv = n.serviceClient<mrvk_gui_interface::AddGeoWaypoint>("mrvk_gui_interface/add_waypoint");
+        editWaypointSrv = n.serviceClient<mrvk_gui_interface::EditWaypoint>("mrvk_gui_interface/edit_waypoint");
+        getWaypointsSrv = n.serviceClient<mrvk_gui_interface::GetWaypointsQueue>("mrvk_gui_interface/get_waypoints");
+
+        updateWaypoints();
+
     }
 
     WaypointsTableWidget::~WaypointsTableWidget() {
-        saveWaypointsToFile(WAYPOINTS_TABLE_CONFIG_FILE);
+//        saveWaypointsToFile(WAYPOINTS_TABLE_CONFIG_FILE);
         delete ui;
     }
 
-    void WaypointsTableWidget::addWaypoint(bool active, const QString& latitude, const QString& longitude) {
+    void WaypointsTableWidget::addWaypoint(bool active, const double& latitude, const double& longitude) {
         unsigned int row = ui->tableWidget->rowCount();
         ui->tableWidget->insertRow(row);
 
@@ -48,11 +57,11 @@ namespace mrvk_gui {
         }
         ui->tableWidget->setItem(row,0, item);
 
-        item = new QTableWidgetItem(latitude);
+        item = new QTableWidgetItem(QString::number(latitude, 'f', 6));
         item->setFlags(item->flags() ^ Qt::ItemIsEditable);
         ui->tableWidget->setItem(row,1, item);
 
-        item = new QTableWidgetItem(longitude);
+        item = new QTableWidgetItem(QString::number(longitude, 'f', 6));
         item->setFlags(item->flags() ^ Qt::ItemIsEditable);
         ui->tableWidget->setItem(row,2, item);
     }
@@ -65,60 +74,26 @@ namespace mrvk_gui {
     }
 
 
-    void WaypointsTableWidget::saveWaypointsToFile(const QString& filepath) {
-        QFile file(filepath);
-        if (!file.open(QIODevice::WriteOnly)) {
-            //error
-            return;
-        }
-
-        QTextStream stream(&file);
-        stream << "Active;Latitude;Longitude;" << endl;
-
-        for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
-            auto item = ui->tableWidget->item(i, 0);
-            if (item->checkState() == Qt::Checked) {
-                stream << 1 << ";";
-            } else {
-                stream << 0 << ";";
-            }
-
-            item = ui->tableWidget->item(i, 1);
-            stream << item->text() << ";";
-            item = ui->tableWidget->item(i, 2);
-            stream << item->text() << ";" << endl;
-        }
-    }
-
-    void WaypointsTableWidget::loadWaypointsFromFile(const QString& filepath) {
-        QFile file(filepath);
-        if (!file.open(QIODevice::ReadOnly)) {
-            //error
-            return;
-        }
-
-        QTextStream stream(&file);
-        QString line;
-        line = stream.readLine();
-
-        while (!stream.atEnd()) {
-            line = stream.readLine();
-            QStringList lineSplit = line.split(';');
-            addWaypoint(lineSplit.at(0).toInt(), lineSplit.at(1), lineSplit.at(2));
-        }
-    }
-
     void WaypointsTableWidget::on_btnAddNew_clicked() {
         mrvk_gui::AddWaypointDialog addNew(this);
         int dialogCode = addNew.exec();
+
         if (dialogCode == 0) {
-            mrvk_gui::QGeoPose geoPose = addNew.getGeoPose();
-            qDebug(geoPose.latitude.toLatin1() + ", " + geoPose.longitude.toLatin1());
-            addWaypoint(true, geoPose.latitude, geoPose.longitude);
-            saveWaypointsToFile(WAYPOINTS_TABLE_CONFIG_FILE);
+            mrvk_gui::GpsPose gpsPose = addNew.getGpsPose();
+           // qDebug(gpsPose.latitude.toLatin1() + ", " + gpsPose.longitude.toLatin1());
+
+            mrvk_gui_interface::AddGeoWaypoint srv;
+            srv.request.waypoint.latitude = gpsPose.latitude;
+            srv.request.waypoint.longitude = gpsPose.longitude;
+            srv.request.waypoint.active = true;
+            srv.request.index = -1;
+            addWaypointSrv.call(srv);
+
         } else {
             qDebug("Cancel");
         }
+
+        updateWaypoints();
     }
 
     void WaypointsTableWidget::on_btnRemove_clicked() {
@@ -133,7 +108,7 @@ namespace mrvk_gui {
     void WaypointsTableWidget::on_btnEdit_clicked() {
         int row = ui->tableWidget->currentRow();
         if (row < 0) {
-            showErrorMessage("Select row before");
+            showErrorMessage("Select waypoint before edit");
             return;
         }
 
@@ -142,23 +117,36 @@ namespace mrvk_gui {
         QString latitude = ui->tableWidget->item(row, 1)->text();
         QString longitude = ui->tableWidget->item(row, 2)->text();
 
-        int dialogCode = addNew.execInitGeoPose(latitude, longitude);
+        int dialogCode = addNew.execInitGeoPose(latitude, longitude);  // edit waypoint
+
         if (dialogCode == 0) {
-            mrvk_gui::QGeoPose geoPose = addNew.getGeoPose();
-            if (geoPose.latitude.isEmpty() || geoPose.longitude.isEmpty()) {
-                return;
-            }
-            editWaypoint(row, geoPose.latitude, geoPose.longitude);
-            saveWaypointsToFile(WAYPOINTS_TABLE_CONFIG_FILE);
+            mrvk_gui::GpsPose gpsPose = addNew.getGpsPose();
+
+            mrvk_gui_interface::EditWaypoint srv;
+            srv.request.waypoint.latitude = gpsPose.latitude;
+            srv.request.waypoint.longitude = gpsPose.longitude;
+            srv.request.waypoint.active = true;         // todo read checkbox
+            srv.request.index = row;
+            editWaypointSrv.call(srv);
+
         } else {
             qDebug("Cancel");
         }
 
+        updateWaypoints();
     }
 
     void WaypointsTableWidget::on_btnAddCurrent_clicked() {
         auto data = subscriber->getData();
-        addWaypoint(true, QString::number(data.latitude), QString::number(data.longitude));
+
+        mrvk_gui_interface::AddGeoWaypoint srv;
+        srv.request.waypoint.latitude = data.latitude;
+        srv.request.waypoint.longitude = data.longitude;
+        srv.request.waypoint.active = true;
+        srv.request.index = -1;
+        addWaypointSrv.call(srv);
+
+        updateWaypoints();
     }
 
     void WaypointsTableWidget::showErrorMessage(const QString& message){
@@ -166,22 +154,31 @@ namespace mrvk_gui {
         msgBox.exec();
     }
 
-    std::list<Waypoint> WaypointsTableWidget::getWaypoints() {
-        std::list<Waypoint> way;
-        QTableWidgetItem *item;
+//    std::list<Waypoint> WaypointsTableWidget::getWaypoints() {
+//        std::list<Waypoint> way;
+//        QTableWidgetItem *item;
+//
+//        for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
+//            item = ui->tableWidget->item(i, 0);
+//            if (item->checkState() == Qt::Checked) {
+//                Waypoint point;
+//                //TODO body treba prekonvertovat z Geo na Map
+//                point.x = ui->tableWidget->item(i, 1)->text().toDouble();
+//                point.y = ui->tableWidget->item(i, 2)->text().toDouble();
+//                way.push_back(point);
+//            }
+//        }
+//
+//        return way;
+//    }
 
-        for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
-            item = ui->tableWidget->item(i, 0);
-            if (item->checkState() == Qt::Checked) {
-                Waypoint point;
-                //TODO body treba prekonvertovat z Geo na Map
-                point.x = ui->tableWidget->item(i, 1)->text().toDouble();
-                point.y = ui->tableWidget->item(i, 2)->text().toDouble();
-                way.push_back(point);
-            }
+    void WaypointsTableWidget::updateWaypoints() {
+        mrvk_gui_interface::GetWaypointsQueue srv;
+        getWaypointsSrv.call(srv);
+        auto waypoints = srv.response.waypoints;
+
+        for (const auto point: waypoints) {
+            addWaypoint(point.active, point.latitude, point.longitude);
         }
-
-        return way;
     }
-
 }

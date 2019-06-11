@@ -1,0 +1,5 @@
+int32 index
+---
+GeoPoint[] waypoints
+bool success
+string message

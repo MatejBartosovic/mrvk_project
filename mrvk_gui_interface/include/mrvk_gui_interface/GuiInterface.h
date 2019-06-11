@@ -10,10 +10,15 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+//#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
 
 #include <mrvk_gui_interface/AddGeoWaypoint.h>
 #include <mrvk_gui_interface/AddGeoWaypoints.h>
-#include <mrvk_gui_interface/EraseWaypointsQueue.h>
+#include <mrvk_gui_interface/ClearWaypointsQueue.h>
+#include <mrvk_gui_interface/EraseWaypoint.h>
 #include <mrvk_gui_interface/GeoPoint.h>
 #include <mrvk_gui_interface/GetWaypointsQueue.h>
 #include <mrvk_gui_interface/PerformWaypointsAction.h>
@@ -54,7 +59,8 @@ namespace mrvk {
 
         bool addWaypoint(mrvk_gui_interface::AddGeoWaypointRequest &req, mrvk_gui_interface::AddGeoWaypointResponse &res);
         bool editWaypoint(mrvk_gui_interface::EditWaypointRequest &req, mrvk_gui_interface::EditWaypointResponse &res);
-        bool eraseWaypointsQueue(mrvk_gui_interface::EraseWaypointsQueueRequest &req, mrvk_gui_interface::EraseWaypointsQueueResponse &res);
+        bool clearWaypointsQueue(mrvk_gui_interface::ClearWaypointsQueueRequest& req,
+                                 mrvk_gui_interface::ClearWaypointsQueueResponse& res);
         bool getWaypointsQueue(mrvk_gui_interface::GetWaypointsQueueRequest &req, mrvk_gui_interface::GetWaypointsQueueResponse &res);
         bool swapWaypoints(mrvk_gui_interface::SwapWaypointsRequest &req, mrvk_gui_interface::SwapWaypointsResponse &res);
 
@@ -74,6 +80,11 @@ namespace mrvk {
         void pushBackWaypoint(mrvk_gui_interface::GeoPoint point);
         double distanceBetweenPoses(geometry_msgs::Pose p1, geometry_msgs::Pose p2);
 
+
+        void saveWaypointsToFile();
+        void loadWaypointsFromFile();
+
+        std::string waypointsBackupFile;
 
         std::vector<mrvk_gui_interface::GeoPoint> waypoints;
         std::list<geometry_msgs::Pose> waypointsQueue;

@@ -30,6 +30,4 @@ namespace mrvk_gui {
     namespace namespaces {}
 }
 
-#define WAYPOINTS_TABLE_CONFIG_FILE (QString(QDir::homePath() + "/.mrvk_waypoints"))
-
 #endif //PROJECT_GUIDEFINES_H
