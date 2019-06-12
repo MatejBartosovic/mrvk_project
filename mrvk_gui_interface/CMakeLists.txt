@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(mrvk_gui_interface)
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -O2)
 
 find_package(catkin REQUIRED COMPONENTS
         roscpp
@@ -22,10 +22,9 @@ add_message_files(
 add_service_files(
         FILES
         AddGeoWaypoint.srv
-        AddGeoWaypoints.srv
         EditWaypoint.srv
-        ClearWaypointsQueue.srv
-        GetWaypointsQueue.srv
+        ClearWaypoints.srv
+        GetWaypoints.srv
         SwapWaypoints.srv
         EraseWaypoint.srv
 )

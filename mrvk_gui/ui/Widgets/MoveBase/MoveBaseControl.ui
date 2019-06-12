@@ -20,13 +20,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QCheckBox" name="goalByOffset_cbx">
-     <property name="text">
-      <string>Goal by /base_link offset</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="mrvk_gui::WaypointsTableWidget" name="waypointsTable" native="true"/>

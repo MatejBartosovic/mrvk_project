@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>411</width>
+    <width>421</width>
     <height>349</height>
    </rect>
   </property>
@@ -63,6 +63,27 @@
       <widget class="QPushButton" name="btnRemove">
        <property name="text">
         <string>Remove</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnMoveUp">
+       <property name="text">
+        <string>▲</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnMoveDown">
+       <property name="text">
+        <string>▼</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSyncTable">
+       <property name="text">
+        <string>Sync with robot</string>
        </property>
       </widget>
      </item>

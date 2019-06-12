@@ -5,9 +5,6 @@
 #include "../include/mrvk_gui_interface/GuiInterface.h"
 #include "../../../osm_planner/include/osm_planner/coordinates_converters/coordinates_converter_base.h"
 
-#define SUCCESS "Success"
-#define SET_SUCCESS_RESPONSE(res) res.message = SUCCESS; res.success = true;
-
 namespace mrvk {
     GuiInterface::GuiInterface() : nh("~"),
                                    waypointsAs(nh, "process_waypoints",
@@ -34,9 +31,10 @@ namespace mrvk {
         // advertise services
         addWaypointSrv = nh.advertiseService("add_waypoint", &GuiInterface::addWaypoint, this);
         editWaypointSrv = nh.advertiseService("edit_waypoint", &GuiInterface::editWaypoint, this);
-        eraseWaypointsQueueSrv = nh.advertiseService("clear_waypoints", &GuiInterface::clearWaypointsQueue, this);
-        getWaypointsSrv = nh.advertiseService("get_waypoints", &GuiInterface::getWaypointsQueue, this);
+        clearWaypointsSrv = nh.advertiseService("clear_waypoints", &GuiInterface::clearWaypoints, this);
+        getWaypointsSrv = nh.advertiseService("get_waypoints", &GuiInterface::getWaypoints, this);
         swapWaypointsSrv = nh.advertiseService("swap_waypoints", &GuiInterface::swapWaypoints, this);
+        eraseWaypointSrv = nh.advertiseService("erase_waypoint", &GuiInterface::eraseWaypoint, this);
 
         waypointsBackupFile = std::getenv("HOME");
         waypointsBackupFile.append("/.ros/mrvk_waypoints");
@@ -66,39 +64,6 @@ namespace mrvk {
         return true;
     }
 
-    bool GuiInterface::clearWaypointsQueue(mrvk_gui_interface::ClearWaypointsQueueRequest& req,
-                                           mrvk_gui_interface::ClearWaypointsQueueResponse& res) {
-
-        waypoints.clear();
-        saveWaypointsToFile();
-        SET_SUCCESS_RESPONSE(res);
-        return true;
-    }
-
-    void GuiInterface::pushBackWaypoint(mrvk_gui_interface::GeoPoint point) {
-        geometry_msgs::Pose pose;
-        osm_planner::coordinates_converters::GeoNode geoNode = {point.latitude, point.longitude, 0, 0};
-        osm_planner::coordinates_converters::HaversineFormula converter;
-        converter.setOrigin(latitudeOrigin, longitudeOrigin);
-        pose.position.x = converter.getCoordinateX(geoNode);
-        pose.position.y = converter.getCoordinateY(geoNode);
-        pose.position.z = 0;
-
-        waypointsQueue.push_back(pose);
-
-        ROS_DEBUG("Add waypoint: GEO[lat,long]: [%f, %f], MAP[X,Y]: [%f, %f]",
-                  point.latitude, point.longitude, pose.position.x, pose.position.y);
-
-    }
-
-    bool GuiInterface::getWaypointsQueue(mrvk_gui_interface::GetWaypointsQueueRequest& req,
-                                         mrvk_gui_interface::GetWaypointsQueueResponse& res) {
-
-        res.waypoints = waypoints;
-        SET_SUCCESS_RESPONSE(res);
-        return true;
-    }
-
     bool GuiInterface::editWaypoint(mrvk_gui_interface::EditWaypointRequest& req,
                                     mrvk_gui_interface::EditWaypointResponse& res) {
         if (req.index < waypoints.size()) {
@@ -113,6 +78,22 @@ namespace mrvk {
         }
 
         saveWaypointsToFile();
+        res.waypoints = waypoints;
+        SET_SUCCESS_RESPONSE(res);
+        return true;
+    }
+
+    bool GuiInterface::clearWaypoints(mrvk_gui_interface::ClearWaypointsRequest& req,
+                                      mrvk_gui_interface::ClearWaypointsResponse& res) {
+        waypoints.clear();
+        saveWaypointsToFile();
+        SET_SUCCESS_RESPONSE(res);
+        return true;
+    }
+
+    bool GuiInterface::getWaypoints(mrvk_gui_interface::GetWaypointsRequest& req,
+                                    mrvk_gui_interface::GetWaypointsResponse& res) {
+
         res.waypoints = waypoints;
         SET_SUCCESS_RESPONSE(res);
         return true;
@@ -141,6 +122,42 @@ namespace mrvk {
         return true;
     }
 
+    bool GuiInterface::eraseWaypoint(mrvk_gui_interface::EraseWaypointRequest &req,
+                                     mrvk_gui_interface::EraseWaypointResponse &res) {
+        if (req.index < 0 || waypoints.size() <= req.index) {
+            std::string msg = "Wrong argument: index = " + std::to_string(req.index) + ". Out of range";
+            ROS_ERROR("%s", msg.c_str());
+            res.waypoints = waypoints;
+            res.message = msg;
+            res.success = false;
+            return false;
+        }
+
+        waypoints.erase(waypoints.begin() + req.index);
+
+        saveWaypointsToFile();
+
+        res.waypoints = waypoints;
+        SET_SUCCESS_RESPONSE(res);
+        return true;
+    }
+
+//    void GuiInterface::pushBackWaypoint(mrvk_gui_interface::GeoPoint point) {
+//        geometry_msgs::Pose pose;
+//        osm_planner::coordinates_converters::GeoNode geoNode = {point.latitude, point.longitude, 0, 0};
+//        osm_planner::coordinates_converters::HaversineFormula converter;
+//        converter.setOrigin(latitudeOrigin, longitudeOrigin);
+//        pose.position.x = converter.getCoordinateX(geoNode);
+//        pose.position.y = converter.getCoordinateY(geoNode);
+//        pose.position.z = 0;
+//
+//        waypointsQueue.push_back(pose);
+//
+//        ROS_DEBUG("Add waypoint: GEO[lat,long]: [%f, %f], MAP[X,Y]: [%f, %f]",
+//                  point.latitude, point.longitude, pose.position.x, pose.position.y);
+//
+//    }
+
     void GuiInterface::waypointsASGoal(const mrvk_gui_interface::PerformWaypointsGoalConstPtr& actionGoal) {
         waypointsCount = waypointsQueue.size();
         performingWaypoint = 0;
@@ -155,6 +172,8 @@ namespace mrvk {
                                           boost::bind(&GuiInterface::moveBaseActive, this),
                                           boost::bind(&GuiInterface::moveBaseFeedback, this, _1));
             performingWaypoint++;
+            ROS_DEBUG("Waypoint number: %d has been send", performingWaypoint);
+
             moveBaseActionClient.waitForResult();
 
             if (moveBaseActionClient.getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
@@ -163,6 +182,8 @@ namespace mrvk {
                 ROS_ERROR("Way point has not been achieved");
             }
         }
+
+        ROS_DEBUG("All waypoints have been send");
 
         // send result
         mrvk_gui_interface::PerformWaypointsResult result;
@@ -177,6 +198,8 @@ namespace mrvk {
 
     void GuiInterface::moveBaseGoalDone(const actionlib::SimpleClientGoalState& state,
                                         const move_base_msgs::MoveBaseResultConstPtr& result) {
+
+        ROS_DEBUG("moveBaseGoalDone: state = %s", state.getText().c_str());
 
         using namespace actionlib;
 
@@ -230,7 +253,7 @@ namespace mrvk {
         ofs<<"Active;Latitude;Longitude;" << std::endl;
 
         for (auto const& point: waypoints) {
-            ofs<<point.active<<';'<<point.latitude<<';'<<point.longitude<<';'<<std::endl;
+            ofs << (int)point.active << ';' << point.latitude << ';' << point.longitude << ';' << std::endl;
         }
 
         ofs.close();
@@ -253,13 +276,12 @@ namespace mrvk {
             mrvk_gui_interface::GeoPoint point;
 
             char mess;
-            iss >> point.active >> mess >> point.latitude >> mess >> point.longitude >> mess;
-
+            int active;
+            iss >> active >> mess >> point.latitude >> mess >> point.longitude >> mess;
+            point.active = active;
             waypoints.push_back(point);
         }
 
         ifs.close();
     }
-
-
 }

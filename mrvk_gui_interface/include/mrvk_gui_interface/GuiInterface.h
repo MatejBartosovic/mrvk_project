@@ -5,40 +5,45 @@
 #ifndef SRC_GUIINTERFACE_H
 #define SRC_GUIINTERFACE_H
 
+// ros
 #include <ros/ros.h>
+
+// std
 #include <list>
 #include <vector>
 #include <cmath>
 #include <algorithm>
-//#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
 
-#include <mrvk_gui_interface/AddGeoWaypoint.h>
-#include <mrvk_gui_interface/AddGeoWaypoints.h>
-#include <mrvk_gui_interface/ClearWaypointsQueue.h>
-#include <mrvk_gui_interface/EraseWaypoint.h>
+// msgs
 #include <mrvk_gui_interface/GeoPoint.h>
-#include <mrvk_gui_interface/GetWaypointsQueue.h>
-#include <mrvk_gui_interface/PerformWaypointsAction.h>
+#include <mrvk_gui_interface/AddGeoWaypoint.h>
+#include <mrvk_gui_interface/ClearWaypoints.h>
+#include <mrvk_gui_interface/EraseWaypoint.h>
+#include <mrvk_gui_interface/GetWaypoints.h>
 #include <mrvk_gui_interface/EditWaypoint.h>
 #include <mrvk_gui_interface/SwapWaypoints.h>
+#include <geometry_msgs/Pose.h>
 
+// actionlib
 #include <actionlib/server/simple_action_server.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/simple_client_goal_state.h>
-
-#include <osm_planner/coordinates_converters/haversine_formula.h>
+#include <mrvk_gui_interface/PerformWaypointsAction.h>
 #include <move_base_msgs/MoveBaseAction.h>
-#include <geometry_msgs/Pose.h>
 
+// others
+#include <osm_planner/coordinates_converters/haversine_formula.h>
 
+// defines
 #define ORIGIN_LATITUDE_PARAM_PATH "/move_base/Planner/origin_latitude"
 #define ORIGIN_LONGTITUDE_PARAM_PATH "/move_base/Planner/origin_longitude"
-
 #define TF_WORLD_FRAME "world"
 #define TF_BASE_LINK_FRAME "base_link"
+#define SUCCESS "Success"
+#define SET_SUCCESS_RESPONSE(res) res.message = SUCCESS; res.success = true;
 
 
 namespace mrvk {
@@ -51,18 +56,20 @@ namespace mrvk {
         ros::NodeHandle nh;
 
         ros::ServiceServer addWaypointSrv;
-        ros::ServiceServer addWaypointsSrv;
-        ros::ServiceServer eraseWaypointsQueueSrv;
+        ros::ServiceServer clearWaypointsSrv;
         ros::ServiceServer getWaypointsSrv;
         ros::ServiceServer editWaypointSrv;
         ros::ServiceServer swapWaypointsSrv;
+        ros::ServiceServer eraseWaypointSrv;
 
         bool addWaypoint(mrvk_gui_interface::AddGeoWaypointRequest &req, mrvk_gui_interface::AddGeoWaypointResponse &res);
         bool editWaypoint(mrvk_gui_interface::EditWaypointRequest &req, mrvk_gui_interface::EditWaypointResponse &res);
-        bool clearWaypointsQueue(mrvk_gui_interface::ClearWaypointsQueueRequest& req,
-                                 mrvk_gui_interface::ClearWaypointsQueueResponse& res);
-        bool getWaypointsQueue(mrvk_gui_interface::GetWaypointsQueueRequest &req, mrvk_gui_interface::GetWaypointsQueueResponse &res);
+        bool clearWaypoints(mrvk_gui_interface::ClearWaypointsRequest& req,
+                            mrvk_gui_interface::ClearWaypointsResponse& res);
+        bool getWaypoints(mrvk_gui_interface::GetWaypointsRequest& req,
+                          mrvk_gui_interface::GetWaypointsResponse& res);
         bool swapWaypoints(mrvk_gui_interface::SwapWaypointsRequest &req, mrvk_gui_interface::SwapWaypointsResponse &res);
+        bool eraseWaypoint(mrvk_gui_interface::EraseWaypointRequest &req, mrvk_gui_interface::EraseWaypointResponse &res);
 
 
         // perform waypoints action server
@@ -77,9 +84,8 @@ namespace mrvk {
         void moveBaseFeedback(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback);
         void moveBaseActive();
 
-        void pushBackWaypoint(mrvk_gui_interface::GeoPoint point);
+//        void pushBackWaypoint(mrvk_gui_interface::GeoPoint point);
         double distanceBetweenPoses(geometry_msgs::Pose p1, geometry_msgs::Pose p2);
-
 
         void saveWaypointsToFile();
         void loadWaypointsFromFile();
