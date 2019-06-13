@@ -3,7 +3,7 @@
 #include <ui_MoveBaseControl.h>
 #include <mrvk_gui/MrvkControllButtons.h>
 
-
+// TODO po kliknuti na go sa musi pripojit Action server
 namespace mrvk_gui {
     MoveBase::MoveBase(QWidget* parent) :
             QWidget(parent),
@@ -26,22 +26,11 @@ namespace mrvk_gui {
             msgBox.exec();
         }
 
-        std::lconv* lc = std::localeconv();
-        QRegExpValidator* latitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:90(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\" + QString( lc->decimal_point) + "[0-9]{1,6})?))$"), this);
-        ui->moveBaseControl->ui->latitudeGoalValue->setValidator(latitudeValidator);
-
-        QRegExpValidator* longitudeValidator = new QRegExpValidator(QRegExp("^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\"+ QString( lc->decimal_point) + "[0-9]{1,6})?))$"), this);
-        ui->moveBaseControl->ui->longitudeGoalValue->setValidator(longitudeValidator);
-
-//        loadDefaultMapOffset();
-
         connect(ui->moveBaseControl->ui->goButton,SIGNAL(released()),this,SLOT(goSlot()));
         connect(ui->moveBaseControl->ui->cancelButton,SIGNAL(released()),this,SLOT(cancelSlot()));
         connect(ui->moveBaseControl->ui->mapOffsetButton,SIGNAL(released()),this,SLOT(editMapOffsetSlot()));
         connect(ui->moveBaseControl->ui->loadQrCodeButton,SIGNAL(released()),this,SLOT(readQrCodeSlot()));
-        connect(ui->moveBaseControl->ui->goalByOffset_cbx, SIGNAL(clicked(bool)), this, SLOT(goByOffsetCbx(bool)));
         connect(&goalThread, SIGNAL(started()), this, SLOT(trackGoals()));
-
     }
 
     MoveBase::~MoveBase() {
@@ -58,10 +47,6 @@ namespace mrvk_gui {
         if(!actionClient.isServerConnected() &&  !actionClient.waitForServer(ros::Duration(0.5))){
             QMessageBox box(QMessageBox::Icon::Warning,"Action client","Action server is not running. Aborting goal.",QMessageBox::Button::Ok,this);
             box.exec();
-            return;
-        }
-
-        if(ui->moveBaseControl->ui->latitudeGoalValue->text().isEmpty() || ui->moveBaseControl->ui->longitudeGoalValue->text().isEmpty()){
             return;
         }
 
@@ -108,7 +93,7 @@ namespace mrvk_gui {
 //            std::cout << geoNode.latitude << "  "<<geoNode.longitude << std::endl;
 //
 //            osm_planner::coordinates_converters::HaversineFormula converter;
-//            converter.setOrigin(latitudeMapOffset,longitudeMapOffset);
+//
 //            goal.target_pose.pose.position.x = converter.getCoordinateX(geoNode);
 //            goal.target_pose.pose.position.y = converter.getCoordinateY(geoNode);
 //            goal.target_pose.pose.position.z = 0;
@@ -121,28 +106,37 @@ namespace mrvk_gui {
     }
 
     void MoveBase::trackGoals(){
-        std::cout << "ANO " << std::endl;
-        osm_planner::coordinates_converters::GeoNode goal1Node = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue->text().toStdString()) ,
-                                                                std::stod(ui->moveBaseControl->ui->longitudeGoalValue->text().toStdString()) ,0,0};
-        osm_planner::coordinates_converters::GeoNode goal2Node = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue2->text().toStdString()) ,
-                                                              std::stod(ui->moveBaseControl->ui->longitudeGoalValue2->text().toStdString()) ,0,0};
-        osm_planner::coordinates_converters::HaversineFormula converter;
-        converter.setOrigin(latitudeMapOffset,longitudeMapOffset);
+//        std::cout << "ANO " << std::endl;
+//
+//        // TODO goals
+////        osm_planner::coordinates_converters::GeoNode goal1Node = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue->text().toStdString()) ,
+////                                                                std::stod(ui->moveBaseControl->ui->longitudeGoalValue->text().toStdString()) ,0,0};
+////        osm_planner::coordinates_converters::GeoNode goal2Node = {std::stod(ui->moveBaseControl->ui->latitudeGoalValue2->text().toStdString()) ,
+////                                                              std::stod(ui->moveBaseControl->ui->longitudeGoalValue2->text().toStdString()) ,0,0};
+//        osm_planner::coordinates_converters::GeoNode goal1Node = {5 ,
+//                                                                  5,0,0};
+//        osm_planner::coordinates_converters::GeoNode goal2Node = {1 ,
+//                                                                  1,0,0};
+//        osm_planner::coordinates_converters::HaversineFormula converter;
+//        converter.setOrigin(latitudeMapOffset,longitudeMapOffset);
+//
+//        auto goalTimestamp = ros::Time::now();
+//        move_base_msgs::MoveBaseGoal goal1, goal2;
+//        goal1.target_pose.header.stamp = goalTimestamp;
+//        goal1.target_pose.header.frame_id = TF_WORLD_FRAME;
+//
+//        goal1.target_pose.pose.position.x = converter.getCoordinateX(goal1Node);
+//        goal1.target_pose.pose.position.y = converter.getCoordinateY(goal1Node);
+//        goal1.target_pose.pose.position.z = 0;
+//        goal2 = goal1;
+//        goal2.target_pose.pose.position.x = converter.getCoordinateX(goal2Node);
+//        goal2.target_pose.pose.position.y = converter.getCoordinateY(goal2Node);
+//
+//        ui->moveBaseStatus->setGoal(goal1.target_pose.pose.position.x, goal1.target_pose.pose.position.y);
 
-        auto goalTimestamp = ros::Time::now();
-        move_base_msgs::MoveBaseGoal goal1, goal2;
-        goal1.target_pose.header.stamp = goalTimestamp;
-        goal1.target_pose.header.frame_id = TF_WORLD_FRAME;
+        mrvk_gui_interface::PerformWaypointsGoal goal;
 
-        goal1.target_pose.pose.position.x = converter.getCoordinateX(goal1Node);
-        goal1.target_pose.pose.position.y = converter.getCoordinateY(goal1Node);
-        goal1.target_pose.pose.position.z = 0;
-        goal2 = goal1;
-        goal2.target_pose.pose.position.x = converter.getCoordinateX(goal2Node);
-        goal2.target_pose.pose.position.y = converter.getCoordinateY(goal2Node);
-
-        ui->moveBaseStatus->setGoal(goal1.target_pose.pose.position.x, goal1.target_pose.pose.position.y);
-        actionClient.sendGoal(goal1,boost::bind(&MoveBase::doneCallback, this, _1, _2),
+        actionClient.sendGoal(goal,boost::bind(&MoveBase::doneCallback, this, _1, _2),
                               boost::bind(&MoveBaseStatus::activeCallback, ui->moveBaseStatus),
                               boost::bind(&MoveBaseStatus::feedbackCallback, ui->moveBaseStatus, _1));
 
@@ -169,7 +163,7 @@ namespace mrvk_gui {
 
     }
 
-    void MoveBase::doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result){
+    void MoveBase::doneCallback(const actionlib::SimpleClientGoalState& state, const mrvk_gui_interface::PerformWaypointsResultConstPtr& result){
         goalDone = true;
         ui->moveBaseStatus->doneCallback(state,result);
     };
@@ -214,22 +208,11 @@ namespace mrvk_gui {
 //            file.close();
 //        }
 //    }
+
+
+
+//    void MoveBase::on_btnAddNew_clicked() {
+//
+//    }
 }
 
-void mrvk_gui::MoveBase::goByOffsetCbx(bool value) {
-    setGoalByOffset = value;
-
-    if (value) {
-        ui->moveBaseControl->ui->latitudeTitle->setText("X");
-        ui->moveBaseControl->ui->longitudTitle->setText("Y");
-
-        // disable some items
-        ui->moveBaseControl->ui->coppyrStartToGoalButton->setDisabled(true);
-    } else {
-        ui->moveBaseControl->ui->latitudeTitle->setText("Latitude");
-        ui->moveBaseControl->ui->longitudTitle->setText("Longitude");
-
-        // enable some items
-        ui->moveBaseControl->ui->coppyrStartToGoalButton->setDisabled(false);
-    }
-}

@@ -55,7 +55,7 @@ namespace mrvk_gui {
 
     private:
         void addTableWaypoint(bool active, const double& latitude, const double& longitude);
-        void showErrorMessage(const std::string& message);
+        void showErrorMessage(std::string message);
 
         void updateWaypoints(const std::vector<mrvk_gui_interface::GeoPoint>& waypoints, int selectedRow = -1);
         void updateWaypoints(int selectedRow = -1);

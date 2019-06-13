@@ -1,5 +1,6 @@
 #include "MoveBaseStatus.h"
 #include <ui_MoveBaseStatus.h>
+#include <mrvk_gui_interface/PerformWaypointsActionFeedback.h>
 
 
 namespace mrvk_gui {
@@ -22,12 +23,12 @@ namespace mrvk_gui {
         status = "Tracking goal.";
     }
 
-    void MoveBaseStatus::feedbackCallback(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback){
+    void MoveBaseStatus::feedbackCallback(const mrvk_gui_interface::PerformWaypointsFeedbackConstPtr& feedback){
         currentPos[0] = feedback->base_position.pose.position.x;
         currentPos[1] = feedback->base_position.pose.position.y;
     }
 
-    void MoveBaseStatus::doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result){
+    void MoveBaseStatus::doneCallback(const actionlib::SimpleClientGoalState& state, const mrvk_gui_interface::PerformWaypointsResultConstPtr& result){
         using namespace actionlib;
 
 

@@ -5,7 +5,6 @@
 #include "WaypointsTableWidget.h"
 #include <ui_WaypointsTableWidget.h>
 
-
 namespace mrvk_gui {
     WaypointsTableWidget::WaypointsTableWidget(QWidget* parent) :
             QWidget(parent),
@@ -13,6 +12,12 @@ namespace mrvk_gui {
         ui->setupUi(this);
 
         this->parent = parent;
+
+        // check if mrvk_gui_interface node running
+        if (!ros::service::exists("mrvk_gui_interface/add_waypoint", true)) {
+            showErrorMessage("Node: mrvk_gui interface is not running");
+        }
+
 
         // TODO mozno by bolo lepsie citat polohu z odometrie
         ros::NodeHandle n("/");
@@ -43,7 +48,10 @@ namespace mrvk_gui {
         delete ui;
     }
 
-    void WaypointsTableWidget::showErrorMessage(const std::string& message){
+    void WaypointsTableWidget::showErrorMessage(std::string message) {
+        if (message.empty()) {
+            message = "Unknown error";
+        }
         ROS_WARN("%s", message.c_str());
         QMessageBox msgBox(QMessageBox::Critical, "Error", QString::fromStdString(message));
         msgBox.exec();

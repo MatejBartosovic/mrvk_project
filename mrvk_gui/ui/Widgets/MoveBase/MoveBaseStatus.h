@@ -8,6 +8,7 @@
 #include <actionlib/client/simple_client_goal_state.h>
 #include <Eigen/Core>
 #include <mrvk_gui/GuiDefines.h>
+#include <mrvk_gui_interface/PerformWaypointsAction.h>
 
 namespace Ui {
 class MoveBaseStatus;
@@ -24,9 +25,9 @@ namespace mrvk_gui {
 
         void activeCallback();
 
-        void feedbackCallback(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback);
+        void feedbackCallback(const mrvk_gui_interface::PerformWaypointsFeedbackConstPtr& feedback);
 
-        void doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result);
+        void doneCallback(const actionlib::SimpleClientGoalState& state, const mrvk_gui_interface::PerformWaypointsResultConstPtr& result);
 
         void updateData();
 

@@ -58,8 +58,6 @@ namespace mrvk_gui {
         } else {
             gpsSpaceSelection = true;
         }
-        ui->inputLabel1->setText("Latitude");
-        ui->inputLabel2->setText("Longitude");
 
         double x = ui->input1->text().toDouble();
         double y = ui->input2->text().toDouble();
@@ -70,6 +68,8 @@ namespace mrvk_gui {
         } catch (std::runtime_error &e) {
             return;
         }
+        ui->inputLabel1->setText("Latitude");
+        ui->inputLabel2->setText("Longitude");
 
         ui->input1->setText(QString::number(gpsPose.latitude, 'f', 12));
         ui->input2->setText(QString::number(gpsPose.longitude, 'f', 12));
@@ -81,11 +81,6 @@ namespace mrvk_gui {
             msgBox.exec();
             return;
         }
-
-//        double latitude;
-//        double longitude;
-
-
 
         if (gpsSpaceSelection) {
             latitudeGoalValue = ui->input1->text().toDouble();

@@ -8,20 +8,23 @@
 #include <QMessageBox>
 #include <osm_planner/coordinates_converters/haversine_formula.h>
 #include <string>
-#include "GpsCoordinatesInput.h"
 #include <fstream>
 #include <ros/ros.h>
 #include <sstream>
 #include <tf/transform_listener.h>
-#include <mrvk_gui/GuiDefines.h>
 #include <QThread>
 #include <atomic>
+#include <mrvk_gui/GuiDefines.h>
+#include "GpsCoordinatesInput.h"
+#include <mrvk_gui_interface/PerformWaypointsAction.h>
+
 
 namespace Ui {
 class MoveBase;
 }
 
 namespace mrvk_gui {
+
     class MoveBase : public QWidget {
     Q_OBJECT
 
@@ -33,13 +36,11 @@ namespace mrvk_gui {
         void updateData();
 
     private:
-//        void loadDefaultMapOffset();
-//        void saveDefaultMapOffset();
         Ui::MoveBase* ui;
-        actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> actionClient;
+//        actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> actionClient;
+        actionlib::SimpleActionClient<mrvk_gui_interface::PerformWaypointsAction> actionClient;
         double latitudeMapOffset = 0;
         double longitudeMapOffset = 0;
-        bool setGoalByOffset = false;
         QThread goalThread;
 
         void doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result);
@@ -50,8 +51,9 @@ namespace mrvk_gui {
         void cancelSlot();
         void editMapOffsetSlot();
         void readQrCodeSlot();
-        void goByOffsetCbx(bool value);
         void trackGoals();
+
+
 
     };
 }
