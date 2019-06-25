@@ -146,6 +146,7 @@ include_directories(
                  src/gps_compass_correction_node.cpp
                  src/bearing_calculator.cpp
          src/robot_commander.cpp
+         src/particle_filter.cpp
          )
 
 add_executable(robot_simulator src/test/robot_simulation_node.cpp)

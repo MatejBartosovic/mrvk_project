@@ -8,7 +8,7 @@
 
 #include <osm_planner/coordinates_converters/haversine_formula.h>
 
-GpsCompassCorrection::GpsCompassCorrection() : map_(), n_("~"), robot_(n_), corrected_transform_(tf::Quaternion(0,0,0,1), tf::Vector3(0,0,0)){
+GpsCompassCorrection::GpsCompassCorrection() : filter(), map_(), n_("~"), robot_(n_), corrected_transform_(tf::Quaternion(0,0,0,1), tf::Vector3(0,0,0)){
 
     // Initialize global variables
     n_.param<bool>("use_compass", use_compass_, false);
@@ -88,6 +88,9 @@ void GpsCompassCorrection::tfBroadcasterCallback(const double frequence){
     }
 
 void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
+
+    std::vector<geometry_msgs::Point> points;
+    filter.createParticles(points);
 
   updateCallback(gps_data, allways_allowed_status_);
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="osm_map_path" default="$(find osm_planner)/osm_example/fei.osm"/>
+    <arg name="osm_map_path" default="$(find osm_planner)/osm_example/wroclaw.osm"/>
 
     <node  name="gps_compass_correction_node" pkg="gps_compass_correction" type="gps_compass_correction_node">
         <rosparam file="$(find gps_compass_correction)/config/config.yaml" command="load"/>

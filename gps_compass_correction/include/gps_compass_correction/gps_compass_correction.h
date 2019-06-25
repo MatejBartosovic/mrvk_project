@@ -19,6 +19,8 @@
 #include "gps_compass_correction/bearing_calculator.h"
 #include "gps_compass_correction/robot_commander.h"
 
+#include "gps_compass_correction/particle_filter.h"
+
 
 //!  A GpcCompassCorrection class
 /*!
@@ -51,6 +53,8 @@ public:
     bool updatePosition(boost::shared_ptr<const gps_common::GPSFix> gps_data, int min_fix_status = gps_common::GPSStatus::STATUS_GBAS_FIX);
 
 private:
+
+    ParticleFilter filter;
 
     osm_planner::Parser map_;
 
@@ -190,11 +194,14 @@ private:
                 return;
             }
             ROS_ERROR("pred2");
-            auto points = map_.getNearestPoints(base_link_transform.getOrigin().getX(), base_link_transform.getOrigin().getY(), 5);
-            ROS_WARN("base link [%f %f]", base_link_transform.getOrigin().getX(), base_link_transform.getOrigin().getY());
-            for (auto point : points){
-                ROS_ERROR("point %d with distance %f", point.first, point.second);
-            }
+//            auto points = map_.getNearestPoints(base_link_transform.getOrigin().getX(), base_link_transform.getOrigin().getY(), 5);
+//            ROS_WARN("base link [%f %f]", base_link_transform.getOrigin().getX(), base_link_transform.getOrigin().getY());
+//            for (auto point : points){
+//                ROS_ERROR("point %d with distance %f", point.first, point.second);
+//                map_.getCalculator()->getCoordinateX(point.first);
+//            }
+
+
             //absolute orientation
             absolute_transform = tf::Transform(base_link_transform.getRotation(), gps_translation);
 
