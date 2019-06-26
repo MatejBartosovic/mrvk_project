@@ -55,6 +55,8 @@ public:
 private:
 
     ParticleFilter filter;
+    tf::TransformListener listener_;
+    ros::NodeHandle node_handle_map_parser_;
 
     osm_planner::Parser map_;
 
@@ -160,17 +162,32 @@ private:
      * @param quat - Quaternion for correction of rotation.
      * If it is nullptr then is used original rotation
      */
+    template<class Transform>
+    bool getRobotTransform(Transform &transform){
+
+        tf::StampedTransform base_link_transform;
+
+        try {
+            listener_.waitForTransform(parent_frame_, target_frame_, ros::Time(0), ros::Duration(1));
+            listener_.lookupTransform(parent_frame_, target_frame_, ros::Time(0), base_link_transform);
+        }
+        catch (tf::TransformException ex) {
+            ROS_WARN("Can't find transform between parent [%s] and robot base_link frame [%s]. Exception: %s",parent_frame_.c_str(), target_frame_.c_str(),ex.what());
+            return false;
+        }
+        transform = base_link_transform;
+        return true;
+    }
+
     template<class N>
     void sendTransform(const N& gps_pose, const tf::Quaternion *quat = nullptr){
-
-        tf::TransformListener listener;
 
         //get transformation
         tf::StampedTransform relative_transform;
         try{
 
-            listener.waitForTransform(child_frame_, target_frame_, ros::Time(0), ros::Duration(1));
-            listener.lookupTransform(child_frame_, target_frame_, ros::Time(0), relative_transform);
+            listener_.waitForTransform(child_frame_, target_frame_, ros::Time(0), ros::Duration(1));
+            listener_.lookupTransform(child_frame_, target_frame_, ros::Time(0), relative_transform);
         }
         catch (tf::TransformException ex){
             ROS_WARN("Can't find transform between child [%s] and robot base_link frame [%s]. Exception: %s",child_frame_,target_frame_,ex.what());
@@ -185,21 +202,9 @@ private:
         if (quat == nullptr) {
             //get transformation
             tf::StampedTransform base_link_transform;
-            try {
-                listener.waitForTransform(parent_frame_, target_frame_, ros::Time(0), ros::Duration(1));
-                listener.lookupTransform(parent_frame_, target_frame_, ros::Time(0), base_link_transform);
-            }
-            catch (tf::TransformException ex) {
-                ROS_WARN("Can't find transform between parent [%s] and robot base_link frame [%s]. Exception: %s",parent_frame_, target_frame_,ex.what());
+            if (!getRobotTransform(base_link_transform))
                 return;
-            }
             ROS_ERROR("pred2");
-//            auto points = map_.getNearestPoints(base_link_transform.getOrigin().getX(), base_link_transform.getOrigin().getY(), 5);
-//            ROS_WARN("base link [%f %f]", base_link_transform.getOrigin().getX(), base_link_transform.getOrigin().getY());
-//            for (auto point : points){
-//                ROS_ERROR("point %d with distance %f", point.first, point.second);
-//                map_.getCalculator()->getCoordinateX(point.first);
-//            }
 
 
             //absolute orientation

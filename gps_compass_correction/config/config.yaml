@@ -30,5 +30,5 @@ set_origin_pose: 3          # Set the origin pose on the map for cartesian calcu
                               # 2 - random origin pose
                               # 3 - origin pose from param
 
-origin_latitude: 48.1531010533
-origin_longitude: 17.0743728117
+origin_latitude: 51.1084679433
+origin_longitude: 17.0650393267

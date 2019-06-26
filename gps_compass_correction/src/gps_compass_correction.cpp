@@ -7,8 +7,10 @@
 #include <std_srvs/Empty.h>
 
 #include <osm_planner/coordinates_converters/haversine_formula.h>
+#include <osm_planner/osm_localization.h>
+#include <tf/transform_datatypes.h>
 
-GpsCompassCorrection::GpsCompassCorrection() : filter(), map_(), n_("~"), robot_(n_), corrected_transform_(tf::Quaternion(0,0,0,1), tf::Vector3(0,0,0)){
+GpsCompassCorrection::GpsCompassCorrection() : node_handle_map_parser_("/move_base/Planner/"), listener_(), filter(), map_(node_handle_map_parser_), n_("~"), robot_(n_), corrected_transform_(tf::Quaternion(0,0,0,1), tf::Vector3(0,0,0)){
 
     // Initialize global variables
     n_.param<bool>("use_compass", use_compass_, false);
@@ -22,8 +24,6 @@ GpsCompassCorrection::GpsCompassCorrection() : filter(), map_(), n_("~"), robot_
     n_.param<int>("min_required_status_service", min_required_status_service_, gps_common::GPSStatus::STATUS_FIX);
     n_.param<int>("allways_allowed_status", allways_allowed_status_, gps_common::GPSStatus::STATUS_GBAS_FIX);
 
-    // Get map origin
-    setMapOrigin(n_);
 
     // Initialize ros subscribers, publishers and services
     gps_sub_ = n_.subscribe(gps_topic_, 1, &GpsCompassCorrection::gpsCallback, this);
@@ -44,11 +44,13 @@ GpsCompassCorrection::GpsCompassCorrection() : filter(), map_(), n_("~"), robot_
     std::vector<std::string> types_of_ways;
     double interpolation_max_distance;
     n_.param<std::string>("osm_map_path",map,"");
-    n_.getParam("filter_of_ways",types_of_ways);
-    n_.param<double>("interpolation_max_distance", interpolation_max_distance, 1000);
+    node_handle_map_parser_.getParam("filter_of_ways",types_of_ways);
+    node_handle_map_parser_.param<double>("interpolation_max_distance", interpolation_max_distance, 1000);
     map_.setInterpolationMaxDistance(interpolation_max_distance);
     map_.setNewMap(map);
     map_.setTypeOfWays(types_of_ways);
+    // Get map origin
+    setMapOrigin(n_);
     map_.parse();
 }
 
@@ -89,14 +91,42 @@ void GpsCompassCorrection::tfBroadcasterCallback(const double frequence){
 
 void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
 
+    tf::Transform robot_pose;
+    if(!getRobotTransform(robot_pose))
+        return;
+
+    osm_planner::Localization localization(std::make_shared<osm_planner::Parser>(map_), "test");
+    ROS_ERROR("robot pose [%f %f]", robot_pose.getOrigin().x(), robot_pose.getOrigin().y());
+
     std::vector<geometry_msgs::Point> points;
-    filter.createParticles(points);
+    geometry_msgs::Pose robot_pose_msg;
+    tf::poseTFToMsg(robot_pose, robot_pose_msg);
+
+    localization.setPositionFromPose(robot_pose_msg);
+
+    //auto points = map_.getNearestPoints(robot_pose.getOrigin().getX(), robot_pose.getOrigin().getY(), 5);
+    points.resize(1);
+   // int id = map_.getNearestPointXY(robot_pose.getOrigin().getX(), robot_pose.getOrigin().getY());
+    auto node = map_.getNodeByID(localization.getPositionNodeID());
+
+    points[0].x = map_.getCalculator()->getCoordinateX(node);
+    points[0].y = map_.getCalculator()->getCoordinateY(node);
+
+    ROS_ERROR("Nearest point in gps correction id: %d [%f %f]", localization.getPositionNodeID(), points[0].x, points[0].y);
+    map_.publishPoint(localization.getPositionNodeID(), osm_planner::Parser::CURRENT_POSITION_MARKER, 1.0);
+    //ROS_WARN("base link [%f %f]", robot_pose.getOrigin().getX(), robot_pose.getOrigin().getY());
+//    for (auto point : points){
+//        ROS_ERROR("point %d with distance %f", point.first, point.second);
+//    }
+
+    filter.createParticles(robot_pose, points);
 
   updateCallback(gps_data, allways_allowed_status_);
 }
 
 bool GpsCompassCorrection::forceUpdateCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res) {
     double timeout = 5;
+    map_.publishRouteNetwork();
     auto gps_data = ros::topic::waitForMessage<gps_common::GPSFix>(gps_topic_, ros::Duration(timeout));
 
     if (!gps_data){
