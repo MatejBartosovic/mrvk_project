@@ -37,8 +37,28 @@ void ParticleFilter::createParticles(const tf::Transform &robot_pose, int num_pa
 
 void ParticleFilter::publishParticles(){
 
+    std_msgs::ColorRGBA color;
+    color.a = 1.0;
+    color.r = 0.0;
+    color.g = 1.0;
+    color.b = 0.0;
+    publishParticles(particles_, color, 1);
+}
+
+void ParticleFilter::publishNewParticles() {
+
+    std_msgs::ColorRGBA color;
+    color.a = 1.0;
+    color.r = 1.0;
+    color.g = 0.0;
+    color.b = 0.0;
+    publishParticles(new_particles_, color, 2);
+}
+
+void ParticleFilter::publishParticles(const particle_filter::Particles &particles, const std_msgs::ColorRGBA &color, int id){
+
     visualization_msgs::Marker marker;
-    marker.id = 1;
+    marker.id = id;
     marker.action = visualization_msgs::Marker::MODIFY;
 
     marker.type = visualization_msgs::Marker::POINTS;
@@ -49,16 +69,15 @@ void ParticleFilter::publishParticles(){
     marker.scale.x = 0.01;
     marker.scale.y = 0.01;
     marker.scale.z = 0.01;
-    marker.color.a = 1.0; // Don't forget to set the alpha!
-    marker.color.r = 0.0;
-    marker.color.g = 1.0;
-    marker.color.b = 0.0;
+    marker.color = color;
 
     marker.lifetime = ros::Duration(0);
 
     particle_filter::particlesToMsg(particles_, marker.points, 0.0);
     particles_pub_.publish(marker);
 }
+
+
 
 void ParticleFilter::filter(const geometry_msgs::Point &sensor_data){
 
@@ -75,14 +94,34 @@ void ParticleFilter::filter(const geometry_msgs::Point &sensor_data){
     for (auto &particle : particles_){
         particle.weight = 1 - particle.distance / max_distance;
     }
+
+    std::vector<int> indexes;
+    for (int i = 0; i < particles_.size(); i++) {
+        double m = particles_.size() * particles_[i].weight;
+        for (int j = 0; j < m; j++){
+            indexes.push_back(i);
+        }
+    }
+
+    new_particles_.clear();
+    for (int i = 0; i < NUM_OF_NEW_PARTICLES; i++){
+        int particle_id = indexes[getRandom(0, indexes.size())];
+        new_particles_.push_back(particles_[particle_id]);
+    }
+
+    particles_ = new_particles_;
+}
+
+double ParticleFilter::getRandom(double offset, double dispersion){
+    return offset + ((double)rand() / RAND_MAX) * dispersion;
 }
 
 particle_filter::Particle ParticleFilter::generateRandom(double x, double y, double radius){
 
     particle_filter::Particle particle;
 
-    double random_radius = ((double)rand() / RAND_MAX) * radius;
-    double random_angle  = -3.14 +  ((double)rand() / RAND_MAX) * 6.28;
+    double random_radius = getRandom(0, radius);
+    double random_angle  = getRandom(-3.14, 6.28);
 
     particle.point.x = x + random_radius * cos(random_angle);
     particle.point.y = y + random_radius * sin(random_angle);

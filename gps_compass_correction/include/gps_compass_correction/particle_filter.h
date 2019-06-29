@@ -39,12 +39,19 @@ public:
     void filter(const geometry_msgs::Point &sensor_data);
 
     void publishParticles();
+    void publishNewParticles();
+    void publishParticles(const particle_filter::Particles &particles, const std_msgs::ColorRGBA &color, int id);
+
 
 private:
     particle_filter::Particles particles_;
-    visualization_msgs::MarkerArray particle_markers_;
+    particle_filter::Particles new_particles_;
+
     ros::Publisher particles_pub_;
 
+    const int NUM_OF_NEW_PARTICLES = 30;
+
+    double getRandom(double offset, double dispersion);
     particle_filter::Particle generateRandom(double x, double y, double radius = 1.0);
     double computeDistance(geometry_msgs::Point point1, geometry_msgs::Point point2);
 };

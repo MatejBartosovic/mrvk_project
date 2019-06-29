@@ -99,7 +99,7 @@ void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
     tf::poseTFToMsg(robot_pose, robot_pose_msg);
     auto points = map_.getNearestPoints(robot_pose.getOrigin().getX(), robot_pose.getOrigin().getY(), 5);
 
-    filter.clear();
+//    filter.clear();
     filter.createParticles(robot_pose, 20, 2.0);
     for (int i = 0; i < points.size(); i++) {
 
@@ -112,9 +112,9 @@ void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
     point_from_gps.x = map_.getCalculator()->getCoordinateX(*gps_data);
     point_from_gps.y = map_.getCalculator()->getCoordinateY(*gps_data);
 
-    filter.filter(point_from_gps);
     filter.publishParticles();
-
+    filter.filter(point_from_gps);
+    filter.publishNewParticles();
   updateCallback(gps_data, allways_allowed_status_);
 }
 
