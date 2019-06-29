@@ -7,6 +7,16 @@
 
 #include <tf/transform_datatypes.h>
 
+namespace particle_filter{
+    void particlesToMsg(const Particles &particles, std::vector<geometry_msgs::Point> &points, double weight){
+        points.clear();
+        for (auto particle : particles) {
+            if (particle.weight >= weight)
+                points.push_back(particle.point);
+        }
+    }
+}
+
 ParticleFilter::ParticleFilter(){
 
     ros::NodeHandle n("~");
@@ -46,19 +56,42 @@ void ParticleFilter::publishParticles(){
 
     marker.lifetime = ros::Duration(0);
 
-    marker.points = particles_;
+    particle_filter::particlesToMsg(particles_, marker.points, 0.0);
     particles_pub_.publish(marker);
 }
 
-geometry_msgs::Point ParticleFilter::generateRandom(double x, double y, double radius){
+void ParticleFilter::filter(const geometry_msgs::Point &sensor_data){
 
-    geometry_msgs::Point point;
+    // Calculate distances
+    double max_distance = 0;
+    for (auto &particle : particles_){
+        particle.distance = computeDistance(particle.point, sensor_data);
+        if (particle.distance > max_distance){
+            max_distance = particle.distance;
+        }
+    }
+
+    // Calculate weights
+    for (auto &particle : particles_){
+        particle.weight = 1 - particle.distance / max_distance;
+    }
+}
+
+particle_filter::Particle ParticleFilter::generateRandom(double x, double y, double radius){
+
+    particle_filter::Particle particle;
 
     double random_radius = ((double)rand() / RAND_MAX) * radius;
     double random_angle  = -3.14 +  ((double)rand() / RAND_MAX) * 6.28;
 
-    point.x = x + random_radius * cos(random_angle);
-    point.y = y + random_radius * sin(random_angle);
+    particle.point.x = x + random_radius * cos(random_angle);
+    particle.point.y = y + random_radius * sin(random_angle);
+    particle.distance = 0;
+    particle.weight = 0;
 
-    return point;
+    return particle;
+}
+
+double ParticleFilter::computeDistance(geometry_msgs::Point point1, geometry_msgs::Point point2){
+    return sqrt(pow(point1.x - point2.x, 2.0) + pow(point1.y - point2.y, 2.0));
 }

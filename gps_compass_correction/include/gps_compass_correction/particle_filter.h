@@ -10,6 +10,16 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <ros/ros.h>
 
+namespace particle_filter{
+    struct Particle{
+        geometry_msgs::Point point;
+        double distance;
+        double weight;
+    };
+    typedef std::vector<Particle> Particles;
+    void particlesToMsg(const Particles &particles, std::vector<geometry_msgs::Point> &points, double weight);
+
+}
 
 class ParticleFilter{
 public:
@@ -26,13 +36,17 @@ public:
             }
     }
 
-    geometry_msgs::Point generateRandom(double x, double y, double radius = 1.0);
+    void filter(const geometry_msgs::Point &sensor_data);
+
     void publishParticles();
 
 private:
-    std::vector<geometry_msgs::Point> particles_;
+    particle_filter::Particles particles_;
     visualization_msgs::MarkerArray particle_markers_;
     ros::Publisher particles_pub_;
+
+    particle_filter::Particle generateRandom(double x, double y, double radius = 1.0);
+    double computeDistance(geometry_msgs::Point point1, geometry_msgs::Point point2);
 };
 
 #endif //PROJECT_PARTICLE_FILTER_H
