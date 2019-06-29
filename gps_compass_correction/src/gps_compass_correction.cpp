@@ -95,38 +95,24 @@ void GpsCompassCorrection::gpsCallback(const gps_common::GPSFixPtr& gps_data){
     if(!getRobotTransform(robot_pose))
         return;
 
-    osm_planner::Localization localization(std::make_shared<osm_planner::Parser>(map_), "test");
-    ROS_ERROR("robot pose [%f %f]", robot_pose.getOrigin().x(), robot_pose.getOrigin().y());
-
-    std::vector<geometry_msgs::Point> points;
     geometry_msgs::Pose robot_pose_msg;
     tf::poseTFToMsg(robot_pose, robot_pose_msg);
+    auto points = map_.getNearestPoints(robot_pose.getOrigin().getX(), robot_pose.getOrigin().getY(), 5);
 
-    localization.setPositionFromPose(robot_pose_msg);
+    filter.createParticles(robot_pose, 10, 2.0);
+    for (int i = 0; i < points.size(); i++) {
 
-    //auto points = map_.getNearestPoints(robot_pose.getOrigin().getX(), robot_pose.getOrigin().getY(), 5);
-    points.resize(1);
-   // int id = map_.getNearestPointXY(robot_pose.getOrigin().getX(), robot_pose.getOrigin().getY());
-    auto node = map_.getNodeByID(localization.getPositionNodeID());
-
-    points[0].x = map_.getCalculator()->getCoordinateX(node);
-    points[0].y = map_.getCalculator()->getCoordinateY(node);
-
-    ROS_ERROR("Nearest point in gps correction id: %d [%f %f]", localization.getPositionNodeID(), points[0].x, points[0].y);
-    map_.publishPoint(localization.getPositionNodeID(), osm_planner::Parser::CURRENT_POSITION_MARKER, 1.0);
-    //ROS_WARN("base link [%f %f]", robot_pose.getOrigin().getX(), robot_pose.getOrigin().getY());
-//    for (auto point : points){
-//        ROS_ERROR("point %d with distance %f", point.first, point.second);
-//    }
-
-    filter.createParticles(robot_pose, points);
+        int num_particles = 10/(i+1);
+        double radius = 2.0/(i+1);
+        filter.createParticles(points[i], num_particles, radius);
+    }
+    filter.publishParticles();
 
   updateCallback(gps_data, allways_allowed_status_);
 }
 
 bool GpsCompassCorrection::forceUpdateCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res) {
     double timeout = 5;
-    map_.publishRouteNetwork();
     auto gps_data = ros::topic::waitForMessage<gps_common::GPSFix>(gps_topic_, ros::Duration(timeout));
 
     if (!gps_data){
