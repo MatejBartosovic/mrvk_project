@@ -11,6 +11,7 @@
 #include <osm_planner/osm_parser.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <actionlib_msgs/GoalID.h>
+#include <osm_planner/coordinates_converters/coordinates_converter_base.h>
 
 namespace mrvk_gui{
 
@@ -34,8 +35,10 @@ namespace mrvk_gui{
         ros::Publisher goal_pub, cancel_pub;
         ros::ServiceClient init_robot;
         actionlib_msgs::GoalID cancel_goal_msg;
+        std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinateConverter;
 
-        private slots:
+
+    private slots:
             void setGoal();
             void cancelGoal();
             void readNavigData();

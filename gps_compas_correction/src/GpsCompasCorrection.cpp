@@ -5,8 +5,9 @@
 #include "gps_compas_correction/GpsCompasCorrection.h"
 #include <std_srvs/SetBool.h>
 #include <std_srvs/Empty.h>
+#include <osm_planner/coordinates_converters/haversine_formula.h>
 
-GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quaternion(0,0,0,1),tf::Vector3(0,0,0)){
+GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quaternion(0,0,0,1),tf::Vector3(0,0,0)) {
 
     double tfRate, correctioninterval;
     std::string blockMovementServerName, clearCostMapServerName, map;
@@ -37,6 +38,7 @@ GpsCompasCorrection::GpsCompasCorrection() : n("~"),correctionTransform(tf::Quat
     n.param<double>("origin_longitude",longitude,0);
 
 
+    coordinateConverter = std::make_shared<osm_planner::coordinates_converters::HaversineFormula>();
     blockMovementClient = n.serviceClient<std_srvs::SetBool>(blockMovementServerName);
     clearCostMapClient = n.serviceClient<std_srvs::SetBool>(clearCostMapServerName);
 
@@ -305,7 +307,7 @@ int GpsCompasCorrection::addPointAndCompute(double *angle) {
         osm_planner::Parser::OSM_NODE secondPoint;
         secondPoint.longitude = gpsData->longitude;
         secondPoint.latitude = gpsData->latitude;
-        double calculatedAngle = -osm_planner::Parser::Haversine::getBearing(firstPoint, secondPoint);
+        double calculatedAngle = -coordinateConverter->getBearing(firstPoint, secondPoint);
         //res.message = "Bearing was calculated";
         firstPointAdded = false;
         //tf::Quaternion q;
@@ -379,7 +381,7 @@ void GpsCompasCorrection::bearingAutoUpdate() {
             return;
         }
 
-        dist = osm_planner::Parser::Haversine::getDistance(*gpsDataFirst, *gpsDataSecond);
+        dist = coordinateConverter->getDistance(*gpsDataFirst, *gpsDataSecond);
 
         //Get rotation on Second Point
         if (!getTransformQuaternion(&secondRotation) || counter > 5) {
@@ -398,7 +400,7 @@ void GpsCompasCorrection::bearingAutoUpdate() {
     relativeQuaternion = firstRotation * secondRotation.inverse();
     ROS_ERROR("relative rotation x %f, y %f, z %f, w %f", relativeQuaternion.x(), relativeQuaternion.y(), relativeQuaternion.z(), relativeQuaternion.w());
     double diffW = 1 - fabs(relativeQuaternion.w());
-   // double dist = osm_planner::Parser::Haversine::getDistance(*gpsDataFirst, *gpsDataSecond);
+   // double dist = coordinateConverter->getDistance(*gpsDataFirst, *gpsDataSecond);
 
     if ( diffW > 0.1 && dist < 0.2){
         ROS_ERROR("Quaterion w diff %f", diffW);
@@ -408,7 +410,7 @@ void GpsCompasCorrection::bearingAutoUpdate() {
     }
 
     //Calculating angle and send transformation
-    double calculatedAngle = -osm_planner::Parser::Haversine::getBearing(*gpsDataFirst, *gpsDataSecond);
+    double calculatedAngle = -coordinateConverter->getBearing(*gpsDataFirst, *gpsDataSecond);
     quat.setRPY(0, 0, calculatedAngle);
     sendTransform(*gpsDataSecond, quat);
     autoUpdateMutex.unlock();

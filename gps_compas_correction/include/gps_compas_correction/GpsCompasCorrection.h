@@ -15,7 +15,7 @@
 #include <std_srvs/Trigger.h>
 #include <geometry_msgs/Twist.h>
 #include <mutex>
-
+#include <osm_planner/coordinates_converters/coordinates_converter_base.h>
 
 class GpsCompasCorrection {
 public:
@@ -71,6 +71,7 @@ private:
     double minDistanceForUpdate;
     double minQuaternionWForUpdate;
     std::mutex autoUpdateMutex;
+    std::shared_ptr<osm_planner::coordinates_converters::CoordinatesConverterBase> coordinateConverter;
 
     /*template<class N> void publishOdometry(N gpsPose, tf::Quaternion quat = tf::createQuaternionFromYaw(0)){
 
@@ -80,8 +81,8 @@ private:
         odom.header.frame_id = childFrame;
         odom.child_frame_id = target_frame;
 
-        odom.pose.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(mapOrigin, gpsPose);
-        odom.pose.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, gpsPose);
+        odom.pose.pose.position.x = coordinateConverter->getCoordinateX(mapOrigin, gpsPose);
+        odom.pose.pose.position.y = coordinateConverter->getCoordinateY(mapOrigin, gpsPose);
         odom.pose.pose.position.z = 0;
 
         odom.pose.pose.orientation.x = 0;
@@ -109,7 +110,7 @@ private:
         }
 
         //construct gps translation
-        tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin,gpsPose),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, gpsPose),0); //todo misov prepocet dorobit
+        tf::Vector3 gpsTranslation(coordinateConverter->getCoordinateX(mapOrigin,gpsPose),coordinateConverter->getCoordinateY(mapOrigin, gpsPose),0); //todo misov prepocet dorobit
 
         //absolute orientation
         tf::Transform absolutTransform(quat, gpsTranslation);
@@ -160,7 +161,7 @@ private:
          }
 
         //construct gps translation
-        tf::Vector3 gpsTranslation(osm_planner::Parser::Haversine::getCoordinateX(mapOrigin,gpsPose),osm_planner::Parser::Haversine::getCoordinateY(mapOrigin, gpsPose),0); //todo misov prepocet dorobit
+        tf::Vector3 gpsTranslation(coordinateConverter->getCoordinateX(mapOrigin,gpsPose),coordinateConverter->getCoordinateY(mapOrigin, gpsPose),0); //todo misov prepocet dorobit
 
         //absolute orientation
         tf::Transform absolutTransform(baseLinkTransform.getRotation(), gpsTranslation);

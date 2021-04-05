@@ -6,11 +6,13 @@
 #include <pluginlib/class_list_macros.h>
 #include <QMessageBox>
 #include <std_srvs/Trigger.h>
+#include <osm_planner/coordinates_converters/haversine_formula.h>
 
 namespace mrvk_gui {
 
     MrvkGui::MrvkGui() : rqt_gui_cpp::Plugin(), mainWidget(0)
     {
+        coordinateConverter = std::make_shared<osm_planner::coordinates_converters::HaversineFormula>();
 
     }
 
@@ -148,8 +150,8 @@ namespace mrvk_gui {
             case QMessageBox::Ok:
                 this->readNavigData();
                 if(init_robot.call(trigger_init) && trigger_init.response.success){
-                    goalXY.pose.position.x = osm_planner::Parser::Haversine::getCoordinateX(map_origin,goal_target);
-                    goalXY.pose.position.y = osm_planner::Parser::Haversine::getCoordinateY(map_origin,goal_target);
+                    goalXY.pose.position.x = coordinateConverter->getCoordinateX(map_origin,goal_target);
+                    goalXY.pose.position.y = coordinateConverter->getCoordinateY(map_origin,goal_target);
                     goalXY.header.stamp = ros::Time::now();
                     goal_pub.publish(goalXY);
                 }
